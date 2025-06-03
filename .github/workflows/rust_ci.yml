@@ -2,9 +2,9 @@ name: Rust CI
 
 on:
   push:
-    branches: [ main ] # Adjust if your main branch is different, e.g., master
+    branches: [main] # Adjust if your main branch is different, e.g., master
   pull_request:
-    branches: [ main ] # Adjust if your main branch is different
+    branches: [main] # Adjust if your main branch is different
 
 env:
   CARGO_TERM_COLOR: always
@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          submodules: 'recursive' # If your project uses git submodules (e.g., googletest)
+          submodules: "recursive" # If your project uses git submodules (e.g., googletest)
 
       - name: Install system dependencies
         run: |
@@ -29,6 +29,7 @@ jobs:
             cmake \
             ninja-build \
             pkg-config \
+            libclang-dev \
             libssl-dev # For Rust networking, if any crate needs it
 
       - name: Set up Rust
@@ -46,16 +47,14 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            crush-sys/target/ # Cache the target dir of the crush-sys crate
-          key: ${{ runner.os }}-cargo-${{ hashFiles('crush-sys/Cargo.lock') }}
+            crush-sys/target/
+            mycrush/target/ # Cache the target dir of the mycrush crate
+          key: ${{ runner.os }}-cargo-${{ hashFiles('crush-sys/Cargo.lock') }}-${{ hashFiles('mycrush/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
 
+      - name: Build
+        run: cargo build --verbose --workspace
 
-      - name: Build Rust project
-        working-directory: crush-sys
-        run: cargo build --verbose
-
-      - name: Run Rust tests
-        working-directory: crush-sys
-        run: cargo test --verbose
+      - name: Test
+        run: cargo test --verbose --workspace
