@@ -3,11 +3,6 @@ cmake_minimum_required(VERSION 2.8.11)
 project(libcrush)
 set(VERSION 1.0.0)
 
-# corrosion-start
-find_package(Corrosion REQUIRED)
-set(RUST_STANDARD 2021) # Or your desired Rust edition
-# corrosion-end
-
 set(CMAKE_C_FLAGS_NONE "${CMAKE_C_FLAGS_NONE} -Wall -O2 -g")
 
 include_directories(${CMAKE_SOURCE_DIR}/crush)
@@ -56,29 +51,6 @@ configure_file(
   @ONLY
 )
 install(FILES ${CMAKE_BINARY_DIR}/libcrush.pc DESTINATION ${CMAKE_INSTALL_DATADIR}/pkgconfig/)
-
-# corrosion-start
-# Import the Rust library (libcrush-rust)
-# This assumes your Cargo.toml is in a subdirectory named "rust"
-# The target name will be libcrush-rust (taken from Cargo.toml)
-corrosion_import_crate(MANIFEST_PATH rust/Cargo.toml)
-
-# Add include directory for the Rust build script to find crush headers
-# This makes ../crush/libcrush.h findable by rust/build.rs
-target_include_directories(crush-sys INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/crush>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/crush>
-)
-
-# Link the Rust library to the C/C++ library 'crush'
-# This ensures that when the Rust tests are run, they can find the C symbols.
-target_link_libraries(crush-sys PRIVATE crush)
-
-# Enable discovery of Rust tests by CTest
-if(BUILD_TESTING)
-    corrosion_add_cargo_test(RUST_TESTS MANIFEST_PATH rust/Cargo.toml)
-endif()
-# corrosion-end
 
 add_subdirectory(test)
 add_subdirectory(googletest)
