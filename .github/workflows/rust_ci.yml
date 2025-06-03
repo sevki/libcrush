@@ -9,8 +9,6 @@ on:
 env:
   CARGO_TERM_COLOR: always
   RUST_VERSION: stable # Or a specific version
-  CORROSION_VERSION: v0.4.0 # Or a newer version
-  CORROSION_INSTALL_DIR: ${{ github.workspace }}/.corrosion
 
 jobs:
   build_and_test:
@@ -48,31 +46,16 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            rust/target/ # Cache the target dir of the libcrush-rust crate
-          key: ${{ runner.os }}-cargo-${{ hashFiles('rust/Cargo.lock') }}
+            crush-sys/target/ # Cache the target dir of the crush-sys crate
+          key: ${{ runner.os }}-cargo-${{ hashFiles('crush-sys/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      - name: Install Corrosion
-        run: |
-          mkdir -p ${{ env.CORROSION_INSTALL_DIR }}/build ${{ env.CORROSION_INSTALL_DIR }}/install
-          curl -L https://github.com/corrosion-rs/corrosion/archive/refs/tags/${{ env.CORROSION_VERSION }}.tar.gz -o corrosion.tar.gz
-          tar -xzf corrosion.tar.gz -C ${{ env.CORROSION_INSTALL_DIR }} --strip-components=1
-          cd ${{ env.CORROSION_INSTALL_DIR }}/build
-          cmake .. -GNinja \
-            -DCMAKE_INSTALL_PREFIX=${{ env.CORROSION_INSTALL_DIR }}/install \
-            -DBUILD_TESTING=OFF
-          ninja install
-        env:
-          CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install
 
-      - name: Cache Corrosion installation
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.CORROSION_INSTALL_DIR }}/install
-          key: ${{ runner.os }}-corrosion-${{ env.CORROSION_VERSION }}
+      - name: Build Rust project
+        working-directory: crush-sys
+        run: cargo build --verbose
 
-      - name: Run build script (builds C/C++ and Rust, runs tests)
-        run: ./build.sh
-        env:
-          CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install:${{ env.CMAKE_PREFIX_PATH }}
+      - name: Run Rust tests
+        working-directory: crush-sys
+        run: cargo test --verbose
