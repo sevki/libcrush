@@ -4,3 +4,5 @@ Makefile
 *~
 output
 crush-sys/target
+target
+.cache

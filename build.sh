@@ -2,15 +2,15 @@
 
 set -ex
 [ $(id -u) = 0 ] || SUDO=sudo
-if hash apt-get 2> /dev/null;
-then
-    $SUDO apt-get update
-    $SUDO apt-get install -y git cmake g++ doxygen
-else
-    $SUDO yum update -y
-    $SUDO yum install -y git cmake gcc-c++ doxygen
-fi
-git submodule sync
+# if hash apt-get 2> /dev/null;
+# then
+#     $SUDO apt-get update
+#     $SUDO apt-get install -y git cmake g++ doxygen
+# else
+#     $SUDO yum update -y
+#     $SUDO yum install -y git cmake gcc-c++ doxygen
+# fi
+# git submodule sync
 git submodule update --force --init --recursive
 mkdir -p build
 (
@@ -18,7 +18,7 @@ mkdir -p build
    # building
    #
    cd build
-   cmake ..
+   cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..
    make VERBOSE=1 all
    #
    # testing

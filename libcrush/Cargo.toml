@@ -1,5 +1,5 @@
 [package]
-name = "crush-sys"
+name = "libcrush"
 version = "0.1.0"
 edition.workspace = true
 license.workspace = true
@@ -12,11 +12,8 @@ categories.workspace = true
 description.workspace = true
 
 [dependencies]
-libc = "0.2"
-
-[build-dependencies]
-bindgen = "0.68"
-cc = "1.2.25"
+crush-sys = { version = "0.1.0", path = "../crush-sys" }
+libc = "0.2.176"
 
 [dev-dependencies]
-googletest = "0.14.1"
+googletest = "0.14.2"

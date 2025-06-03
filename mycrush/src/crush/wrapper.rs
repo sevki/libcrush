@@ -1,6 +1,13 @@
-pub use crate::*;
+use crate::crush::builder::*;
+use crate::crush::crush::*;
+use crate::crush::helpers::crush_find_roots;
+use crate::crush::mapper::{crush_do_rule, crush_init_workspace};
+use crate::crush::types::*;
+
 use std::ptr;
 use std::slice;
+
+pub use crate::crush::builder::crush_bucket_add_item;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum BucketAlgorithm {
@@ -14,21 +21,21 @@ pub enum BucketAlgorithm {
 impl BucketAlgorithm {
     fn to_c(self) -> i32 {
         match self {
-            BucketAlgorithm::Uniform => crush_algorithm_CRUSH_BUCKET_UNIFORM as i32,
-            BucketAlgorithm::List => crush_algorithm_CRUSH_BUCKET_LIST as i32,
-            BucketAlgorithm::Tree => crush_algorithm_CRUSH_BUCKET_TREE as i32,
-            BucketAlgorithm::Straw => crush_algorithm_CRUSH_BUCKET_STRAW as i32,
-            BucketAlgorithm::Straw2 => crush_algorithm_CRUSH_BUCKET_STRAW2 as i32,
+            BucketAlgorithm::Uniform => CRUSH_BUCKET_UNIFORM as i32,
+            BucketAlgorithm::List => CRUSH_BUCKET_LIST as i32,
+            BucketAlgorithm::Tree => CRUSH_BUCKET_TREE as i32,
+            BucketAlgorithm::Straw => CRUSH_BUCKET_STRAW as i32,
+            BucketAlgorithm::Straw2 => CRUSH_BUCKET_STRAW2 as i32,
         }
     }
 
     fn from_c(alg: u8) -> Option<Self> {
         match alg {
-            x if x == crush_algorithm_CRUSH_BUCKET_UNIFORM as u8 => Some(BucketAlgorithm::Uniform),
-            x if x == crush_algorithm_CRUSH_BUCKET_LIST as u8 => Some(BucketAlgorithm::List),
-            x if x == crush_algorithm_CRUSH_BUCKET_TREE as u8 => Some(BucketAlgorithm::Tree),
-            x if x == crush_algorithm_CRUSH_BUCKET_STRAW as u8 => Some(BucketAlgorithm::Straw),
-            x if x == crush_algorithm_CRUSH_BUCKET_STRAW2 as u8 => Some(BucketAlgorithm::Straw2),
+            x if x == CRUSH_BUCKET_UNIFORM as u8 => Some(BucketAlgorithm::Uniform),
+            x if x == CRUSH_BUCKET_LIST as u8 => Some(BucketAlgorithm::List),
+            x if x == CRUSH_BUCKET_TREE as u8 => Some(BucketAlgorithm::Tree),
+            x if x == CRUSH_BUCKET_STRAW as u8 => Some(BucketAlgorithm::Straw),
+            x if x == CRUSH_BUCKET_STRAW2 as u8 => Some(BucketAlgorithm::Straw2),
             _ => None,
         }
     }
@@ -197,7 +204,7 @@ impl CrushMap {
         unsafe {
             // Implement crush_work_size inline function
             let cwin_size =
-                (*self.ptr).working_size + (result.len() * 3 * std::mem::size_of::<u32>());
+                (*self.ptr).working_size as usize + (result.len() * 3 * std::mem::size_of::<u32>());
             let mut cwin = vec![0u8; cwin_size];
             crush_init_workspace(self.ptr, cwin.as_mut_ptr() as *mut std::os::raw::c_void);
 
@@ -307,35 +314,21 @@ pub enum RuleStep {
 impl RuleStep {
     fn to_crush_parts(self) -> (i32, i32, i32) {
         match self {
-            RuleStep::Noop => (crush_opcodes_CRUSH_RULE_NOOP as i32, 0, 0),
-            RuleStep::Take(x) => (crush_opcodes_CRUSH_RULE_TAKE as i32, x, 0),
-            RuleStep::ChooseFirstN(n, t) => (crush_opcodes_CRUSH_RULE_CHOOSE_FIRSTN as i32, n, t),
-            RuleStep::ChooseIndep(n, t) => (crush_opcodes_CRUSH_RULE_CHOOSE_INDEP as i32, n, t),
-            RuleStep::Emit => (crush_opcodes_CRUSH_RULE_EMIT as i32, 0, 0),
-            RuleStep::ChooseLeafFirstN(n, t) => {
-                (crush_opcodes_CRUSH_RULE_CHOOSELEAF_FIRSTN as i32, n, t)
+            RuleStep::Noop => (CRUSH_RULE_NOOP as i32, 0, 0),
+            RuleStep::Take(x) => (CRUSH_RULE_TAKE as i32, x, 0),
+            RuleStep::ChooseFirstN(n, t) => (CRUSH_RULE_CHOOSE_FIRSTN as i32, n, t),
+            RuleStep::ChooseIndep(n, t) => (CRUSH_RULE_CHOOSE_INDEP as i32, n, t),
+            RuleStep::Emit => (CRUSH_RULE_EMIT as i32, 0, 0),
+            RuleStep::ChooseLeafFirstN(n, t) => (CRUSH_RULE_CHOOSELEAF_FIRSTN as i32, n, t),
+            RuleStep::ChooseLeafIndep(n, t) => (CRUSH_RULE_CHOOSELEAF_INDEP as i32, n, t),
+            RuleStep::SetChooseTries(n) => (CRUSH_RULE_SET_CHOOSE_TRIES as i32, n, 0),
+            RuleStep::SetChooseLeafTries(n) => (CRUSH_RULE_SET_CHOOSELEAF_TRIES as i32, n, 0),
+            RuleStep::SetChooseLocalTries(n) => (CRUSH_RULE_SET_CHOOSE_LOCAL_TRIES as i32, n, 0),
+            RuleStep::SetChooseLocalFallbackTries(n) => {
+                (CRUSH_RULE_SET_CHOOSE_LOCAL_FALLBACK_TRIES as i32, n, 0)
             }
-            RuleStep::ChooseLeafIndep(n, t) => {
-                (crush_opcodes_CRUSH_RULE_CHOOSELEAF_INDEP as i32, n, t)
-            }
-            RuleStep::SetChooseTries(n) => (crush_opcodes_CRUSH_RULE_SET_CHOOSE_TRIES as i32, n, 0),
-            RuleStep::SetChooseLeafTries(n) => {
-                (crush_opcodes_CRUSH_RULE_SET_CHOOSELEAF_TRIES as i32, n, 0)
-            }
-            RuleStep::SetChooseLocalTries(n) => {
-                (crush_opcodes_CRUSH_RULE_SET_CHOOSE_LOCAL_TRIES as i32, n, 0)
-            }
-            RuleStep::SetChooseLocalFallbackTries(n) => (
-                crush_opcodes_CRUSH_RULE_SET_CHOOSE_LOCAL_FALLBACK_TRIES as i32,
-                n,
-                0,
-            ),
-            RuleStep::SetChooseLeafVaryR(n) => {
-                (crush_opcodes_CRUSH_RULE_SET_CHOOSELEAF_VARY_R as i32, n, 0)
-            }
-            RuleStep::SetChooseLeafStable(n) => {
-                (crush_opcodes_CRUSH_RULE_SET_CHOOSELEAF_STABLE as i32, n, 0)
-            }
+            RuleStep::SetChooseLeafVaryR(n) => (CRUSH_RULE_SET_CHOOSELEAF_VARY_R as i32, n, 0),
+            RuleStep::SetChooseLeafStable(n) => (CRUSH_RULE_SET_CHOOSELEAF_STABLE as i32, n, 0),
         }
     }
 }
@@ -386,7 +379,7 @@ pub struct ChooseArgs {
 }
 
 impl ChooseArgs {
-    pub fn get_weight_set(&self, bucket_id: i32, position: usize) -> Option<WeightSet> {
+    pub fn get_weight_set(&self, bucket_id: i32, position: usize) -> Option<WeightSet<'_>> {
         unsafe {
             let arg = &*self.ptr.offset(-1 - bucket_id as isize);
             if arg.weight_set.is_null() || position >= arg.weight_set_size as usize {

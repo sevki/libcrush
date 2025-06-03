@@ -1,0 +1,15 @@
+[workspace]
+members = ["mycrush", "crush-sys", "libcrush"]
+
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "GPL-3.0-or-later OR LGPL-2.1-or-later"
+repository = "https://github.com/sevki/libcrush"
+homepage = "https://github.com/sevki/libcrush"
+documentation = "https://docs.rs/libcrush"
+readme = "README.md"
+keywords = ["crush", "hashing", "distributed", "consistent-hashing", "ceph"]
+categories = ["algorithms", "data-structures"]
+description = "Rust implementation of the CRUSH (Controlled Replication Under Scalable Hashing) algorithm"
