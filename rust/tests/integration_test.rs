@@ -1,5 +1,5 @@
-use libcrush_rust::wrapper::{CrushMap, crush_bucket_alg_name};
-use libcrush_rust::{// Import necessary C functions and types directly if not fully wrapped yet
+use crush_sys::wrapper::{CrushMap, crush_bucket_alg_name};
+use crush_sys::{// Import necessary C functions and types directly if not fully wrapped yet
     crush_rule_set_step, crush_add_rule, crush_make_rule,
     crush_add_bucket, crush_make_bucket,
     crush_finalize, crush_do_rule,

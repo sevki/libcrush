@@ -65,14 +65,14 @@ corrosion_import_crate(MANIFEST_PATH rust/Cargo.toml)
 
 # Add include directory for the Rust build script to find crush headers
 # This makes ../crush/libcrush.h findable by rust/build.rs
-target_include_directories(libcrush-rust INTERFACE
+target_include_directories(crush-sys INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/crush>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/crush>
 )
 
 # Link the Rust library to the C/C++ library 'crush'
 # This ensures that when the Rust tests are run, they can find the C symbols.
-target_link_libraries(libcrush-rust PRIVATE crush)
+target_link_libraries(crush-sys PRIVATE crush)
 
 # Enable discovery of Rust tests by CTest
 if(BUILD_TESTING)
