@@ -1,4 +1,9 @@
-#[derive(Debug, Clone, PartialEq)]
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive as NumTraitsFromPrimitive; // Alias to avoid potential conflicts
+
+#[derive(Debug, Clone, PartialEq, FromPrimitive)]
+#[allow(non_camel_case_types)] // To keep original C-style names for opcodes if needed, though Rust style is preferred.
+                               // For FromPrimitive, the derive macro should handle it.
 pub enum CrushOpcode {
     Noop = 0,
     Take = 1,

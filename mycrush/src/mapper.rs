@@ -1,9 +1,17 @@
 use crate::{
-    CrushMap, CrushRule, CrushRuleStep, CrushOpcode, CrushBucket,
+    CrushMap, CrushOpcode, CrushBucket, // Removed CrushRule, CrushRuleStep
     CrushBucketUniform, CrushBucketList, CrushBucketStraw2,
     hash::crush_hash32_rjenkins1,
 };
 use std::collections::HashSet;
+// use crate::CrushOpcode; // This was a duplicate import, CrushOpcode is already imported above.
+use num_traits::FromPrimitive; // Keep this as it's the standard way for the trait to be in scope.
+                               // The compiler error for E0599 (no from_u32 on CrushOpcode) suggested a path like
+                               // use crate::_IMPL_NUM_FromPrimitive_FOR_CrushOpcode::_num_traits::FromPrimitive;
+                               // This implies the derive macro is working but the method isn't found without specific help.
+                               // However, a direct call `CrushOpcode::from_u32` should work if derived correctly
+                               // and the `FromPrimitive` trait itself is in scope for the method call.
+                               // Let's ensure `FromPrimitive` is broadly available.
 
 // Helper function to get bucket by ID from the map
 // This function would be more robust in a real scenario, handling missing buckets etc.
@@ -180,9 +188,14 @@ fn crush_bucket_choose_list(
     // Fallback: could pick last valid item or none. Original list would always pick one if total weight > 0.
     // If any item has weight, one should be chosen.
     // If all weights are 0, original CRUSH might pick items[r % size].
-    if total_weight_for_bucket > 0 && !bucket.common.items.is_empty() {
-        // Fallback to a modulo selection if the above loop fails (which it easily can)
-        // This is a deviation but ensures something is picked if possible.
+    // Fallback if the loop fails to select (e.g. due to simplified logic or all-zero weights with the formula).
+    // Only attempt fallback if there are items.
+    if !bucket.common.items.is_empty() {
+        // The original condition `total_weight_for_bucket > 0` is problematic due to scope.
+        // The fallback itself doesn't use total_weight_for_bucket.
+        // This fallback ensures *something* is picked if items exist, which is closer to CRUSH behavior
+        // than returning None when a bucket has items.
+        // println!("crush_bucket_choose_list: Loop failed, attempting fallback selection for bucket {}", bucket.common.id);
         let fallback_idx = (crush_hash32_rjenkins1(x as u32, bucket.common.id as u32, current_r as u32) % bucket.common.size as u32) as usize;
         return bucket.common.items.get(fallback_idx).copied();
     }
@@ -374,7 +387,7 @@ pub fn crush_do_rule(
             break;
         }
 
-        match num::FromPrimitive::from_u32(step.op) {
+        match CrushOpcode::from_u32(step.op) { // Changed to call from_u32 directly on the enum
             Some(CrushOpcode::Take) => {
                 println!("Executing Take: arg1 = {}", step.arg1);
                 current_selection.clear();
@@ -522,7 +535,10 @@ pub fn crush_do_rule(
                             // The 'r' for dispatch_bucket_choose is varied by try_num for each slot.
                             // r_for_this_item_slot provides uniqueness per slot, try_num provides retries.
                             // Multiplying try_num by a larger factor can help spread out attempts more.
-                            let current_r = r_for_this_item_slot + (try_num * num_items_to_select_for_rule.max(1) as i32);
+                            // All parts of the calculation for current_r must be i32.
+                            // try_num is u32. num_items_to_select_for_rule is usize.
+                            let factor = try_num as i32 * (num_items_to_select_for_rule.max(1) as i32);
+                            let current_r = r_for_this_item_slot + factor;
 
                             let initial_chosen_item = if op == CrushOpcode::ChooseLeafIndep {
                                 // For ChooseLeafIndep, input_item_id is the starting point for descent.

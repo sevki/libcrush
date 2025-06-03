@@ -29,6 +29,7 @@ jobs:
             cmake \
             ninja-build \
             pkg-config \
+            libclang-dev \
             libssl-dev # For Rust networking, if any crate needs it
 
       - name: Set up Rust
@@ -46,16 +47,25 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            crush-sys/target/ # Cache the target dir of the crush-sys crate
-          key: ${{ runner.os }}-cargo-${{ hashFiles('crush-sys/Cargo.lock') }}
+            crush-sys/target/
+            mycrush/target/ # Cache the target dir of the mycrush crate
+          key: ${{ runner.os }}-cargo-${{ hashFiles('crush-sys/Cargo.lock') }}-${{ hashFiles('mycrush/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
 
 
-      - name: Build Rust project
+      - name: Build crush-sys
         working-directory: crush-sys
         run: cargo build --verbose
 
-      - name: Run Rust tests
+      - name: Test crush-sys
         working-directory: crush-sys
+        run: cargo test --verbose
+
+      - name: Build mycrush
+        working-directory: mycrush
+        run: cargo build --verbose
+
+      - name: Test mycrush
+        working-directory: mycrush
         run: cargo test --verbose
