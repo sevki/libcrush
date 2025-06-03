@@ -1,0 +1,78 @@
+name: Rust CI
+
+on:
+  push:
+    branches: [ main ] # Adjust if your main branch is different, e.g., master
+  pull_request:
+    branches: [ main ] # Adjust if your main branch is different
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_VERSION: stable # Or a specific version
+  CORROSION_VERSION: v0.4.0 # Or a newer version
+  CORROSION_INSTALL_DIR: ${{ github.workspace }}/.corrosion
+
+jobs:
+  build_and_test:
+    name: Build and Test (Ubuntu)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive' # If your project uses git submodules (e.g., googletest)
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            ninja-build \
+            pkg-config \
+            libssl-dev # For Rust networking, if any crate needs it
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          profile: minimal
+          override: true
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            rust/target/ # Cache the target dir of the libcrush-rust crate
+          key: ${{ runner.os }}-cargo-${{ hashFiles('rust/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install Corrosion
+        run: |
+          mkdir -p ${{ env.CORROSION_INSTALL_DIR }}/build ${{ env.CORROSION_INSTALL_DIR }}/install
+          curl -L https://github.com/corrosion-rs/corrosion/archive/refs/tags/${{ env.CORROSION_VERSION }}.tar.gz -o corrosion.tar.gz
+          tar -xzf corrosion.tar.gz -C ${{ env.CORROSION_INSTALL_DIR }} --strip-components=1
+          cd ${{ env.CORROSION_INSTALL_DIR }}/build
+          cmake .. -GNinja \
+            -DCMAKE_INSTALL_PREFIX=${{ env.CORROSION_INSTALL_DIR }}/install \
+            -DBUILD_TESTING=OFF
+          ninja install
+        env:
+          CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install
+
+      - name: Cache Corrosion installation
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CORROSION_INSTALL_DIR }}/install
+          key: ${{ runner.os }}-corrosion-${{ env.CORROSION_VERSION }}
+
+      - name: Run build script (builds C/C++ and Rust, runs tests)
+        run: ./build.sh
+        env:
+          CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install:${{ env.CMAKE_PREFIX_PATH }}
