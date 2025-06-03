@@ -2,9 +2,9 @@ name: Rust CI
 
 on:
   push:
-    branches: [ main ] # Adjust if your main branch is different, e.g., master
+    branches: [ master ] # Adjust if your main branch is different, e.g., master
   pull_request:
-    branches: [ main ] # Adjust if your main branch is different
+    branches: [ master ] # Adjust if your main branch is different
 
 env:
   CARGO_TERM_COLOR: always
@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive' # If your project uses git submodules (e.g., googletest)
 
@@ -31,17 +31,17 @@ jobs:
             cmake \
             ninja-build \
             pkg-config \
-            libssl-dev # For Rust networking, if any crate needs it
+            libssl-dev \
+            libclang-dev # For Rust networking, if any crate needs it
 
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ env.RUST_VERSION }}
-          profile: minimal
-          override: true
+          # components: "rustfmt, clippy" # Optional: if needed
 
       - name: Cache Cargo dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/bin/
@@ -67,12 +67,27 @@ jobs:
           CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install
 
       - name: Cache Corrosion installation
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.CORROSION_INSTALL_DIR }}/install
           key: ${{ runner.os }}-corrosion-${{ env.CORROSION_VERSION }}
 
-      - name: Run build script (builds C/C++ and Rust, runs tests)
-        run: ./build.sh
+      - name: Create build directory
+        run: mkdir build
+      - name: Configure CMake
+        working-directory: ./build
+        run: cmake .. -DCMAKE_BUILD_TYPE=Release # Or Debug
         env:
           CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install:${{ env.CMAKE_PREFIX_PATH }}
+      - name: Build (C/C++ and Rust via Corrosion)
+        working-directory: ./build
+        run: cmake --build . --verbose # 'make VERBOSE=1 all' could also be used
+        env:
+          CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install:${{ env.CMAKE_PREFIX_PATH }}
+      - name: Test (CTest, including Rust tests)
+        working-directory: ./build
+        run: ctest -V --output-on-failure
+        env:
+          CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install:${{ env.CMAKE_PREFIX_PATH }}
+          # Potentially need RUST_BACKTRACE=1 for more detailed Rust panic logs
+          RUST_BACKTRACE: 1

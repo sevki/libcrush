@@ -13,11 +13,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+    - name: Create build directory
+      run: mkdir build
+    - name: Configure CMake
+      run: cmake -S . -B build
+       # Add any necessary CMake options here, e.g., -DCMAKE_BUILD_TYPE=Release
+    - name: Build
+      run: cmake --build build --verbose
+    - name: Test
+      run: |
+        cd build
+        ctest -V --output-on-failure
