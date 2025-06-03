@@ -78,16 +78,19 @@ jobs:
         working-directory: ./build
         run: cmake .. -DCMAKE_BUILD_TYPE=Release # Or Debug
         env:
+          PATH: $HOME/.cargo/bin:${{ env.PATH }}
           CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install:${{ env.CMAKE_PREFIX_PATH }}
       - name: Build (C/C++ and Rust via Corrosion)
         working-directory: ./build
         run: cmake --build . --verbose # 'make VERBOSE=1 all' could also be used
         env:
+          PATH: $HOME/.cargo/bin:${{ env.PATH }}
           CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install:${{ env.CMAKE_PREFIX_PATH }}
       - name: Test (CTest, including Rust tests)
         working-directory: ./build
         run: ctest -V --output-on-failure
         env:
+          PATH: $HOME/.cargo/bin:${{ env.PATH }}
           CMAKE_PREFIX_PATH: ${{ env.CORROSION_INSTALL_DIR }}/install:${{ env.CMAKE_PREFIX_PATH }}
           # Potentially need RUST_BACKTRACE=1 for more detailed Rust panic logs
           RUST_BACKTRACE: 1
