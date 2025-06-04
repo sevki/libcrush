@@ -1,9 +1,5 @@
-use num_derive::FromPrimitive;
-use num_traits::FromPrimitive as NumTraitsFromPrimitive; // Alias to avoid potential conflicts
-
-#[derive(Debug, Clone, PartialEq, FromPrimitive)]
-#[allow(non_camel_case_types)] // To keep original C-style names for opcodes if needed, though Rust style is preferred.
-                               // For FromPrimitive, the derive macro should handle it.
+#[derive(Debug, Clone, PartialEq)]
+#[allow(non_camel_case_types)]
 pub enum CrushOpcode {
     Noop = 0,
     Take = 1,
@@ -18,6 +14,26 @@ pub enum CrushOpcode {
     SetChooseLocalFallbackTries = 11,
     SetChooseLeafVaryR = 12,
     SetChooseLeafStable = 13,
+}
+impl CrushOpcode {
+    fn from_u32(op: u32) -> Option<CrushOpcode> {
+        match op {
+            0 => Some(CrushOpcode::Noop),
+            1 => Some(CrushOpcode::Take),
+            2 => Some(CrushOpcode::ChooseFirstN),
+            3 => Some(CrushOpcode::ChooseIndep),
+            4 => Some(CrushOpcode::Emit),
+            6 => Some(CrushOpcode::ChooseLeafFirstN),
+            7 => Some(CrushOpcode::ChooseLeafIndep),
+            8 => Some(CrushOpcode::SetChooseTries),
+            9 => Some(CrushOpcode::SetChooseLeafTries),
+            10 => Some(CrushOpcode::SetChooseLocalTries),
+            11 => Some(CrushOpcode::SetChooseLocalFallbackTries),
+            12 => Some(CrushOpcode::SetChooseLeafVaryR),
+            13 => Some(CrushOpcode::SetChooseLeafStable),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -115,21 +131,17 @@ impl CrushBucket {
 #[derive(Debug, Clone, PartialEq)]
 pub struct CrushWeightSet {
     pub weights: Vec<u32>,
-    pub size: u32, // Corresponds to the C struct's size, might be redundant with Vec::len()
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CrushChooseArg {
     pub ids: Vec<i32>,
-    pub ids_size: u32, // Corresponds to the C struct's size, might be redundant
     pub weight_set: Vec<CrushWeightSet>,
-    pub weight_set_size: u32, // Corresponds to the C struct's size, might be redundant
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CrushChooseArgMap {
     pub args: Vec<CrushChooseArg>,
-    pub size: u32, // Corresponds to the C struct's size, might be redundant
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -149,23 +161,22 @@ pub struct CrushMap {
     pub chooseleaf_stable: u8,
     pub straw_calc_version: u8, // from #ifndef __KERNEL__ block
     pub allowed_bucket_algs: u32, // from #ifndef __KERNEL__ block
-    // pub choose_tries: Vec<u32>, // This was a pointer in C, needs decision on how to represent if needed
+                                // pub choose_tries: Vec<u32>, // This was a pointer in C, needs decision on how to represent if needed
 
-    // C-specific fields, omitted for now or represented differently:
-    // working_size: usize, (related to crush_work, C-specific memory management)
-    // choose_tries: *mut u32 (pointer, if needed, should be Vec<u32> or similar)
+                                // C-specific fields, omitted for now or represented differently:
+                                // working_size: usize, (related to crush_work, C-specific memory management)
+                                // choose_tries: *mut u32 (pointer, if needed, should be Vec<u32> or similar)
 }
-
 
 // Add a dummy function to make it a library
 pub fn hello() {
     println!("Hello from mycrush!");
 }
 
-pub mod hash;
-pub mod mapper;
 pub mod builder;
+pub mod hash;
 pub mod helpers;
+pub mod mapper;
 
 pub fn crush_get_bucket_item_weight(bucket: &CrushBucket, pos: i32) -> Option<u32> {
     if pos < 0 {

@@ -231,6 +231,9 @@ fn test_choose_firstn_straw2_bucket() {
 
         crush_sys::crush_finalize(c_map_ptr);
         my_map.max_devices = (*c_map_ptr).max_devices;
+        
+        println!("C map working_size: {}", (*c_map_ptr).working_size);
+        println!("C map max_devices: {}", (*c_map_ptr).max_devices);
 
         // 4. Test inputs
         let x_initial = 54321;
@@ -252,10 +255,13 @@ fn test_choose_firstn_straw2_bucket() {
 
 
             if c_workspace_size_loop > 0 {
+                // Create weight vector for devices (all devices have weight 0x10000)
+                let c_weights = vec![0x10000u32; (*c_map_ptr).max_devices as usize];
+                
                 let c_selection_count_loop = crush_sys::crush_do_rule(
                     c_map_ptr, rule_id as ::std::os::raw::c_int, current_x as ::std::os::raw::c_int,
                     c_result_vec_loop.as_mut_ptr(), result_max as ::std::os::raw::c_int,
-                    std::ptr::null_mut(), 0,
+                    c_weights.as_ptr() as *const u32, c_weights.len() as ::std::os::raw::c_int,
                     c_workspace_loop.as_mut_ptr() as *mut ::std::os::raw::c_void,
                     std::ptr::null_mut(),
                 );
