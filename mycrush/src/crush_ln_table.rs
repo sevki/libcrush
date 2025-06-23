@@ -68,6 +68,12 @@ pub const RH_LH_TBL: [i64; 128 * 2 + 2] = [
     0x000083126e978d50i64, 0x0000fa2aab2b1fcdi64, 0x0000828cbfbeb9a1i64, 0x0000fbb18ea8088di64,
     0x0000820820820821i64, 0x0000fd36e5e3a55fi64, 0x000081848da8faf1i64, 0x0000feb5b299cc32i64,
     0x0000810204081021i64, 0x000100330c8a6068i64, 0x0000808080808081i64, 0x0001018ef5a1e830i64,
+    // These last two values correspond to k=128 for the original C table which has size 258 (0 to 257)
+    // mapper.rs __RH_LH_tbl has these as its last two:
+    // 0x800000000000 as std::ffi::c_longlong,
+    // 0xffff00000000 as std::ffi::c_longlong,
+    // Which are 0x0000_8000_0000_0000 and 0x0000_FFFF_0000_0000
+    0x0000800000000000i64, 0x0000FFFF00000000i64,
 ];
 
 // LL_tbl[k] = 2^48*log2(1.0+k/2^15)
