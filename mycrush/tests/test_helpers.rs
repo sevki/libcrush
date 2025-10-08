@@ -1,4 +1,5 @@
 use googletest::prelude::*;
+use mycrush::wrapper::Map as CrushMap;
 use mycrush::wrapper::*;
 #[googletest::test]
 fn test_crush_find_roots() {

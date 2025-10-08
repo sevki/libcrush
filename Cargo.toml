@@ -4,11 +4,10 @@ members = ["libcrush", "mycrush"]
 resolver = "2"
 
 [workspace.package]
-edition = "2021"
+edition = "2024"
 license = "GPL-3.0-or-later OR LGPL-2.1-or-later"
 repository = "https://github.com/sevki/libcrush"
 homepage = "https://github.com/sevki/libcrush"
-documentation = "https://docs.rs/libcrush"
 readme = "README.md"
 keywords = ["crush", "hashing", "distributed", "consistent-hashing", "ceph"]
 categories = ["algorithms", "data-structures"]
@@ -21,7 +20,6 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
-documentation.workspace = true
 readme.workspace = true
 keywords.workspace = true
 categories.workspace = true
@@ -31,7 +29,7 @@ description.workspace = true
 libc = "0.2"
 
 [build-dependencies]
-bindgen = "0.68"
+bindgen = "0.72.1"
 cc = "1.2.25"
 
 [dev-dependencies]

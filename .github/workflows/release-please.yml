@@ -39,20 +39,19 @@ jobs:
         uses: actions-rs/toolchain@v1
         if: ${{ steps.release.outputs.release_created }}
         with:
-          toolchain: stable
+          toolchain: nightly
           override: true
       - name: Update and install dependencies
         run: |
           sudo apt-get update -y
           sudo apt-get install -y libssl-dev pkg-config
-          cargo install cargo-publish-workspace-v2
       - name: publish to crates.io (dry-run)
         run: |
           export VERSION=v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}.${{ steps.release.outputs.patch }}
           echo $VERSION
           echo "CI_TAG=$VERSION" >> $GITHUB_ENV
-          cargo publish-workspace --target-version v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}.${{ steps.release.outputs.patch }} --token ${{ secrets.CARGO_REGISTRY_TOKEN }} --dry-run
+          cargo publish --workspace --token ${{ secrets.CARGO_REGISTRY_TOKEN }} --dry-run
       - name: publish to crates.io
         if: ${{ steps.release.outputs.release_created }}
         run: |
-          cargo publish-workspace --target-version v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}.${{ steps.release.outputs.patch }} --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          cargo publish --workspace --token ${{ secrets.CARGO_REGISTRY_TOKEN }}

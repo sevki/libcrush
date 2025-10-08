@@ -2,18 +2,18 @@
   "plugins": ["cargo-workspace"],
   "include-component-in-tag": true,
   "packages": {
-    "libcrush": {
+    "crush-sys": {
       "changelog-path": "CHANGELOG.md",
-      "path": "libcrush",
+      "path": "crush-sys",
       "release-type": "rust",
       "bump-minor-pre-major": false,
       "bump-patch-for-minor-pre-major": true,
       "draft": true,
       "prerelease": true
     },
-    "crush-sys": {
+    "libcrush": {
       "changelog-path": "CHANGELOG.md",
-      "path": "crush-sys",
+      "path": "libcrush",
       "release-type": "rust",
       "bump-minor-pre-major": false,
       "bump-patch-for-minor-pre-major": true,
