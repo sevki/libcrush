@@ -27,7 +27,7 @@ unsafe extern "C" {
 }
 #[inline]
 unsafe extern "C" fn crush_calc_tree_node(mut i: libc::c_int) -> libc::c_int {
-    ((i + 1 as libc::c_int) << 1 as libc::c_int) - 1 as libc::c_int
+    ((i + 1) << 1) - 1
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_create() -> *mut CrushMap {
@@ -39,7 +39,7 @@ pub unsafe extern "C" fn crush_create() -> *mut CrushMap {
         }
         memset(
             m as *mut libc::c_void,
-            0 as libc::c_int,
+            0,
             ::core::mem::size_of::<CrushMap>() as libc::c_ulong,
         );
         set_optimal_crush_map(m);
@@ -56,18 +56,18 @@ pub unsafe extern "C" fn crush_finalize(mut map: *mut CrushMap) {
             ((*map).max_buckets as libc::c_ulong)
                 .wrapping_mul(::core::mem::size_of::<*mut CrushWorkBucket>() as libc::c_ulong),
         ) as SizeT as SizeT;
-        (*map).max_devices = 0 as libc::c_int;
-        b = 0 as libc::c_int;
+        (*map).max_devices = 0;
+        b = 0;
         while b < (*map).max_buckets {
             if !(*((*map).buckets).offset(b as isize)).is_null() {
-                i = 0 as libc::c_int as U32;
+                i = 0 as U32;
                 while i < (**((*map).buckets).offset(b as isize)).size {
                     if *((**((*map).buckets).offset(b as isize)).items).offset(i as isize)
                         >= (*map).max_devices
                     {
                         (*map).max_devices = *((**((*map).buckets).offset(b as isize)).items)
                             .offset(i as isize)
-                            + 1 as libc::c_int;
+                            + 1;
                     }
                     i = i.wrapping_add(1);
                 }
@@ -92,15 +92,15 @@ pub unsafe extern "C" fn crush_add_rule(
 ) -> libc::c_int {
     unsafe {
         let mut r: U32 = 0;
-        if ruleno < 0 as libc::c_int {
-            r = 0 as libc::c_int as U32;
+        if ruleno < 0 {
+            r = 0 as U32;
             while r < (*map).max_rules {
                 if (*((*map).rules).offset(r as isize)).is_null() {
                     break;
                 }
                 r = r.wrapping_add(1);
             }
-            if r < ((1 as libc::c_int) << 8 as libc::c_int) as U32 {
+            if r < ((1) << 8 as libc::c_int) as U32 {
             } else {
                 __assert_fail(
                     b"r < CRUSH_MAX_RULES\0" as *const u8 as *const libc::c_char,
@@ -119,13 +119,13 @@ pub unsafe extern "C" fn crush_add_rule(
         if r >= (*map).max_rules {
             let mut oldsize: libc::c_int = 0;
             let mut _realloc: *mut libc::c_void = std::ptr::null_mut::<libc::c_void>();
-            if ((*map).max_rules).wrapping_add(1 as libc::c_int as U32)
-                > ((1 as libc::c_int) << 8 as libc::c_int) as U32
+            if ((*map).max_rules).wrapping_add(1 as U32)
+                > ((1) << 8 as libc::c_int) as U32
             {
                 return -(28 as libc::c_int);
             }
             oldsize = (*map).max_rules as libc::c_int;
-            (*map).max_rules = r.wrapping_add(1 as libc::c_int as U32);
+            (*map).max_rules = r.wrapping_add(1 as U32);
             _realloc = realloc(
                 (*map).rules as *mut libc::c_void,
                 ((*map).max_rules as libc::c_ulong)
@@ -138,7 +138,7 @@ pub unsafe extern "C" fn crush_add_rule(
             }
             memset(
                 ((*map).rules).offset(oldsize as isize) as *mut libc::c_void,
-                0 as libc::c_int,
+                0,
                 (((*map).max_rules).wrapping_sub(oldsize as U32) as libc::c_ulong)
                     .wrapping_mul(::core::mem::size_of::<*mut CrushRule>() as libc::c_ulong),
             );
@@ -222,10 +222,10 @@ pub unsafe extern "C" fn crush_add_bucket(
 ) -> libc::c_int {
     unsafe {
         let mut pos: libc::c_int = 0;
-        if id == 0 as libc::c_int {
+        if id == 0 {
             id = crush_get_next_bucket_id(map);
         }
-        pos = -(1 as libc::c_int) - id;
+        pos = (-1) - id;
         while pos >= (*map).max_buckets {
             let mut oldsize: libc::c_int = (*map).max_buckets;
             if (*map).max_buckets != 0 {
@@ -246,7 +246,7 @@ pub unsafe extern "C" fn crush_add_bucket(
             }
             memset(
                 ((*map).buckets).offset(oldsize as isize) as *mut libc::c_void,
-                0 as libc::c_int,
+                0,
                 (((*map).max_buckets - oldsize) as libc::c_ulong)
                     .wrapping_mul(::core::mem::size_of::<*mut CrushBucket>() as libc::c_ulong),
             );
@@ -260,7 +260,7 @@ pub unsafe extern "C" fn crush_add_bucket(
         if !idout.is_null() {
             *idout = id;
         }
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -269,7 +269,7 @@ pub unsafe extern "C" fn crush_remove_bucket(
     mut bucket: *mut CrushBucket,
 ) -> libc::c_int {
     unsafe {
-        let mut pos: libc::c_int = -(1 as libc::c_int) - (*bucket).id;
+        let mut pos: libc::c_int = (-1) - (*bucket).id;
         if pos < (*map).max_buckets {
         } else {
             __assert_fail(
@@ -285,7 +285,7 @@ pub unsafe extern "C" fn crush_remove_bucket(
         let fresh2 = &mut (*((*map).buckets).offset(pos as isize));
         *fresh2 = std::ptr::null_mut::<CrushBucket>();
         crush_destroy_bucket(bucket);
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -306,7 +306,7 @@ pub unsafe extern "C" fn crush_make_uniform_bucket(
         }
         memset(
             bucket as *mut libc::c_void,
-            0 as libc::c_int,
+            0,
             ::core::mem::size_of::<CrushBucketUniform>() as libc::c_ulong,
         );
         (*bucket).h.alg = CRUSH_BUCKET_UNIFORM as libc::c_int as U8;
@@ -321,7 +321,7 @@ pub unsafe extern "C" fn crush_make_uniform_bucket(
                     .wrapping_mul(size as libc::c_ulong),
             ) as *mut S32;
             if !((*bucket).h.items).is_null() {
-                i = 0 as libc::c_int;
+                i = 0;
                 while i < size {
                     *((*bucket).h.items).offset(i as isize) = *items.offset(i as isize);
                     i += 1;
@@ -354,7 +354,7 @@ pub unsafe extern "C" fn crush_make_list_bucket(
         }
         memset(
             bucket as *mut libc::c_void,
-            0 as libc::c_int,
+            0,
             ::core::mem::size_of::<CrushBucketList>() as libc::c_ulong,
         );
         (*bucket).h.alg = CRUSH_BUCKET_LIST as libc::c_int as U8;
@@ -375,8 +375,8 @@ pub unsafe extern "C" fn crush_make_list_bucket(
                         .wrapping_mul(size as libc::c_ulong),
                 ) as *mut U32;
                 if !((*bucket).sum_weights).is_null() {
-                    w = 0 as libc::c_int;
-                    i = 0 as libc::c_int;
+                    w = 0;
+                    i = 0;
                     loop {
                         if i >= size {
                             current_block = 15652330335145281839;
@@ -413,34 +413,34 @@ pub unsafe extern "C" fn crush_make_list_bucket(
     }
 }
 unsafe extern "C" fn height(mut n: libc::c_int) -> libc::c_int {
-    let mut h: libc::c_int = 0 as libc::c_int;
-    while n & 1 as libc::c_int == 0 as libc::c_int {
+    let mut h: libc::c_int = 0;
+    while n & 1 == 0 {
         h += 1;
-        n >>= 1 as libc::c_int;
+        n >>= 1;
     }
     h
 }
 unsafe extern "C" fn on_right(mut n: libc::c_int, mut h: libc::c_int) -> libc::c_int {
-    n & (1 as libc::c_int) << (h + 1 as libc::c_int)
+    n & (1) << (h + 1)
 }
 unsafe extern "C" fn parent(mut n: libc::c_int) -> libc::c_int {
     unsafe {
         let mut h: libc::c_int = height(n);
         if on_right(n, h) != 0 {
-            n - ((1 as libc::c_int) << h)
+            n - ((1) << h)
         } else {
-            n + ((1 as libc::c_int) << h)
+            n + ((1) << h)
         }
     }
 }
 unsafe extern "C" fn calc_depth(mut size: libc::c_int) -> libc::c_int {
-    if size == 0 as libc::c_int {
-        return 0 as libc::c_int;
+    if size == 0 {
+        return 0;
     }
-    let mut depth: libc::c_int = 1 as libc::c_int;
-    let mut t: libc::c_int = size - 1 as libc::c_int;
+    let mut depth: libc::c_int = 1;
+    let mut t: libc::c_int = size - 1;
     while t != 0 {
-        t >>= 1 as libc::c_int;
+        t >>= 1;
         depth += 1;
     }
     depth
@@ -467,18 +467,18 @@ pub unsafe extern "C" fn crush_make_tree_bucket(
         }
         memset(
             bucket as *mut libc::c_void,
-            0 as libc::c_int,
+            0,
             ::core::mem::size_of::<CrushBucketTree>() as libc::c_ulong,
         );
         (*bucket).h.alg = CRUSH_BUCKET_TREE as libc::c_int as U8;
         (*bucket).h.hash = hash as U8;
         (*bucket).h.type_0 = type_0 as U16;
         (*bucket).h.size = size as U32;
-        if size == 0 as libc::c_int {
+        if size == 0 {
             (*bucket).h.items = std::ptr::null_mut::<S32>();
-            (*bucket).h.weight = 0 as libc::c_int as U32;
+            (*bucket).h.weight = 0 as U32;
             (*bucket).node_weights = std::ptr::null_mut::<U32>();
-            (*bucket).num_nodes = 0 as libc::c_int as U8;
+            (*bucket).num_nodes = 0 as U8;
             return bucket;
         }
         (*bucket).h.items = malloc(
@@ -486,7 +486,7 @@ pub unsafe extern "C" fn crush_make_tree_bucket(
         ) as *mut S32;
         if !((*bucket).h.items).is_null() {
             depth = calc_depth(size);
-            (*bucket).num_nodes = ((1 as libc::c_int) << depth) as U8;
+            (*bucket).num_nodes = ((1) << depth) as U8;
             (*bucket).node_weights = malloc(
                 (::core::mem::size_of::<U32>() as libc::c_ulong)
                     .wrapping_mul((*bucket).num_nodes as libc::c_ulong),
@@ -494,17 +494,17 @@ pub unsafe extern "C" fn crush_make_tree_bucket(
             if !((*bucket).node_weights).is_null() {
                 memset(
                     (*bucket).h.items as *mut libc::c_void,
-                    0 as libc::c_int,
+                    0,
                     (::core::mem::size_of::<S32>() as libc::c_ulong)
                         .wrapping_mul((*bucket).h.size as libc::c_ulong),
                 );
                 memset(
                     (*bucket).node_weights as *mut libc::c_void,
-                    0 as libc::c_int,
+                    0,
                     (::core::mem::size_of::<U32>() as libc::c_ulong)
                         .wrapping_mul((*bucket).num_nodes as libc::c_ulong),
                 );
-                i = 0 as libc::c_int;
+                i = 0;
                 's_88: loop {
                     if i >= size {
                         current_block = 16924917904204750491;
@@ -524,7 +524,7 @@ pub unsafe extern "C" fn crush_make_tree_bucket(
                     }
                     (*bucket).h.weight =
                         ((*bucket).h.weight).wrapping_add(*weights.offset(i as isize) as U32);
-                    j = 1 as libc::c_int;
+                    j = 1;
                     while j < depth {
                         node = parent(node);
                         if crush_addition_is_unsafe(
@@ -602,11 +602,11 @@ pub unsafe extern "C" fn crush_calc_straw(
             return -(12 as libc::c_int);
         }
         if size != 0 {
-            *reverse.offset(0 as libc::c_int as isize) = 0 as libc::c_int;
+            *reverse.offset(0 as isize) = 0;
         }
-        i = 1 as libc::c_int;
+        i = 1;
         while i < size {
-            j = 0 as libc::c_int;
+            j = 0;
             while j < i {
                 if *weights.offset(i as isize)
                     < *weights.offset(*reverse.offset(j as isize) as isize)
@@ -614,7 +614,7 @@ pub unsafe extern "C" fn crush_calc_straw(
                     k = i;
                     while k > j {
                         *reverse.offset(k as isize) =
-                            *reverse.offset((k - 1 as libc::c_int) as isize);
+                            *reverse.offset((k - 1) as isize);
                         k -= 1;
                     }
                     *reverse.offset(j as isize) = i;
@@ -630,31 +630,31 @@ pub unsafe extern "C" fn crush_calc_straw(
         }
         numleft = size;
         straw = 1.0f64;
-        wbelow = 0 as libc::c_int as libc::c_double;
-        lastw = 0 as libc::c_int as libc::c_double;
-        i = 0 as libc::c_int;
+        wbelow = 0 as libc::c_double;
+        lastw = 0 as libc::c_double;
+        i = 0;
         while i < size {
-            if (*map).straw_calc_version as libc::c_int == 0 as libc::c_int {
-                if *weights.offset(*reverse.offset(i as isize) as isize) == 0 as libc::c_int as U32
+            if (*map).straw_calc_version as libc::c_int == 0 {
+                if *weights.offset(*reverse.offset(i as isize) as isize) == 0 as U32
                 {
                     *((*bucket).straws).offset(*reverse.offset(i as isize) as isize) =
-                        0 as libc::c_int as U32;
+                        0 as U32;
                     i += 1;
                 } else {
                     *((*bucket).straws).offset(*reverse.offset(i as isize) as isize) =
-                        (straw * 0x10000 as libc::c_int as libc::c_double) as U32;
+                        (straw * 0x10000 as libc::c_double) as U32;
                     i += 1;
                     if i == size {
                         break;
                     }
                     if *weights.offset(*reverse.offset(i as isize) as isize)
                         == *weights
-                            .offset(*reverse.offset((i - 1 as libc::c_int) as isize) as isize)
+                            .offset(*reverse.offset((i - 1) as isize) as isize)
                     {
                         continue;
                     }
                     wbelow += (*weights
-                        .offset(*reverse.offset((i - 1 as libc::c_int) as isize) as isize)
+                        .offset(*reverse.offset((i - 1) as isize) as isize)
                         as libc::c_double
                         - lastw)
                         * numleft as libc::c_double;
@@ -671,33 +671,33 @@ pub unsafe extern "C" fn crush_calc_straw(
                     wnext = (numleft as U32
                         * (*weights.offset(*reverse.offset(i as isize) as isize)).wrapping_sub(
                             *weights
-                                .offset(*reverse.offset((i - 1 as libc::c_int) as isize) as isize),
+                                .offset(*reverse.offset((i - 1) as isize) as isize),
                         )) as libc::c_double;
                     pbelow = wbelow / (wbelow + wnext);
                     straw *= pow(1.0f64 / pbelow, 1.0f64 / numleft as libc::c_double);
                     lastw = *weights
-                        .offset(*reverse.offset((i - 1 as libc::c_int) as isize) as isize)
+                        .offset(*reverse.offset((i - 1) as isize) as isize)
                         as libc::c_double;
                 }
             } else {
-                if ((*map).straw_calc_version as libc::c_int) < 1 as libc::c_int {
+                if ((*map).straw_calc_version as libc::c_int) < 1 {
                     continue;
                 }
-                if *weights.offset(*reverse.offset(i as isize) as isize) == 0 as libc::c_int as U32
+                if *weights.offset(*reverse.offset(i as isize) as isize) == 0 as U32
                 {
                     *((*bucket).straws).offset(*reverse.offset(i as isize) as isize) =
-                        0 as libc::c_int as U32;
+                        0 as U32;
                     i += 1;
                     numleft -= 1;
                 } else {
                     *((*bucket).straws).offset(*reverse.offset(i as isize) as isize) =
-                        (straw * 0x10000 as libc::c_int as libc::c_double) as U32;
+                        (straw * 0x10000 as libc::c_double) as U32;
                     i += 1;
                     if i == size {
                         break;
                     }
                     wbelow += (*weights
-                        .offset(*reverse.offset((i - 1 as libc::c_int) as isize) as isize)
+                        .offset(*reverse.offset((i - 1) as isize) as isize)
                         as libc::c_double
                         - lastw)
                         * numleft as libc::c_double;
@@ -705,18 +705,18 @@ pub unsafe extern "C" fn crush_calc_straw(
                     wnext = (numleft as U32
                         * (*weights.offset(*reverse.offset(i as isize) as isize)).wrapping_sub(
                             *weights
-                                .offset(*reverse.offset((i - 1 as libc::c_int) as isize) as isize),
+                                .offset(*reverse.offset((i - 1) as isize) as isize),
                         )) as libc::c_double;
                     pbelow = wbelow / (wbelow + wnext);
                     straw *= pow(1.0f64 / pbelow, 1.0f64 / numleft as libc::c_double);
                     lastw = *weights
-                        .offset(*reverse.offset((i - 1 as libc::c_int) as isize) as isize)
+                        .offset(*reverse.offset((i - 1) as isize) as isize)
                         as libc::c_double;
                 }
             }
         }
         free(reverse as *mut libc::c_void);
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -738,7 +738,7 @@ pub unsafe extern "C" fn crush_make_straw_bucket(
         }
         memset(
             bucket as *mut libc::c_void,
-            0 as libc::c_int,
+            0,
             ::core::mem::size_of::<CrushBucketStraw>() as libc::c_ulong,
         );
         (*bucket).h.alg = CRUSH_BUCKET_STRAW as libc::c_int as U8;
@@ -759,8 +759,8 @@ pub unsafe extern "C" fn crush_make_straw_bucket(
                         .wrapping_mul(size as libc::c_ulong),
                 ) as *mut U32;
                 if !((*bucket).straws).is_null() {
-                    (*bucket).h.weight = 0 as libc::c_int as U32;
-                    i = 0 as libc::c_int;
+                    (*bucket).h.weight = 0 as U32;
+                    i = 0;
                     while i < size {
                         *((*bucket).h.items).offset(i as isize) = *items.offset(i as isize);
                         (*bucket).h.weight =
@@ -769,7 +769,7 @@ pub unsafe extern "C" fn crush_make_straw_bucket(
                             *weights.offset(i as isize) as U32;
                         i += 1;
                     }
-                    if crush_calc_straw(map, bucket) >= 0 as libc::c_int {
+                    if crush_calc_straw(map, bucket) >= 0 {
                         return bucket;
                     }
                 }
@@ -801,7 +801,7 @@ pub unsafe extern "C" fn crush_make_straw2_bucket(
         }
         memset(
             bucket as *mut libc::c_void,
-            0 as libc::c_int,
+            0,
             ::core::mem::size_of::<CrushBucketStraw2>() as libc::c_ulong,
         );
         (*bucket).h.alg = CRUSH_BUCKET_STRAW2 as libc::c_int as U8;
@@ -817,8 +817,8 @@ pub unsafe extern "C" fn crush_make_straw2_bucket(
                     .wrapping_mul(size as libc::c_ulong),
             ) as *mut U32;
             if !((*bucket).item_weights).is_null() {
-                (*bucket).h.weight = 0 as libc::c_int as U32;
-                i = 0 as libc::c_int;
+                (*bucket).h.weight = 0 as U32;
+                i = 0;
                 while i < size {
                     *((*bucket).h.items).offset(i as isize) = *items.offset(i as isize);
                     (*bucket).h.weight =
@@ -851,9 +851,9 @@ pub unsafe extern "C" fn crush_make_bucket(
         match alg {
             1 => {
                 if size != 0 && !weights.is_null() {
-                    item_weight = *weights.offset(0 as libc::c_int as isize);
+                    item_weight = *weights.offset(0 as isize);
                 } else {
-                    item_weight = 0 as libc::c_int;
+                    item_weight = 0;
                 }
                 return crush_make_uniform_bucket(hash, type_0, size, items, item_weight)
                     as *mut CrushBucket;
@@ -887,7 +887,7 @@ pub unsafe extern "C" fn crush_add_uniform_bucket_item(
 ) -> libc::c_int {
     unsafe {
         let mut newsize: libc::c_int =
-            ((*bucket).h.size).wrapping_add(1 as libc::c_int as U32) as libc::c_int;
+            ((*bucket).h.size).wrapping_add(1 as U32) as libc::c_int;
         let mut _realloc: *mut libc::c_void = std::ptr::null_mut::<libc::c_void>();
         if (*bucket).item_weight != weight as U32 {
             return -(22 as libc::c_int);
@@ -901,13 +901,13 @@ pub unsafe extern "C" fn crush_add_uniform_bucket_item(
         } else {
             (*bucket).h.items = _realloc as *mut S32;
         }
-        *((*bucket).h.items).offset((newsize - 1 as libc::c_int) as isize) = item;
+        *((*bucket).h.items).offset((newsize - 1) as isize) = item;
         if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) != 0 {
             return -(34 as libc::c_int);
         }
         (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(weight as U32);
         (*bucket).h.size = ((*bucket).h.size).wrapping_add(1);
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -918,7 +918,7 @@ pub unsafe extern "C" fn crush_add_list_bucket_item(
 ) -> libc::c_int {
     unsafe {
         let mut newsize: libc::c_int =
-            ((*bucket).h.size).wrapping_add(1 as libc::c_int as U32) as libc::c_int;
+            ((*bucket).h.size).wrapping_add(1 as U32) as libc::c_int;
         let mut _realloc: *mut libc::c_void = std::ptr::null_mut::<libc::c_void>();
         _realloc = realloc(
             (*bucket).h.items as *mut libc::c_void,
@@ -947,9 +947,9 @@ pub unsafe extern "C" fn crush_add_list_bucket_item(
         } else {
             (*bucket).sum_weights = _realloc as *mut U32;
         }
-        *((*bucket).h.items).offset((newsize - 1 as libc::c_int) as isize) = item;
-        *((*bucket).item_weights).offset((newsize - 1 as libc::c_int) as isize) = weight as U32;
-        if newsize > 1 as libc::c_int {
+        *((*bucket).h.items).offset((newsize - 1) as isize) = item;
+        *((*bucket).item_weights).offset((newsize - 1) as isize) = weight as U32;
+        if newsize > 1 {
             if crush_addition_is_unsafe(
                 *((*bucket).sum_weights).offset((newsize - 2 as libc::c_int) as isize),
                 weight as U32,
@@ -957,15 +957,15 @@ pub unsafe extern "C" fn crush_add_list_bucket_item(
             {
                 return -(34 as libc::c_int);
             }
-            *((*bucket).sum_weights).offset((newsize - 1 as libc::c_int) as isize) =
+            *((*bucket).sum_weights).offset((newsize - 1) as isize) =
                 (*((*bucket).sum_weights).offset((newsize - 2 as libc::c_int) as isize))
                     .wrapping_add(weight as U32);
         } else {
-            *((*bucket).sum_weights).offset((newsize - 1 as libc::c_int) as isize) = weight as U32;
+            *((*bucket).sum_weights).offset((newsize - 1) as isize) = weight as U32;
         }
         (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(weight as U32);
         (*bucket).h.size = ((*bucket).h.size).wrapping_add(1);
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -976,12 +976,12 @@ pub unsafe extern "C" fn crush_add_tree_bucket_item(
 ) -> libc::c_int {
     unsafe {
         let mut newsize: libc::c_int =
-            ((*bucket).h.size).wrapping_add(1 as libc::c_int as U32) as libc::c_int;
+            ((*bucket).h.size).wrapping_add(1 as U32) as libc::c_int;
         let mut depth: libc::c_int = calc_depth(newsize);
         let mut node: libc::c_int = 0;
         let mut j: libc::c_int = 0;
         let mut _realloc: *mut libc::c_void = std::ptr::null_mut::<libc::c_void>();
-        (*bucket).num_nodes = ((1 as libc::c_int) << depth) as U8;
+        (*bucket).num_nodes = ((1) << depth) as U8;
         _realloc = realloc(
             (*bucket).h.items as *mut libc::c_void,
             (::core::mem::size_of::<S32>() as libc::c_ulong).wrapping_mul(newsize as libc::c_ulong),
@@ -1001,14 +1001,14 @@ pub unsafe extern "C" fn crush_add_tree_bucket_item(
         } else {
             (*bucket).node_weights = _realloc as *mut U32;
         }
-        node = crush_calc_tree_node(newsize - 1 as libc::c_int);
+        node = crush_calc_tree_node(newsize - 1);
         *((*bucket).node_weights).offset(node as isize) = weight as U32;
         let mut root: libc::c_int = (*bucket).num_nodes as libc::c_int / 2 as libc::c_int;
-        if depth >= 2 as libc::c_int && node - 1 as libc::c_int == root {
+        if depth >= 2 as libc::c_int && node - 1 == root {
             *((*bucket).node_weights).offset(root as isize) =
                 *((*bucket).node_weights).offset((root / 2 as libc::c_int) as isize);
         }
-        j = 1 as libc::c_int;
+        j = 1;
         while j < depth {
             node = parent(node);
             if crush_addition_is_unsafe(
@@ -1025,10 +1025,10 @@ pub unsafe extern "C" fn crush_add_tree_bucket_item(
         if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) != 0 {
             return -(34 as libc::c_int);
         }
-        *((*bucket).h.items).offset((newsize - 1 as libc::c_int) as isize) = item;
+        *((*bucket).h.items).offset((newsize - 1) as isize) = item;
         (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(weight as U32);
         (*bucket).h.size = ((*bucket).h.size).wrapping_add(1);
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -1040,7 +1040,7 @@ pub unsafe extern "C" fn crush_add_straw_bucket_item(
 ) -> libc::c_int {
     unsafe {
         let mut newsize: libc::c_int =
-            ((*bucket).h.size).wrapping_add(1 as libc::c_int as U32) as libc::c_int;
+            ((*bucket).h.size).wrapping_add(1 as U32) as libc::c_int;
         let mut _realloc: *mut libc::c_void = std::ptr::null_mut::<libc::c_void>();
         _realloc = realloc(
             (*bucket).h.items as *mut libc::c_void,
@@ -1069,8 +1069,8 @@ pub unsafe extern "C" fn crush_add_straw_bucket_item(
         } else {
             (*bucket).straws = _realloc as *mut U32;
         }
-        *((*bucket).h.items).offset((newsize - 1 as libc::c_int) as isize) = item;
-        *((*bucket).item_weights).offset((newsize - 1 as libc::c_int) as isize) = weight as U32;
+        *((*bucket).h.items).offset((newsize - 1) as isize) = item;
+        *((*bucket).item_weights).offset((newsize - 1) as isize) = weight as U32;
         if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) != 0 {
             return -(34 as libc::c_int);
         }
@@ -1088,7 +1088,7 @@ pub unsafe extern "C" fn crush_add_straw2_bucket_item(
 ) -> libc::c_int {
     unsafe {
         let mut newsize: libc::c_int =
-            ((*bucket).h.size).wrapping_add(1 as libc::c_int as U32) as libc::c_int;
+            ((*bucket).h.size).wrapping_add(1 as U32) as libc::c_int;
         let mut _realloc: *mut libc::c_void = std::ptr::null_mut::<libc::c_void>();
         _realloc = realloc(
             (*bucket).h.items as *mut libc::c_void,
@@ -1108,14 +1108,14 @@ pub unsafe extern "C" fn crush_add_straw2_bucket_item(
         } else {
             (*bucket).item_weights = _realloc as *mut U32;
         }
-        *((*bucket).h.items).offset((newsize - 1 as libc::c_int) as isize) = item;
-        *((*bucket).item_weights).offset((newsize - 1 as libc::c_int) as isize) = weight as U32;
+        *((*bucket).h.items).offset((newsize - 1) as isize) = item;
+        *((*bucket).item_weights).offset((newsize - 1) as isize) = weight as U32;
         if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) != 0 {
             return -(34 as libc::c_int);
         }
         (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(weight as U32);
         (*bucket).h.size = ((*bucket).h.size).wrapping_add(1);
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -1133,7 +1133,7 @@ pub unsafe extern "C" fn crush_bucket_add_item(
             3 => crush_add_tree_bucket_item(b as *mut CrushBucketTree, item, weight),
             4 => crush_add_straw_bucket_item(map, b as *mut CrushBucketStraw, item, weight),
             5 => crush_add_straw2_bucket_item(map, b as *mut CrushBucketStraw2, item, weight),
-            _ => -(1 as libc::c_int),
+            _ => (-1),
         }
     }
 }
@@ -1147,7 +1147,7 @@ pub unsafe extern "C" fn crush_remove_uniform_bucket_item(
         let mut j: libc::c_uint = 0;
         let mut newsize: libc::c_int = 0;
         let mut _realloc: *mut libc::c_void = std::ptr::null_mut::<libc::c_void>();
-        i = 0 as libc::c_int as libc::c_uint;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             if *((*bucket).h.items).offset(i as isize) == item {
                 break;
@@ -1160,7 +1160,7 @@ pub unsafe extern "C" fn crush_remove_uniform_bucket_item(
         j = i;
         while j < (*bucket).h.size {
             *((*bucket).h.items).offset(j as isize) = *((*bucket).h.items)
-                .offset(j.wrapping_add(1 as libc::c_int as libc::c_uint) as isize);
+                .offset(j.wrapping_add(1 as libc::c_uint) as isize);
             j = j.wrapping_add(1);
         }
         (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
@@ -1168,7 +1168,7 @@ pub unsafe extern "C" fn crush_remove_uniform_bucket_item(
         if (*bucket).item_weight < (*bucket).h.weight {
             (*bucket).h.weight = ((*bucket).h.weight).wrapping_sub((*bucket).item_weight);
         } else {
-            (*bucket).h.weight = 0 as libc::c_int as U32;
+            (*bucket).h.weight = 0 as U32;
         }
         _realloc = realloc(
             (*bucket).h.items as *mut libc::c_void,
@@ -1179,7 +1179,7 @@ pub unsafe extern "C" fn crush_remove_uniform_bucket_item(
         } else {
             (*bucket).h.items = _realloc as *mut S32;
         }
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -1192,7 +1192,7 @@ pub unsafe extern "C" fn crush_remove_list_bucket_item(
         let mut j: libc::c_uint = 0;
         let mut newsize: libc::c_int = 0;
         let mut weight: libc::c_uint = 0;
-        i = 0 as libc::c_int as libc::c_uint;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             if *((*bucket).h.items).offset(i as isize) == item {
                 break;
@@ -1206,11 +1206,11 @@ pub unsafe extern "C" fn crush_remove_list_bucket_item(
         j = i;
         while j < (*bucket).h.size {
             *((*bucket).h.items).offset(j as isize) = *((*bucket).h.items)
-                .offset(j.wrapping_add(1 as libc::c_int as libc::c_uint) as isize);
+                .offset(j.wrapping_add(1 as libc::c_uint) as isize);
             *((*bucket).item_weights).offset(j as isize) = *((*bucket).item_weights)
-                .offset(j.wrapping_add(1 as libc::c_int as libc::c_uint) as isize);
+                .offset(j.wrapping_add(1 as libc::c_uint) as isize);
             *((*bucket).sum_weights).offset(j as isize) = (*((*bucket).sum_weights)
-                .offset(j.wrapping_add(1 as libc::c_int as libc::c_uint) as isize))
+                .offset(j.wrapping_add(1 as libc::c_uint) as isize))
             .wrapping_sub(weight);
             j = j.wrapping_add(1);
         }
@@ -1218,7 +1218,7 @@ pub unsafe extern "C" fn crush_remove_list_bucket_item(
             (*bucket).h.weight =
                 ((*bucket).h.weight as libc::c_uint).wrapping_sub(weight) as U32 as U32;
         } else {
-            (*bucket).h.weight = 0 as libc::c_int as U32;
+            (*bucket).h.weight = 0 as U32;
         }
         (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
         newsize = (*bucket).h.size as libc::c_int;
@@ -1250,7 +1250,7 @@ pub unsafe extern "C" fn crush_remove_list_bucket_item(
         } else {
             (*bucket).sum_weights = _realloc as *mut U32;
         }
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -1261,7 +1261,7 @@ pub unsafe extern "C" fn crush_remove_tree_bucket_item(
     unsafe {
         let mut i: libc::c_uint = 0;
         let mut newsize: libc::c_uint = 0;
-        i = 0 as libc::c_int as libc::c_uint;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             let mut node: libc::c_int = 0;
             let mut weight: libc::c_uint = 0;
@@ -1270,11 +1270,11 @@ pub unsafe extern "C" fn crush_remove_tree_bucket_item(
             if *((*bucket).h.items).offset(i as isize) != item {
                 i = i.wrapping_add(1);
             } else {
-                *((*bucket).h.items).offset(i as isize) = 0 as libc::c_int;
+                *((*bucket).h.items).offset(i as isize) = 0;
                 node = crush_calc_tree_node(i as libc::c_int);
                 weight = *((*bucket).node_weights).offset(node as isize);
-                *((*bucket).node_weights).offset(node as isize) = 0 as libc::c_int as U32;
-                j = 1 as libc::c_int;
+                *((*bucket).node_weights).offset(node as isize) = 0 as U32;
+                j = 1;
                 while j < depth {
                     node = parent(node);
                     let fresh5 = &mut (*((*bucket).node_weights).offset(node as isize));
@@ -1285,7 +1285,7 @@ pub unsafe extern "C" fn crush_remove_tree_bucket_item(
                     (*bucket).h.weight =
                         ((*bucket).h.weight as libc::c_uint).wrapping_sub(weight) as U32 as U32;
                 } else {
-                    (*bucket).h.weight = 0 as libc::c_int as U32;
+                    (*bucket).h.weight = 0 as U32;
                 }
                 break;
             }
@@ -1294,9 +1294,9 @@ pub unsafe extern "C" fn crush_remove_tree_bucket_item(
             return -(2 as libc::c_int);
         }
         newsize = (*bucket).h.size;
-        while newsize > 0 as libc::c_int as libc::c_uint {
+        while newsize > 0 as libc::c_uint {
             let mut node_0: libc::c_int = crush_calc_tree_node(
-                newsize.wrapping_sub(1 as libc::c_int as libc::c_uint) as libc::c_int,
+                newsize.wrapping_sub(1 as libc::c_uint) as libc::c_int,
             );
             if *((*bucket).node_weights).offset(node_0 as isize) != 0 {
                 break;
@@ -1320,7 +1320,7 @@ pub unsafe extern "C" fn crush_remove_tree_bucket_item(
             olddepth = calc_depth((*bucket).h.size as libc::c_int);
             newdepth = calc_depth(newsize as libc::c_int);
             if olddepth != newdepth {
-                (*bucket).num_nodes = ((1 as libc::c_int) << newdepth) as U8;
+                (*bucket).num_nodes = ((1) << newdepth) as U8;
                 _realloc = realloc(
                     (*bucket).node_weights as *mut libc::c_void,
                     (::core::mem::size_of::<U32>() as libc::c_ulong)
@@ -1334,7 +1334,7 @@ pub unsafe extern "C" fn crush_remove_tree_bucket_item(
             }
             (*bucket).h.size = newsize;
         }
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -1345,10 +1345,10 @@ pub unsafe extern "C" fn crush_remove_straw_bucket_item(
 ) -> libc::c_int {
     unsafe {
         let mut newsize: libc::c_int =
-            ((*bucket).h.size).wrapping_sub(1 as libc::c_int as U32) as libc::c_int;
+            ((*bucket).h.size).wrapping_sub(1 as U32) as libc::c_int;
         let mut i: libc::c_uint = 0;
         let mut j: libc::c_uint = 0;
-        i = 0 as libc::c_int as libc::c_uint;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             if *((*bucket).h.items).offset(i as isize) == item {
                 (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
@@ -1356,14 +1356,14 @@ pub unsafe extern "C" fn crush_remove_straw_bucket_item(
                     (*bucket).h.weight = ((*bucket).h.weight)
                         .wrapping_sub(*((*bucket).item_weights).offset(i as isize));
                 } else {
-                    (*bucket).h.weight = 0 as libc::c_int as U32;
+                    (*bucket).h.weight = 0 as U32;
                 }
                 j = i;
                 while j < (*bucket).h.size {
                     *((*bucket).h.items).offset(j as isize) = *((*bucket).h.items)
-                        .offset(j.wrapping_add(1 as libc::c_int as libc::c_uint) as isize);
+                        .offset(j.wrapping_add(1 as libc::c_uint) as isize);
                     *((*bucket).item_weights).offset(j as isize) = *((*bucket).item_weights)
-                        .offset(j.wrapping_add(1 as libc::c_int as libc::c_uint) as isize);
+                        .offset(j.wrapping_add(1 as libc::c_uint) as isize);
                     j = j.wrapping_add(1);
                 }
                 break;
@@ -1413,10 +1413,10 @@ pub unsafe extern "C" fn crush_remove_straw2_bucket_item(
 ) -> libc::c_int {
     unsafe {
         let mut newsize: libc::c_int =
-            ((*bucket).h.size).wrapping_sub(1 as libc::c_int as U32) as libc::c_int;
+            ((*bucket).h.size).wrapping_sub(1 as U32) as libc::c_int;
         let mut i: libc::c_uint = 0;
         let mut j: libc::c_uint = 0;
-        i = 0 as libc::c_int as libc::c_uint;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             if *((*bucket).h.items).offset(i as isize) == item {
                 (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
@@ -1424,14 +1424,14 @@ pub unsafe extern "C" fn crush_remove_straw2_bucket_item(
                     (*bucket).h.weight = ((*bucket).h.weight)
                         .wrapping_sub(*((*bucket).item_weights).offset(i as isize));
                 } else {
-                    (*bucket).h.weight = 0 as libc::c_int as U32;
+                    (*bucket).h.weight = 0 as U32;
                 }
                 j = i;
                 while j < (*bucket).h.size {
                     *((*bucket).h.items).offset(j as isize) = *((*bucket).h.items)
-                        .offset(j.wrapping_add(1 as libc::c_int as libc::c_uint) as isize);
+                        .offset(j.wrapping_add(1 as libc::c_uint) as isize);
                     *((*bucket).item_weights).offset(j as isize) = *((*bucket).item_weights)
-                        .offset(j.wrapping_add(1 as libc::c_int as libc::c_uint) as isize);
+                        .offset(j.wrapping_add(1 as libc::c_uint) as isize);
                     j = j.wrapping_add(1);
                 }
                 break;
@@ -1461,7 +1461,7 @@ pub unsafe extern "C" fn crush_remove_straw2_bucket_item(
         } else {
             (*bucket).item_weights = _realloc as *mut U32;
         }
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -1477,7 +1477,7 @@ pub unsafe extern "C" fn crush_bucket_remove_item(
             3 => crush_remove_tree_bucket_item(b as *mut CrushBucketTree, item),
             4 => crush_remove_straw_bucket_item(map, b as *mut CrushBucketStraw, item),
             5 => crush_remove_straw2_bucket_item(map, b as *mut CrushBucketStraw2, item),
-            _ => -(1 as libc::c_int),
+            _ => (-1),
         }
     }
 }
@@ -1505,7 +1505,7 @@ pub unsafe extern "C" fn crush_adjust_list_bucket_item_weight(
         let mut diff: libc::c_int = 0;
         let mut i: libc::c_uint = 0;
         let mut j: libc::c_uint = 0;
-        i = 0 as libc::c_int as libc::c_uint;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             if *((*bucket).h.items).offset(i as isize) == item {
                 break;
@@ -1513,7 +1513,7 @@ pub unsafe extern "C" fn crush_adjust_list_bucket_item_weight(
             i = i.wrapping_add(1);
         }
         if i == (*bucket).h.size {
-            return 0 as libc::c_int;
+            return 0;
         }
         diff = (weight as U32).wrapping_sub(*((*bucket).item_weights).offset(i as isize))
             as libc::c_int;
@@ -1540,7 +1540,7 @@ pub unsafe extern "C" fn crush_adjust_tree_bucket_item_weight(
         let mut i: libc::c_uint = 0;
         let mut j: libc::c_uint = 0;
         let mut depth: libc::c_uint = calc_depth((*bucket).h.size as libc::c_int) as libc::c_uint;
-        i = 0 as libc::c_int as libc::c_uint;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             if *((*bucket).h.items).offset(i as isize) == item {
                 break;
@@ -1548,14 +1548,14 @@ pub unsafe extern "C" fn crush_adjust_tree_bucket_item_weight(
             i = i.wrapping_add(1);
         }
         if i == (*bucket).h.size {
-            return 0 as libc::c_int;
+            return 0;
         }
         node = crush_calc_tree_node(i as libc::c_int);
         diff = (weight as U32).wrapping_sub(*((*bucket).node_weights).offset(node as isize))
             as libc::c_int;
         *((*bucket).node_weights).offset(node as isize) = weight as U32;
         (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(diff as U32);
-        j = 1 as libc::c_int as libc::c_uint;
+        j = 1 as libc::c_uint;
         while j < depth {
             node = parent(node);
             let fresh7 = &mut (*((*bucket).node_weights).offset(node as isize));
@@ -1576,7 +1576,7 @@ pub unsafe extern "C" fn crush_adjust_straw_bucket_item_weight(
         let mut idx: libc::c_uint = 0;
         let mut diff: libc::c_int = 0;
         let mut r: libc::c_int = 0;
-        idx = 0 as libc::c_int as libc::c_uint;
+        idx = 0 as libc::c_uint;
         while idx < (*bucket).h.size {
             if *((*bucket).h.items).offset(idx as isize) == item {
                 break;
@@ -1584,14 +1584,14 @@ pub unsafe extern "C" fn crush_adjust_straw_bucket_item_weight(
             idx = idx.wrapping_add(1);
         }
         if idx == (*bucket).h.size {
-            return 0 as libc::c_int;
+            return 0;
         }
         diff = (weight as U32).wrapping_sub(*((*bucket).item_weights).offset(idx as isize))
             as libc::c_int;
         *((*bucket).item_weights).offset(idx as isize) = weight as U32;
         (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(diff as U32);
         r = crush_calc_straw(map, bucket);
-        if r < 0 as libc::c_int {
+        if r < 0 {
             return r;
         }
         diff
@@ -1607,7 +1607,7 @@ pub unsafe extern "C" fn crush_adjust_straw2_bucket_item_weight(
     unsafe {
         let mut idx: libc::c_uint = 0;
         let mut diff: libc::c_int = 0;
-        idx = 0 as libc::c_int as libc::c_uint;
+        idx = 0 as libc::c_uint;
         while idx < (*bucket).h.size {
             if *((*bucket).h.items).offset(idx as isize) == item {
                 break;
@@ -1615,7 +1615,7 @@ pub unsafe extern "C" fn crush_adjust_straw2_bucket_item_weight(
             idx = idx.wrapping_add(1);
         }
         if idx == (*bucket).h.size {
-            return 0 as libc::c_int;
+            return 0;
         }
         diff = (weight as U32).wrapping_sub(*((*bucket).item_weights).offset(idx as isize))
             as libc::c_int;
@@ -1647,7 +1647,7 @@ pub unsafe extern "C" fn crush_bucket_adjust_item_weight(
                 item,
                 weight,
             ),
-            _ => -(1 as libc::c_int),
+            _ => (-1),
         }
     }
 }
@@ -1657,15 +1657,15 @@ unsafe extern "C" fn crush_reweight_uniform_bucket(
 ) -> libc::c_int {
     unsafe {
         let mut i: libc::c_uint = 0;
-        let mut sum: libc::c_uint = 0 as libc::c_int as libc::c_uint;
-        let mut n: libc::c_uint = 0 as libc::c_int as libc::c_uint;
-        let mut leaves: libc::c_uint = 0 as libc::c_int as libc::c_uint;
-        i = 0 as libc::c_int as libc::c_uint;
+        let mut sum: libc::c_uint = 0 as libc::c_uint;
+        let mut n: libc::c_uint = 0 as libc::c_uint;
+        let mut leaves: libc::c_uint = 0 as libc::c_uint;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             let mut id: libc::c_int = *((*bucket).h.items).offset(i as isize);
-            if id < 0 as libc::c_int {
+            if id < 0 {
                 let mut c: *mut CrushBucket =
-                    *((*map).buckets).offset((-(1 as libc::c_int) - id) as isize);
+                    *((*map).buckets).offset(((-1) - id) as isize);
                 crush_reweight_bucket(map, c);
                 if crush_addition_is_unsafe(sum, (*c).weight) != 0 {
                     return -(34 as libc::c_int);
@@ -1681,7 +1681,7 @@ unsafe extern "C" fn crush_reweight_uniform_bucket(
             (*bucket).item_weight = sum.wrapping_div(n);
         }
         (*bucket).h.weight = (*bucket).item_weight * (*bucket).h.size;
-        0 as libc::c_int
+        0
     }
 }
 unsafe extern "C" fn crush_reweight_list_bucket(
@@ -1690,13 +1690,13 @@ unsafe extern "C" fn crush_reweight_list_bucket(
 ) -> libc::c_int {
     unsafe {
         let mut i: libc::c_uint = 0;
-        (*bucket).h.weight = 0 as libc::c_int as U32;
-        i = 0 as libc::c_int as libc::c_uint;
+        (*bucket).h.weight = 0 as U32;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             let mut id: libc::c_int = *((*bucket).h.items).offset(i as isize);
-            if id < 0 as libc::c_int {
+            if id < 0 {
                 let mut c: *mut CrushBucket =
-                    *((*map).buckets).offset((-(1 as libc::c_int) - id) as isize);
+                    *((*map).buckets).offset(((-1) - id) as isize);
                 crush_reweight_bucket(map, c);
                 *((*bucket).item_weights).offset(i as isize) = (*c).weight;
             }
@@ -1711,7 +1711,7 @@ unsafe extern "C" fn crush_reweight_list_bucket(
                 ((*bucket).h.weight).wrapping_add(*((*bucket).item_weights).offset(i as isize));
             i = i.wrapping_add(1);
         }
-        0 as libc::c_int
+        0
     }
 }
 unsafe extern "C" fn crush_reweight_tree_bucket(
@@ -1720,14 +1720,14 @@ unsafe extern "C" fn crush_reweight_tree_bucket(
 ) -> libc::c_int {
     unsafe {
         let mut i: libc::c_uint = 0;
-        (*bucket).h.weight = 0 as libc::c_int as U32;
-        i = 0 as libc::c_int as libc::c_uint;
+        (*bucket).h.weight = 0 as U32;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             let mut node: libc::c_int = crush_calc_tree_node(i as libc::c_int);
             let mut id: libc::c_int = *((*bucket).h.items).offset(i as isize);
-            if id < 0 as libc::c_int {
+            if id < 0 {
                 let mut c: *mut CrushBucket =
-                    *((*map).buckets).offset((-(1 as libc::c_int) - id) as isize);
+                    *((*map).buckets).offset(((-1) - id) as isize);
                 crush_reweight_bucket(map, c);
                 *((*bucket).node_weights).offset(node as isize) = (*c).weight;
             }
@@ -1742,7 +1742,7 @@ unsafe extern "C" fn crush_reweight_tree_bucket(
                 ((*bucket).h.weight).wrapping_add(*((*bucket).node_weights).offset(node as isize));
             i = i.wrapping_add(1);
         }
-        0 as libc::c_int
+        0
     }
 }
 unsafe extern "C" fn crush_reweight_straw_bucket(
@@ -1751,13 +1751,13 @@ unsafe extern "C" fn crush_reweight_straw_bucket(
 ) -> libc::c_int {
     unsafe {
         let mut i: libc::c_uint = 0;
-        (*bucket).h.weight = 0 as libc::c_int as U32;
-        i = 0 as libc::c_int as libc::c_uint;
+        (*bucket).h.weight = 0 as U32;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             let mut id: libc::c_int = *((*bucket).h.items).offset(i as isize);
-            if id < 0 as libc::c_int {
+            if id < 0 {
                 let mut c: *mut CrushBucket =
-                    *((*map).buckets).offset((-(1 as libc::c_int) - id) as isize);
+                    *((*map).buckets).offset(((-1) - id) as isize);
                 crush_reweight_bucket(map, c);
                 *((*bucket).item_weights).offset(i as isize) = (*c).weight;
             }
@@ -1773,7 +1773,7 @@ unsafe extern "C" fn crush_reweight_straw_bucket(
             i = i.wrapping_add(1);
         }
         crush_calc_straw(map, bucket);
-        0 as libc::c_int
+        0
     }
 }
 unsafe extern "C" fn crush_reweight_straw2_bucket(
@@ -1782,13 +1782,13 @@ unsafe extern "C" fn crush_reweight_straw2_bucket(
 ) -> libc::c_int {
     unsafe {
         let mut i: libc::c_uint = 0;
-        (*bucket).h.weight = 0 as libc::c_int as U32;
-        i = 0 as libc::c_int as libc::c_uint;
+        (*bucket).h.weight = 0 as U32;
+        i = 0 as libc::c_uint;
         while i < (*bucket).h.size {
             let mut id: libc::c_int = *((*bucket).h.items).offset(i as isize);
-            if id < 0 as libc::c_int {
+            if id < 0 {
                 let mut c: *mut CrushBucket =
-                    *((*map).buckets).offset((-(1 as libc::c_int) - id) as isize);
+                    *((*map).buckets).offset(((-1) - id) as isize);
                 crush_reweight_bucket(map, c);
                 *((*bucket).item_weights).offset(i as isize) = (*c).weight;
             }
@@ -1803,7 +1803,7 @@ unsafe extern "C" fn crush_reweight_straw2_bucket(
                 ((*bucket).h.weight).wrapping_add(*((*bucket).item_weights).offset(i as isize));
             i = i.wrapping_add(1);
         }
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
@@ -1827,9 +1827,9 @@ pub unsafe extern "C" fn crush_make_choose_args(
 ) -> *mut CrushChooseArg {
     unsafe {
         let mut b: libc::c_int = 0;
-        let mut sum_bucket_size: libc::c_int = 0 as libc::c_int;
-        let mut bucket_count: libc::c_int = 0 as libc::c_int;
-        b = 0 as libc::c_int;
+        let mut sum_bucket_size: libc::c_int = 0;
+        let mut bucket_count: libc::c_int = 0;
+        b = 0;
         while b < (*map).max_buckets {
             if !(*((*map).buckets).offset(b as isize)).is_null() {
                 sum_bucket_size = (sum_bucket_size as U32)
@@ -1880,7 +1880,7 @@ pub unsafe extern "C" fn crush_make_choose_args(
             );
         }
 
-        b = 0 as libc::c_int;
+        b = 0;
         while b < (*map).max_buckets {
             if (*((*map).buckets).offset(b as isize)).is_null() {
                 memset(
@@ -1892,7 +1892,7 @@ pub unsafe extern "C" fn crush_make_choose_args(
                 let mut bucket: *mut CrushBucketStraw2 =
                     *((*map).buckets).offset(b as isize) as *mut CrushBucketStraw2;
                 let mut position: libc::c_int = 0;
-                position = 0 as libc::c_int;
+                position = 0;
                 while position < num_positions {
                     memcpy(
                         weights as *mut libc::c_void,
