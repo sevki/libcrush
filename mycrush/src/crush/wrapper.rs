@@ -43,16 +43,16 @@ impl BucketAlgorithm {
 
 // Wrapper for crush_map
 #[repr(transparent)]
-pub struct CrushMap {
-    pub ptr: *mut crush_map,
+pub struct Map {
+    pub ptr: *mut CrushMap,
 }
 
-impl CrushMap {
+impl Map {
     pub fn new() -> Self {
         unsafe {
             let ptr = crush_create();
             assert!(!ptr.is_null());
-            CrushMap { ptr }
+            Map { ptr }
         }
     }
 
@@ -231,7 +231,7 @@ impl CrushMap {
     }
 }
 
-impl Drop for CrushMap {
+impl Drop for Map {
     fn drop(&mut self) {
         unsafe {
             if !self.ptr.is_null() {
@@ -241,7 +241,7 @@ impl Drop for CrushMap {
     }
 }
 
-impl Default for CrushMap {
+impl Default for Map {
     fn default() -> Self {
         Self::new()
     }
@@ -249,8 +249,8 @@ impl Default for CrushMap {
 
 #[derive(Debug)]
 pub struct Bucket {
-    ptr: *mut crush_bucket,
-    _map: *mut crush_map,
+    ptr: *mut CrushBucket,
+    _map: *mut CrushMap,
 }
 
 impl Bucket {
@@ -266,14 +266,10 @@ impl Bucket {
         unsafe { (*self.ptr).size }
     }
 
-    pub fn add_item(&mut self, map: &mut CrushMap, item: i32, weight: i32) -> Result<(), i32> {
+    pub fn add_item(&mut self, map: &mut Map, item: i32, weight: i32) -> Result<(), i32> {
         unsafe {
             let result = crush_bucket_add_item(map.ptr, self.ptr, item, weight);
-            if result == 0 {
-                Ok(())
-            } else {
-                Err(result)
-            }
+            if result == 0 { Ok(()) } else { Err(result) }
         }
     }
 }
@@ -291,7 +287,7 @@ impl Drop for Bucket {
 
 #[derive(Debug)]
 pub struct Rule {
-    ptr: *mut crush_rule,
+    ptr: *mut CrushRule,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -374,7 +370,7 @@ impl Drop for Rule {
 
 #[derive(Debug)]
 pub struct ChooseArgs {
-    ptr: *mut crush_choose_arg,
+    ptr: *mut CrushChooseArg,
     _num_positions: i32,
 }
 

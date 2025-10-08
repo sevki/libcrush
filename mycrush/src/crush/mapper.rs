@@ -11,7 +11,7 @@
 use crate::crush::types::*;
 use ::libc;
 
-extern "C" {
+unsafe extern "C" {
     fn __assert_fail(
         __assertion: *const libc::c_char,
         __file: *const libc::c_char,
@@ -541,144 +541,151 @@ static mut __LL_tbl: [__s64; 256] = [
     0x2da102d63b0 as libc::c_ulonglong as __s64,
     0x2dced24f814 as libc::c_ulonglong as __s64,
 ];
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_find_rule(
-    mut map: *const crush_map,
+    mut map: *const CrushMap,
     mut ruleset: libc::c_int,
     mut type_0: libc::c_int,
     mut size: libc::c_int,
 ) -> libc::c_int {
-    let mut i: __u32 = 0;
-    i = 0 as libc::c_int as __u32;
-    while i < (*map).max_rules {
-        if !(*((*map).rules).offset(i as isize)).is_null()
-            && (**((*map).rules).offset(i as isize)).mask.ruleset as libc::c_int == ruleset
-            && (**((*map).rules).offset(i as isize)).mask.type_0 as libc::c_int == type_0
-            && (**((*map).rules).offset(i as isize)).mask.min_size as libc::c_int <= size
-            && (**((*map).rules).offset(i as isize)).mask.max_size as libc::c_int >= size
-        {
-            return i as libc::c_int;
-        }
-        i = i.wrapping_add(1);
-        i;
-    }
-    -(1 as libc::c_int)
-}
-unsafe extern "C" fn bucket_perm_choose(
-    mut bucket: *const crush_bucket,
-    mut work: *mut crush_work_bucket,
-    mut x: libc::c_int,
-    mut r: libc::c_int,
-) -> libc::c_int {
-    let mut current_block: u64;
-    let mut pr: libc::c_uint = r as __u32 % (*bucket).size;
-    let mut i: libc::c_uint = 0;
-    let mut s: libc::c_uint = 0;
-    if (*work).perm_x != x as __u32 || (*work).perm_n == 0 as libc::c_int as __u32 {
-        (*work).perm_x = x as __u32;
-        if pr == 0 as libc::c_int as libc::c_uint {
-            s = crush_hash32_3(
-                (*bucket).hash as libc::c_int,
-                x as __u32,
-                (*bucket).id as __u32,
-                0 as libc::c_int as __u32,
-            ) % (*bucket).size;
-            *((*work).perm).offset(0 as libc::c_int as isize) = s;
-            (*work).perm_n = 0xffff as libc::c_int as __u32;
-            current_block = 3275366147856559585;
-        } else {
-            i = 0 as libc::c_int as libc::c_uint;
-            while i < (*bucket).size {
-                *((*work).perm).offset(i as isize) = i;
-                i = i.wrapping_add(1);
-                i;
+    unsafe {
+        let mut i: __u32 = 0;
+        i = 0 as libc::c_int as __u32;
+        while i < (*map).max_rules {
+            if !(*((*map).rules).offset(i as isize)).is_null()
+                && (**((*map).rules).offset(i as isize)).mask.ruleset as libc::c_int == ruleset
+                && (**((*map).rules).offset(i as isize)).mask.type_0 as libc::c_int == type_0
+                && (**((*map).rules).offset(i as isize)).mask.min_size as libc::c_int <= size
+                && (**((*map).rules).offset(i as isize)).mask.max_size as libc::c_int >= size
+            {
+                return i as libc::c_int;
             }
-            (*work).perm_n = 0 as libc::c_int as __u32;
-            current_block = 13056961889198038528;
-        }
-    } else {
-        if (*work).perm_n == 0xffff as libc::c_int as __u32 {
-            i = 1 as libc::c_int as libc::c_uint;
-            while i < (*bucket).size {
-                *((*work).perm).offset(i as isize) = i;
-                i = i.wrapping_add(1);
-                i;
-            }
-            *((*work).perm).offset(*((*work).perm).offset(0 as libc::c_int as isize) as isize) =
-                0 as libc::c_int as __u32;
-            (*work).perm_n = 1 as libc::c_int as __u32;
-        }
-        current_block = 13056961889198038528;
-    }
-    if current_block == 13056961889198038528 {
-        i = 0 as libc::c_int as libc::c_uint;
-        while i < (*work).perm_n {
             i = i.wrapping_add(1);
             i;
         }
-        while (*work).perm_n <= pr {
-            let mut p: libc::c_uint = (*work).perm_n;
-            if p < ((*bucket).size).wrapping_sub(1 as libc::c_int as __u32) {
-                i = (crush_hash32_3(
+        -(1 as libc::c_int)
+    }
+}
+unsafe extern "C" fn bucket_perm_choose(
+    mut bucket: *const CrushBucket,
+    mut work: *mut CrushWorkBucket,
+    mut x: libc::c_int,
+    mut r: libc::c_int,
+) -> libc::c_int {
+    unsafe {
+        let mut current_block: u64;
+        let mut pr: libc::c_uint = r as __u32 % (*bucket).size;
+        let mut i: libc::c_uint = 0;
+        let mut s: libc::c_uint = 0;
+        if (*work).perm_x != x as __u32 || (*work).perm_n == 0 as libc::c_int as __u32 {
+            (*work).perm_x = x as __u32;
+            if pr == 0 as libc::c_int as libc::c_uint {
+                s = crush_hash32_3(
                     (*bucket).hash as libc::c_int,
                     x as __u32,
                     (*bucket).id as __u32,
-                    p,
-                ))
-                .wrapping_rem(((*bucket).size).wrapping_sub(p));
-                if i != 0 {
-                    let mut t: libc::c_uint =
-                        *((*work).perm).offset(p.wrapping_add(i) as isize);
-                    *((*work).perm).offset(p.wrapping_add(i) as isize) =
-                        *((*work).perm).offset(p as isize);
-                    *((*work).perm).offset(p as isize) = t;
+                    0 as libc::c_int as __u32,
+                ) % (*bucket).size;
+                *((*work).perm).offset(0 as libc::c_int as isize) = s;
+                (*work).perm_n = 0xffff as libc::c_int as __u32;
+                current_block = 3275366147856559585;
+            } else {
+                i = 0 as libc::c_int as libc::c_uint;
+                while i < (*bucket).size {
+                    *((*work).perm).offset(i as isize) = i;
+                    i = i.wrapping_add(1);
+                    i;
                 }
+                (*work).perm_n = 0 as libc::c_int as __u32;
+                current_block = 13056961889198038528;
             }
-            (*work).perm_n = ((*work).perm_n).wrapping_add(1);
-            (*work).perm_n;
+        } else {
+            if (*work).perm_n == 0xffff as libc::c_int as __u32 {
+                i = 1 as libc::c_int as libc::c_uint;
+                while i < (*bucket).size {
+                    *((*work).perm).offset(i as isize) = i;
+                    i = i.wrapping_add(1);
+                    i;
+                }
+                *((*work).perm)
+                    .offset(*((*work).perm).offset(0 as libc::c_int as isize) as isize) =
+                    0 as libc::c_int as __u32;
+                (*work).perm_n = 1 as libc::c_int as __u32;
+            }
+            current_block = 13056961889198038528;
         }
-        i = 0 as libc::c_int as libc::c_uint;
-        while i < (*bucket).size {
-            i = i.wrapping_add(1);
-            i;
+        if current_block == 13056961889198038528 {
+            i = 0 as libc::c_int as libc::c_uint;
+            while i < (*work).perm_n {
+                i = i.wrapping_add(1);
+                i;
+            }
+            while (*work).perm_n <= pr {
+                let mut p: libc::c_uint = (*work).perm_n;
+                if p < ((*bucket).size).wrapping_sub(1 as libc::c_int as __u32) {
+                    i = (crush_hash32_3(
+                        (*bucket).hash as libc::c_int,
+                        x as __u32,
+                        (*bucket).id as __u32,
+                        p,
+                    ))
+                    .wrapping_rem(((*bucket).size).wrapping_sub(p));
+                    if i != 0 {
+                        let mut t: libc::c_uint =
+                            *((*work).perm).offset(p.wrapping_add(i) as isize);
+                        *((*work).perm).offset(p.wrapping_add(i) as isize) =
+                            *((*work).perm).offset(p as isize);
+                        *((*work).perm).offset(p as isize) = t;
+                    }
+                }
+                (*work).perm_n = ((*work).perm_n).wrapping_add(1);
+                (*work).perm_n;
+            }
+            i = 0 as libc::c_int as libc::c_uint;
+            while i < (*bucket).size {
+                i = i.wrapping_add(1);
+                i;
+            }
+            s = *((*work).perm).offset(pr as isize);
         }
-        s = *((*work).perm).offset(pr as isize);
+        *((*bucket).items).offset(s as isize)
     }
-    *((*bucket).items).offset(s as isize)
 }
 unsafe extern "C" fn bucket_uniform_choose(
-    mut bucket: *const crush_bucket_uniform,
-    mut work: *mut crush_work_bucket,
+    mut bucket: *const CrushBucketUniform,
+    mut work: *mut CrushWorkBucket,
     mut x: libc::c_int,
     mut r: libc::c_int,
 ) -> libc::c_int {
-    bucket_perm_choose(&(*bucket).h, work, x, r)
+    unsafe { bucket_perm_choose(&(*bucket).h, work, x, r) }
 }
 unsafe extern "C" fn bucket_list_choose(
-    mut bucket: *const crush_bucket_list,
+    mut bucket: *const CrushBucketList,
     mut x: libc::c_int,
     mut r: libc::c_int,
 ) -> libc::c_int {
-    let mut i: libc::c_int = 0;
-    i = ((*bucket).h.size).wrapping_sub(1 as libc::c_int as __u32) as libc::c_int;
-    while i >= 0 as libc::c_int {
-        let mut w: __u64 = crush_hash32_4(
-            (*bucket).h.hash as libc::c_int,
-            x as __u32,
-            *((*bucket).h.items).offset(i as isize) as __u32,
-            r as __u32,
-            (*bucket).h.id as __u32,
-        ) as __u64;
-        w &= 0xffff as libc::c_int as __u64;
-        w *= *((*bucket).sum_weights).offset(i as isize) as __u64;
-        w >>= 16 as libc::c_int;
-        if w < *((*bucket).item_weights).offset(i as isize) as __u64 {
-            return *((*bucket).h.items).offset(i as isize);
+    unsafe {
+        let mut i: libc::c_int = 0;
+        i = ((*bucket).h.size).wrapping_sub(1 as libc::c_int as __u32) as libc::c_int;
+        while i >= 0 as libc::c_int {
+            let mut w: __u64 = crush_hash32_4(
+                (*bucket).h.hash as libc::c_int,
+                x as __u32,
+                *((*bucket).h.items).offset(i as isize) as __u32,
+                r as __u32,
+                (*bucket).h.id as __u32,
+            ) as __u64;
+            w &= 0xffff as libc::c_int as __u64;
+            w *= *((*bucket).sum_weights).offset(i as isize) as __u64;
+            w >>= 16 as libc::c_int;
+            if w < *((*bucket).item_weights).offset(i as isize) as __u64 {
+                return *((*bucket).h.items).offset(i as isize);
+            }
+            i -= 1;
+            i;
         }
-        i -= 1;
-        i;
+        *((*bucket).h.items).offset(0 as libc::c_int as isize)
     }
-    *((*bucket).h.items).offset(0 as libc::c_int as isize)
 }
 unsafe extern "C" fn height(mut n: libc::c_int) -> libc::c_int {
     let mut h: libc::c_int = 0 as libc::c_int;
@@ -690,185 +697,205 @@ unsafe extern "C" fn height(mut n: libc::c_int) -> libc::c_int {
     h
 }
 unsafe extern "C" fn left(mut x: libc::c_int) -> libc::c_int {
-    let mut h: libc::c_int = height(x);
-    x - ((1 as libc::c_int) << (h - 1 as libc::c_int))
+    unsafe {
+        let mut h: libc::c_int = height(x);
+        x - ((1 as libc::c_int) << (h - 1 as libc::c_int))
+    }
 }
 unsafe extern "C" fn right(mut x: libc::c_int) -> libc::c_int {
-    let mut h: libc::c_int = height(x);
-    x + ((1 as libc::c_int) << (h - 1 as libc::c_int))
+    unsafe {
+        let mut h: libc::c_int = height(x);
+        x + ((1 as libc::c_int) << (h - 1 as libc::c_int))
+    }
 }
 unsafe extern "C" fn terminal(mut x: libc::c_int) -> libc::c_int {
     x & 1 as libc::c_int
 }
 unsafe extern "C" fn bucket_tree_choose(
-    mut bucket: *const crush_bucket_tree,
+    mut bucket: *const CrushBucketTree,
     mut x: libc::c_int,
     mut r: libc::c_int,
 ) -> libc::c_int {
-    let mut n: libc::c_int = 0;
-    let mut w: __u32 = 0;
-    let mut t: __u64 = 0;
-    n = (*bucket).num_nodes as libc::c_int >> 1 as libc::c_int;
-    while terminal(n) == 0 {
-        let mut l: libc::c_int = 0;
-        w = *((*bucket).node_weights).offset(n as isize);
-        t = crush_hash32_4(
-            (*bucket).h.hash as libc::c_int,
-            x as __u32,
-            n as __u32,
-            r as __u32,
-            (*bucket).h.id as __u32,
-        ) as __u64
-            * w as __u64;
-        t >>= 32 as libc::c_int;
-        l = left(n);
-        if t < *((*bucket).node_weights).offset(l as isize) as __u64 {
-            n = l;
-        } else {
-            n = right(n);
+    unsafe {
+        let mut n: libc::c_int = 0;
+        let mut w: __u32 = 0;
+        let mut t: __u64 = 0;
+        n = (*bucket).num_nodes as libc::c_int >> 1 as libc::c_int;
+        while terminal(n) == 0 {
+            let mut l: libc::c_int = 0;
+            w = *((*bucket).node_weights).offset(n as isize);
+            t = crush_hash32_4(
+                (*bucket).h.hash as libc::c_int,
+                x as __u32,
+                n as __u32,
+                r as __u32,
+                (*bucket).h.id as __u32,
+            ) as __u64
+                * w as __u64;
+            t >>= 32 as libc::c_int;
+            l = left(n);
+            if t < *((*bucket).node_weights).offset(l as isize) as __u64 {
+                n = l;
+            } else {
+                n = right(n);
+            }
         }
+        *((*bucket).h.items).offset((n >> 1 as libc::c_int) as isize)
     }
-    *((*bucket).h.items).offset((n >> 1 as libc::c_int) as isize)
 }
 unsafe extern "C" fn bucket_straw_choose(
-    mut bucket: *const crush_bucket_straw,
+    mut bucket: *const CrushBucketStraw,
     mut x: libc::c_int,
     mut r: libc::c_int,
 ) -> libc::c_int {
-    let mut i: __u32 = 0;
-    let mut high: libc::c_int = 0 as libc::c_int;
-    let mut high_draw: __u64 = 0 as libc::c_int as __u64;
-    let mut draw: __u64 = 0;
-    i = 0 as libc::c_int as __u32;
-    while i < (*bucket).h.size {
-        draw = crush_hash32_3(
-            (*bucket).h.hash as libc::c_int,
-            x as __u32,
-            *((*bucket).h.items).offset(i as isize) as __u32,
-            r as __u32,
-        ) as __u64;
-        draw &= 0xffff as libc::c_int as __u64;
-        draw *= *((*bucket).straws).offset(i as isize) as __u64;
-        if i == 0 as libc::c_int as __u32 || draw > high_draw {
-            high = i as libc::c_int;
-            high_draw = draw;
+    unsafe {
+        let mut i: __u32 = 0;
+        let mut high: libc::c_int = 0 as libc::c_int;
+        let mut high_draw: __u64 = 0 as libc::c_int as __u64;
+        let mut draw: __u64 = 0;
+        i = 0 as libc::c_int as __u32;
+        while i < (*bucket).h.size {
+            draw = crush_hash32_3(
+                (*bucket).h.hash as libc::c_int,
+                x as __u32,
+                *((*bucket).h.items).offset(i as isize) as __u32,
+                r as __u32,
+            ) as __u64;
+            draw &= 0xffff as libc::c_int as __u64;
+            draw *= *((*bucket).straws).offset(i as isize) as __u64;
+            if i == 0 as libc::c_int as __u32 || draw > high_draw {
+                high = i as libc::c_int;
+                high_draw = draw;
+            }
+            i = i.wrapping_add(1);
+            i;
         }
-        i = i.wrapping_add(1);
-        i;
+        *((*bucket).h.items).offset(high as isize)
     }
-    *((*bucket).h.items).offset(high as isize)
 }
 unsafe extern "C" fn crush_ln(mut xin: libc::c_uint) -> __u64 {
-    let mut x: libc::c_uint = xin;
-    let mut iexpon: libc::c_int = 0;
-    let mut index1: libc::c_int = 0;
-    let mut index2: libc::c_int = 0;
-    let mut RH: __u64 = 0;
-    let mut LH: __u64 = 0;
-    let mut LL: __u64 = 0;
-    let mut xl64: __u64 = 0;
-    let mut result: __u64 = 0;
-    x = x.wrapping_add(1);
-    x;
-    iexpon = 15 as libc::c_int;
-    if x & 0x18000 as libc::c_int as libc::c_uint == 0 {
-        let mut bits: libc::c_int =
-            (x & 0x1ffff as libc::c_int as libc::c_uint).leading_zeros() as i32 - 16 as libc::c_int;
-        x <<= bits;
-        iexpon = 15 as libc::c_int - bits;
+    unsafe {
+        let mut x: libc::c_uint = xin;
+        let mut iexpon: libc::c_int = 0;
+        let mut index1: libc::c_int = 0;
+        let mut index2: libc::c_int = 0;
+        let mut RH: __u64 = 0;
+        let mut LH: __u64 = 0;
+        let mut LL: __u64 = 0;
+        let mut xl64: __u64 = 0;
+        let mut result: __u64 = 0;
+        x = x.wrapping_add(1);
+        x;
+        iexpon = 15 as libc::c_int;
+        if x & 0x18000 as libc::c_int as libc::c_uint == 0 {
+            let mut bits: libc::c_int = (x & 0x1ffff as libc::c_int as libc::c_uint).leading_zeros()
+                as i32
+                - 16 as libc::c_int;
+            x <<= bits;
+            iexpon = 15 as libc::c_int - bits;
+        }
+        index1 = ((x >> 8 as libc::c_int) << 1 as libc::c_int) as libc::c_int;
+        RH = __RH_LH_tbl[(index1 - 256 as libc::c_int) as usize] as __u64;
+        LH = __RH_LH_tbl[(index1 + 1 as libc::c_int - 256 as libc::c_int) as usize] as __u64;
+        xl64 = x as __s64 as __u64 * RH;
+        xl64 >>= 48 as libc::c_int;
+        result = iexpon as __u64;
+        result <<= 12 as libc::c_int + 32 as libc::c_int;
+        index2 = (xl64 & 0xff as libc::c_int as __u64) as libc::c_int;
+        LL = __LL_tbl[index2 as usize] as __u64;
+        LH = LH.wrapping_add(LL);
+        LH >>= 48 as libc::c_int - 12 as libc::c_int - 32 as libc::c_int;
+        result = result.wrapping_add(LH);
+        result
     }
-    index1 = ((x >> 8 as libc::c_int) << 1 as libc::c_int) as libc::c_int;
-    RH = __RH_LH_tbl[(index1 - 256 as libc::c_int) as usize] as __u64;
-    LH = __RH_LH_tbl[(index1 + 1 as libc::c_int - 256 as libc::c_int) as usize] as __u64;
-    xl64 = x as __s64 as __u64 * RH;
-    xl64 >>= 48 as libc::c_int;
-    result = iexpon as __u64;
-    result <<= 12 as libc::c_int + 32 as libc::c_int;
-    index2 = (xl64 & 0xff as libc::c_int as __u64) as libc::c_int;
-    LL = __LL_tbl[index2 as usize] as __u64;
-    LH = LH.wrapping_add(LL);
-    LH >>= 48 as libc::c_int - 12 as libc::c_int - 32 as libc::c_int;
-    result = result.wrapping_add(LH);
-    result
 }
 #[inline]
 unsafe extern "C" fn get_choose_arg_weights(
-    mut bucket: *const crush_bucket_straw2,
-    mut arg: *const crush_choose_arg,
+    mut bucket: *const CrushBucketStraw2,
+    mut arg: *const CrushChooseArg,
     mut position: libc::c_int,
 ) -> *mut __u32 {
-    if arg.is_null()
-        || ((*arg).weight_set).is_null()
-        || (*arg).weight_set_size == 0 as libc::c_int as __u32
-    {
-        return (*bucket).item_weights;
+    unsafe {
+        if arg.is_null()
+            || ((*arg).weight_set).is_null()
+            || (*arg).weight_set_size == 0 as libc::c_int as __u32
+        {
+            return (*bucket).item_weights;
+        }
+        if position as __u32 >= (*arg).weight_set_size {
+            position =
+                ((*arg).weight_set_size).wrapping_sub(1 as libc::c_int as __u32) as libc::c_int;
+        }
+        (*((*arg).weight_set).offset(position as isize)).weights
     }
-    if position as __u32 >= (*arg).weight_set_size {
-        position = ((*arg).weight_set_size).wrapping_sub(1 as libc::c_int as __u32) as libc::c_int;
-    }
-    (*((*arg).weight_set).offset(position as isize)).weights
 }
 #[inline]
 unsafe extern "C" fn get_choose_arg_ids(
-    mut bucket: *const crush_bucket_straw2,
-    mut arg: *const crush_choose_arg,
+    mut bucket: *const CrushBucketStraw2,
+    mut arg: *const CrushChooseArg,
 ) -> *mut libc::c_int {
-    if arg.is_null() || ((*arg).ids).is_null() {
-        return (*bucket).h.items;
+    unsafe {
+        if arg.is_null() || ((*arg).ids).is_null() {
+            return (*bucket).h.items;
+        }
+        (*arg).ids
     }
-    (*arg).ids
 }
 unsafe extern "C" fn bucket_straw2_choose(
-    mut bucket: *const crush_bucket_straw2,
+    mut bucket: *const CrushBucketStraw2,
     mut x: libc::c_int,
     mut r: libc::c_int,
-    mut arg: *const crush_choose_arg,
+    mut arg: *const CrushChooseArg,
     mut position: libc::c_int,
 ) -> libc::c_int {
-    let mut i: libc::c_uint = 0;
-    let mut high: libc::c_uint = 0 as libc::c_int as libc::c_uint;
-    let mut u: libc::c_uint = 0;
-    let mut ln: __s64 = 0;
-    let mut draw: __s64 = 0;
-    let mut high_draw: __s64 = 0 as libc::c_int as __s64;
-    let mut weights: *mut __u32 = get_choose_arg_weights(bucket, arg, position);
-    let mut ids: *mut libc::c_int = get_choose_arg_ids(bucket, arg);
-    i = 0 as libc::c_int as libc::c_uint;
-    while i < (*bucket).h.size {
-        if *weights.offset(i as isize) != 0 {
-            u = crush_hash32_3(
-                (*bucket).h.hash as libc::c_int,
-                x as __u32,
-                *ids.offset(i as isize) as __u32,
-                r as __u32,
-            );
-            u &= 0xffff as libc::c_int as libc::c_uint;
-            ln = (crush_ln(u)).wrapping_sub(0x1000000000000 as libc::c_longlong as __u64) as __s64;
-            draw = ln / *weights.offset(i as isize) as __s64;
-        } else {
-            draw = -((!(0 as libc::c_ulonglong) >> 1 as libc::c_int) as __s64)
-                - 1 as libc::c_int as __s64;
+    unsafe {
+        let mut i: libc::c_uint = 0;
+        let mut high: libc::c_uint = 0 as libc::c_int as libc::c_uint;
+        let mut u: libc::c_uint = 0;
+        let mut ln: __s64 = 0;
+        let mut draw: __s64 = 0;
+        let mut high_draw: __s64 = 0 as libc::c_int as __s64;
+        let mut weights: *mut __u32 = get_choose_arg_weights(bucket, arg, position);
+        let mut ids: *mut libc::c_int = get_choose_arg_ids(bucket, arg);
+        i = 0 as libc::c_int as libc::c_uint;
+        while i < (*bucket).h.size {
+            if *weights.offset(i as isize) != 0 {
+                u = crush_hash32_3(
+                    (*bucket).h.hash as libc::c_int,
+                    x as __u32,
+                    *ids.offset(i as isize) as __u32,
+                    r as __u32,
+                );
+                u &= 0xffff as libc::c_int as libc::c_uint;
+                ln = (crush_ln(u)).wrapping_sub(0x1000000000000 as libc::c_longlong as __u64)
+                    as __s64;
+                draw = ln / *weights.offset(i as isize) as __s64;
+            } else {
+                draw = -((!(0 as libc::c_ulonglong) >> 1 as libc::c_int) as __s64)
+                    - 1 as libc::c_int as __s64;
+            }
+            if i == 0 as libc::c_int as libc::c_uint || draw > high_draw {
+                high = i;
+                high_draw = draw;
+            }
+            i = i.wrapping_add(1);
+            i;
         }
-        if i == 0 as libc::c_int as libc::c_uint || draw > high_draw {
-            high = i;
-            high_draw = draw;
-        }
-        i = i.wrapping_add(1);
-        i;
+        *((*bucket).h.items).offset(high as isize)
     }
-    *((*bucket).h.items).offset(high as isize)
 }
 unsafe extern "C" fn crush_bucket_choose(
-    mut in_0: *const crush_bucket,
-    mut work: *mut crush_work_bucket,
+    mut in_0: *const CrushBucket,
+    mut work: *mut CrushWorkBucket,
     mut x: libc::c_int,
     mut r: libc::c_int,
-    mut arg: *const crush_choose_arg,
+    mut arg: *const CrushChooseArg,
     mut position: libc::c_int,
 ) -> libc::c_int {
-    if (*in_0).size != 0 as libc::c_int as __u32 {
-    } else {
-        __assert_fail(
+    unsafe {
+        if (*in_0).size != 0 as libc::c_int as __u32 {
+        } else {
+            __assert_fail(
             b"!(in->size == 0)\0" as *const u8 as *const libc::c_char,
             b"/home/sevki/src/libcrush/crush/mapper.c\0" as *const u8
                 as *const libc::c_char,
@@ -881,11 +908,11 @@ unsafe extern "C" fn crush_bucket_choose(
             ))
                 .as_ptr(),
         );
-    }
-    'c_5383: {
-        if (*in_0).size != 0 as libc::c_int as __u32 {
-        } else {
-            __assert_fail(
+        }
+        'c_5383: {
+            if (*in_0).size != 0 as libc::c_int as __u32 {
+            } else {
+                __assert_fail(
                 b"!(in->size == 0)\0" as *const u8 as *const libc::c_char,
                 b"/home/sevki/src/libcrush/crush/mapper.c\0" as *const u8
                     as *const libc::c_char,
@@ -898,49 +925,48 @@ unsafe extern "C" fn crush_bucket_choose(
                 ))
                     .as_ptr(),
             );
+            }
+        };
+        match (*in_0).alg as libc::c_int {
+            1 => bucket_uniform_choose(in_0 as *const CrushBucketUniform, work, x, r),
+            2 => bucket_list_choose(in_0 as *const CrushBucketList, x, r),
+            3 => bucket_tree_choose(in_0 as *const CrushBucketTree, x, r),
+            4 => bucket_straw_choose(in_0 as *const CrushBucketStraw, x, r),
+            5 => bucket_straw2_choose(in_0 as *const CrushBucketStraw2, x, r, arg, position),
+            _ => *((*in_0).items).offset(0 as libc::c_int as isize),
         }
-    };
-    match (*in_0).alg as libc::c_int {
-        1 => {
-            bucket_uniform_choose(in_0 as *const crush_bucket_uniform, work, x, r)
-        }
-        2 => bucket_list_choose(in_0 as *const crush_bucket_list, x, r),
-        3 => bucket_tree_choose(in_0 as *const crush_bucket_tree, x, r),
-        4 => bucket_straw_choose(in_0 as *const crush_bucket_straw, x, r),
-        5 => {
-            bucket_straw2_choose(in_0 as *const crush_bucket_straw2, x, r, arg, position)
-        }
-        _ => *((*in_0).items).offset(0 as libc::c_int as isize),
     }
 }
 unsafe extern "C" fn is_out(
-    mut map: *const crush_map,
+    mut map: *const CrushMap,
     mut weight: *const __u32,
     mut weight_max: libc::c_int,
     mut item: libc::c_int,
     mut x: libc::c_int,
 ) -> libc::c_int {
-    if item >= weight_max {
-        return 1 as libc::c_int;
+    unsafe {
+        if item >= weight_max {
+            return 1 as libc::c_int;
+        }
+        if *weight.offset(item as isize) >= 0x10000 as libc::c_int as __u32 {
+            return 0 as libc::c_int;
+        }
+        if *weight.offset(item as isize) == 0 as libc::c_int as __u32 {
+            return 1 as libc::c_int;
+        }
+        if (crush_hash32_2(0 as libc::c_int, x as __u32, item as __u32)
+            & 0xffff as libc::c_int as __u32)
+            < *weight.offset(item as isize)
+        {
+            return 0 as libc::c_int;
+        }
+        1 as libc::c_int
     }
-    if *weight.offset(item as isize) >= 0x10000 as libc::c_int as __u32 {
-        return 0 as libc::c_int;
-    }
-    if *weight.offset(item as isize) == 0 as libc::c_int as __u32 {
-        return 1 as libc::c_int;
-    }
-    if (crush_hash32_2(0 as libc::c_int, x as __u32, item as __u32)
-        & 0xffff as libc::c_int as __u32)
-        < *weight.offset(item as isize)
-    {
-        return 0 as libc::c_int;
-    }
-    1 as libc::c_int
 }
 unsafe extern "C" fn crush_choose_firstn(
-    mut map: *const crush_map,
-    mut work: *mut crush_work,
-    mut bucket: *const crush_bucket,
+    mut map: *const CrushMap,
+    mut work: *mut CrushWork,
+    mut bucket: *const CrushBucket,
     mut weight: *const __u32,
     mut weight_max: libc::c_int,
     mut x: libc::c_int,
@@ -958,158 +984,158 @@ unsafe extern "C" fn crush_choose_firstn(
     mut stable: libc::c_uint,
     mut out2: *mut libc::c_int,
     mut parent_r: libc::c_int,
-    mut choose_args: *const crush_choose_arg,
+    mut choose_args: *const CrushChooseArg,
 ) -> libc::c_int {
-    let mut rep: libc::c_int = 0;
-    let mut ftotal: libc::c_uint = 0;
-    let mut flocal: libc::c_uint = 0;
-    let mut retry_descent: libc::c_int = 0;
-    let mut retry_bucket: libc::c_int = 0;
-    let mut skip_rep: libc::c_int = 0;
-    let mut in_0: *const crush_bucket = bucket;
-    let mut r: libc::c_int = 0;
-    let mut i: libc::c_int = 0;
-    let mut item: libc::c_int = 0 as libc::c_int;
-    let mut itemtype: libc::c_int = 0;
-    let mut collide: libc::c_int = 0;
-    let mut reject: libc::c_int = 0;
-    let mut count: libc::c_int = out_size;
-    rep = if stable != 0 {
-        0 as libc::c_int
-    } else {
-        outpos
-    };
-    while rep < numrep && count > 0 as libc::c_int {
-        ftotal = 0 as libc::c_int as libc::c_uint;
-        skip_rep = 0 as libc::c_int;
-        loop {
-            retry_descent = 0 as libc::c_int;
-            in_0 = bucket;
-            flocal = 0 as libc::c_int as libc::c_uint;
-            let mut current_block_55: u64;
+    unsafe {
+        let mut rep: libc::c_int = 0;
+        let mut ftotal: libc::c_uint = 0;
+        let mut flocal: libc::c_uint = 0;
+        let mut retry_descent: libc::c_int = 0;
+        let mut retry_bucket: libc::c_int = 0;
+        let mut skip_rep: libc::c_int = 0;
+        let mut in_0: *const CrushBucket = bucket;
+        let mut r: libc::c_int = 0;
+        let mut i: libc::c_int = 0;
+        let mut item: libc::c_int = 0 as libc::c_int;
+        let mut itemtype: libc::c_int = 0;
+        let mut collide: libc::c_int = 0;
+        let mut reject: libc::c_int = 0;
+        let mut count: libc::c_int = out_size;
+        rep = if stable != 0 {
+            0 as libc::c_int
+        } else {
+            outpos
+        };
+        while rep < numrep && count > 0 as libc::c_int {
+            ftotal = 0 as libc::c_int as libc::c_uint;
+            skip_rep = 0 as libc::c_int;
             loop {
-                collide = 0 as libc::c_int;
-                retry_bucket = 0 as libc::c_int;
-                r = rep + parent_r;
-                r = (r as libc::c_uint).wrapping_add(ftotal) as libc::c_int as libc::c_int;
-                if (*in_0).size == 0 as libc::c_int as __u32 {
-                    reject = 1 as libc::c_int;
-                    current_block_55 = 5532067231413442433;
-                } else {
-                    if local_fallback_retries > 0 as libc::c_int as libc::c_uint
-                        && flocal >= (*in_0).size >> 1 as libc::c_int
-                        && flocal > local_fallback_retries
-                    {
-                        item = bucket_perm_choose(
-                            in_0,
-                            *((*work).work).offset((-(1 as libc::c_int) - (*in_0).id) as isize),
-                            x,
-                            r,
-                        );
+                retry_descent = 0 as libc::c_int;
+                in_0 = bucket;
+                flocal = 0 as libc::c_int as libc::c_uint;
+                let mut current_block_55: u64;
+                loop {
+                    collide = 0 as libc::c_int;
+                    retry_bucket = 0 as libc::c_int;
+                    r = rep + parent_r;
+                    r = (r as libc::c_uint).wrapping_add(ftotal) as libc::c_int as libc::c_int;
+                    if (*in_0).size == 0 as libc::c_int as __u32 {
+                        reject = 1 as libc::c_int;
+                        current_block_55 = 5532067231413442433;
                     } else {
-                        item = crush_bucket_choose(
-                            in_0,
-                            *((*work).work).offset((-(1 as libc::c_int) - (*in_0).id) as isize),
-                            x,
-                            r,
-                            if !choose_args.is_null() {
-                                &*choose_args.offset((-(1 as libc::c_int) - (*in_0).id) as isize)
-                            } else {
-                                std::ptr::null::<crush_choose_arg>()
-                            },
-                            outpos,
-                        );
-                    }
-                    if item >= (*map).max_devices {
-                        skip_rep = 1 as libc::c_int;
-                        break;
-                    } else {
-                        if item < 0 as libc::c_int {
-                            itemtype = (**((*map).buckets)
-                                .offset((-(1 as libc::c_int) - item) as isize))
-                            .type_0 as libc::c_int;
+                        if local_fallback_retries > 0 as libc::c_int as libc::c_uint
+                            && flocal >= (*in_0).size >> 1 as libc::c_int
+                            && flocal > local_fallback_retries
+                        {
+                            item = bucket_perm_choose(
+                                in_0,
+                                *((*work).work).offset((-(1 as libc::c_int) - (*in_0).id) as isize),
+                                x,
+                                r,
+                            );
                         } else {
-                            itemtype = 0 as libc::c_int;
+                            item = crush_bucket_choose(
+                                in_0,
+                                *((*work).work).offset((-(1 as libc::c_int) - (*in_0).id) as isize),
+                                x,
+                                r,
+                                if !choose_args.is_null() {
+                                    &*choose_args
+                                        .offset((-(1 as libc::c_int) - (*in_0).id) as isize)
+                                } else {
+                                    std::ptr::null::<CrushChooseArg>()
+                                },
+                                outpos,
+                            );
                         }
-                        if itemtype != type_0 {
-                            if item >= 0 as libc::c_int
-                                || -(1 as libc::c_int) - item >= (*map).max_buckets
-                            {
-                                skip_rep = 1 as libc::c_int;
-                                break;
-                            } else {
-                                in_0 =
-                                    *((*map).buckets).offset((-(1 as libc::c_int) - item) as isize);
-                                retry_bucket = 1 as libc::c_int;
-                            }
-                            current_block_55 = 13109137661213826276;
+                        if item >= (*map).max_devices {
+                            skip_rep = 1 as libc::c_int;
+                            break;
                         } else {
-                            i = 0 as libc::c_int;
-                            while i < outpos {
-                                if *out.offset(i as isize) == item {
-                                    collide = 1 as libc::c_int;
+                            if item < 0 as libc::c_int {
+                                itemtype = (**((*map).buckets)
+                                    .offset((-(1 as libc::c_int) - item) as isize))
+                                .type_0 as libc::c_int;
+                            } else {
+                                itemtype = 0 as libc::c_int;
+                            }
+                            if itemtype != type_0 {
+                                if item >= 0 as libc::c_int
+                                    || -(1 as libc::c_int) - item >= (*map).max_buckets
+                                {
+                                    skip_rep = 1 as libc::c_int;
                                     break;
                                 } else {
-                                    i += 1;
-                                    i;
+                                    in_0 = *((*map).buckets)
+                                        .offset((-(1 as libc::c_int) - item) as isize);
+                                    retry_bucket = 1 as libc::c_int;
                                 }
-                            }
-                            reject = 0 as libc::c_int;
-                            if collide == 0 && recurse_to_leaf != 0 {
-                                if item < 0 as libc::c_int {
-                                    let mut sub_r: libc::c_int = 0;
-                                    if vary_r != 0 {
-                                        sub_r = r
-                                            >> vary_r
-                                                .wrapping_sub(1 as libc::c_int as libc::c_uint);
+                                current_block_55 = 13109137661213826276;
+                            } else {
+                                i = 0 as libc::c_int;
+                                while i < outpos {
+                                    if *out.offset(i as isize) == item {
+                                        collide = 1 as libc::c_int;
+                                        break;
                                     } else {
-                                        sub_r = 0 as libc::c_int;
+                                        i += 1;
+                                        i;
                                     }
-                                    if crush_choose_firstn(
-                                        map,
-                                        work,
-                                        *((*map).buckets)
-                                            .offset((-(1 as libc::c_int) - item) as isize),
-                                        weight,
-                                        weight_max,
-                                        x,
-                                        if stable != 0 {
-                                            1 as libc::c_int
-                                        } else {
-                                            outpos + 1 as libc::c_int
-                                        },
-                                        0 as libc::c_int,
-                                        out2,
-                                        outpos,
-                                        count,
-                                        recurse_tries,
-                                        0 as libc::c_int as libc::c_uint,
-                                        local_retries,
-                                        local_fallback_retries,
-                                        0 as libc::c_int,
-                                        vary_r,
-                                        stable,
-                                        std::ptr::null_mut::<libc::c_int>(),
-                                        sub_r,
-                                        choose_args,
-                                    ) <= outpos
-                                    {
-                                        reject = 1 as libc::c_int;
-                                    }
-                                } else {
-                                    *out2.offset(outpos as isize) = item;
                                 }
-                            }
-                            if reject == 0 && collide == 0
-                                && itemtype == 0 as libc::c_int {
+                                reject = 0 as libc::c_int;
+                                if collide == 0 && recurse_to_leaf != 0 {
+                                    if item < 0 as libc::c_int {
+                                        let mut sub_r: libc::c_int = 0;
+                                        if vary_r != 0 {
+                                            sub_r = r
+                                                >> vary_r
+                                                    .wrapping_sub(1 as libc::c_int as libc::c_uint);
+                                        } else {
+                                            sub_r = 0 as libc::c_int;
+                                        }
+                                        if crush_choose_firstn(
+                                            map,
+                                            work,
+                                            *((*map).buckets)
+                                                .offset((-(1 as libc::c_int) - item) as isize),
+                                            weight,
+                                            weight_max,
+                                            x,
+                                            if stable != 0 {
+                                                1 as libc::c_int
+                                            } else {
+                                                outpos + 1 as libc::c_int
+                                            },
+                                            0 as libc::c_int,
+                                            out2,
+                                            outpos,
+                                            count,
+                                            recurse_tries,
+                                            0 as libc::c_int as libc::c_uint,
+                                            local_retries,
+                                            local_fallback_retries,
+                                            0 as libc::c_int,
+                                            vary_r,
+                                            stable,
+                                            std::ptr::null_mut::<libc::c_int>(),
+                                            sub_r,
+                                            choose_args,
+                                        ) <= outpos
+                                        {
+                                            reject = 1 as libc::c_int;
+                                        }
+                                    } else {
+                                        *out2.offset(outpos as isize) = item;
+                                    }
+                                }
+                                if reject == 0 && collide == 0 && itemtype == 0 as libc::c_int {
                                     reject = is_out(map, weight, weight_max, item, x);
                                 }
-                            current_block_55 = 5532067231413442433;
+                                current_block_55 = 5532067231413442433;
+                            }
                         }
                     }
-                }
-                if current_block_55 == 5532067231413442433
-                    && (reject != 0 || collide != 0) {
+                    if current_block_55 == 5532067231413442433 && (reject != 0 || collide != 0) {
                         ftotal = ftotal.wrapping_add(1);
                         ftotal;
                         flocal = flocal.wrapping_add(1);
@@ -1126,35 +1152,36 @@ unsafe extern "C" fn crush_choose_firstn(
                             skip_rep = 1 as libc::c_int;
                         }
                     }
-                if retry_bucket == 0 {
+                    if retry_bucket == 0 {
+                        break;
+                    }
+                }
+                if retry_descent == 0 {
                     break;
                 }
             }
-            if retry_descent == 0 {
-                break;
+            if skip_rep == 0 {
+                *out.offset(outpos as isize) = item;
+                outpos += 1;
+                outpos;
+                count -= 1;
+                count;
+                if !((*map).choose_tries).is_null() && ftotal <= (*map).choose_total_tries {
+                    let fresh0 = &mut (*((*map).choose_tries).offset(ftotal as isize));
+                    *fresh0 = (*fresh0).wrapping_add(1);
+                    *fresh0;
+                }
             }
+            rep += 1;
+            rep;
         }
-        if skip_rep == 0 {
-            *out.offset(outpos as isize) = item;
-            outpos += 1;
-            outpos;
-            count -= 1;
-            count;
-            if !((*map).choose_tries).is_null() && ftotal <= (*map).choose_total_tries {
-                let fresh0 = &mut (*((*map).choose_tries).offset(ftotal as isize));
-                *fresh0 = (*fresh0).wrapping_add(1);
-                *fresh0;
-            }
-        }
-        rep += 1;
-        rep;
+        outpos
     }
-    outpos
 }
 unsafe extern "C" fn crush_choose_indep(
-    mut map: *const crush_map,
-    mut work: *mut crush_work,
-    mut bucket: *const crush_bucket,
+    mut map: *const CrushMap,
+    mut work: *mut CrushWork,
+    mut bucket: *const CrushBucket,
     mut weight: *const __u32,
     mut weight_max: libc::c_int,
     mut x: libc::c_int,
@@ -1168,220 +1195,209 @@ unsafe extern "C" fn crush_choose_indep(
     mut recurse_to_leaf: libc::c_int,
     mut out2: *mut libc::c_int,
     mut parent_r: libc::c_int,
-    mut choose_args: *const crush_choose_arg,
+    mut choose_args: *const CrushChooseArg,
 ) {
-    let mut in_0: *const crush_bucket = bucket;
-    let mut endpos: libc::c_int = outpos + left_0;
-    let mut rep: libc::c_int = 0;
-    let mut ftotal: libc::c_uint = 0;
-    let mut r: libc::c_int = 0;
-    let mut i: libc::c_int = 0;
-    let mut item: libc::c_int = 0 as libc::c_int;
-    let mut itemtype: libc::c_int = 0;
-    let mut collide: libc::c_int = 0;
-    rep = outpos;
-    while rep < endpos {
-        *out.offset(rep as isize) = 0x7ffffffe as libc::c_int;
-        if !out2.is_null() {
-            *out2.offset(rep as isize) = 0x7ffffffe as libc::c_int;
-        }
-        rep += 1;
-        rep;
-    }
-    ftotal = 0 as libc::c_int as libc::c_uint;
-    while left_0 > 0 as libc::c_int && ftotal < tries {
+    unsafe {
+        let mut in_0: *const CrushBucket = bucket;
+        let mut endpos: libc::c_int = outpos + left_0;
+        let mut rep: libc::c_int = 0;
+        let mut ftotal: libc::c_uint = 0;
+        let mut r: libc::c_int = 0;
+        let mut i: libc::c_int = 0;
+        let mut item: libc::c_int = 0 as libc::c_int;
+        let mut itemtype: libc::c_int = 0;
+        let mut collide: libc::c_int = 0;
         rep = outpos;
         while rep < endpos {
-            if *out.offset(rep as isize) == 0x7ffffffe as libc::c_int {
-                in_0 = bucket;
-                loop {
-                    r = rep + parent_r;
-                    if (*in_0).alg as libc::c_int == CRUSH_BUCKET_UNIFORM as libc::c_int
-                        && (*in_0).size % numrep as __u32 == 0 as libc::c_int as __u32
-                    {
-                        r = (r as libc::c_uint).wrapping_add(
-                            ((numrep + 1 as libc::c_int) as libc::c_uint).wrapping_mul(ftotal),
-                        ) as libc::c_int as libc::c_int;
-                    } else {
-                        r = (r as libc::c_uint)
-                            .wrapping_add((numrep as libc::c_uint).wrapping_mul(ftotal))
-                            as libc::c_int as libc::c_int;
-                    }
-                    if (*in_0).size == 0 as libc::c_int as __u32 {
-                        break;
-                    }
-                    item = crush_bucket_choose(
-                        in_0,
-                        *((*work).work).offset((-(1 as libc::c_int) - (*in_0).id) as isize),
-                        x,
-                        r,
-                        if !choose_args.is_null() {
-                            &*choose_args.offset((-(1 as libc::c_int) - (*in_0).id) as isize)
-                        } else {
-                            std::ptr::null::<crush_choose_arg>()
-                        },
-                        outpos,
-                    );
-                    if item >= (*map).max_devices {
-                        *out.offset(rep as isize) = 0x7fffffff as libc::c_int;
-                        if !out2.is_null() {
-                            *out2.offset(rep as isize) = 0x7fffffff as libc::c_int;
-                        }
-                        left_0 -= 1;
-                        left_0;
-                        break;
-                    } else {
-                        if item < 0 as libc::c_int {
-                            itemtype = (**((*map).buckets)
-                                .offset((-(1 as libc::c_int) - item) as isize))
-                            .type_0 as libc::c_int;
-                        } else {
-                            itemtype = 0 as libc::c_int;
-                        }
-                        if itemtype != type_0 {
-                            if item >= 0 as libc::c_int
-                                || -(1 as libc::c_int) - item >= (*map).max_buckets
-                            {
-                                *out.offset(rep as isize) = 0x7fffffff as libc::c_int;
-                                if !out2.is_null() {
-                                    *out2.offset(rep as isize) = 0x7fffffff as libc::c_int;
-                                }
-                                left_0 -= 1;
-                                left_0;
-                                break;
-                            } else {
-                                in_0 =
-                                    *((*map).buckets).offset((-(1 as libc::c_int) - item) as isize);
-                            }
-                        } else {
-                            collide = 0 as libc::c_int;
-                            i = outpos;
-                            while i < endpos {
-                                if *out.offset(i as isize) == item {
-                                    collide = 1 as libc::c_int;
-                                    break;
-                                } else {
-                                    i += 1;
-                                    i;
-                                }
-                            }
-                            if collide != 0 {
-                                break;
-                            }
-                            if recurse_to_leaf != 0 {
-                                if item < 0 as libc::c_int {
-                                    crush_choose_indep(
-                                        map,
-                                        work,
-                                        *((*map).buckets)
-                                            .offset((-(1 as libc::c_int) - item) as isize),
-                                        weight,
-                                        weight_max,
-                                        x,
-                                        1 as libc::c_int,
-                                        numrep,
-                                        0 as libc::c_int,
-                                        out2,
-                                        rep,
-                                        recurse_tries,
-                                        0 as libc::c_int as libc::c_uint,
-                                        0 as libc::c_int,
-                                        std::ptr::null_mut::<libc::c_int>(),
-                                        r,
-                                        choose_args,
-                                    );
-                                    if *out2.offset(rep as isize) == 0x7fffffff as libc::c_int {
-                                        break;
-                                    }
-                                } else {
-                                    *out2.offset(rep as isize) = item;
-                                }
-                            }
-                            if itemtype == 0 as libc::c_int
-                                && is_out(map, weight, weight_max, item, x) != 0
-                            {
-                                break;
-                            }
-                            *out.offset(rep as isize) = item;
-                            left_0 -= 1;
-                            left_0;
-                            break;
-                        }
-                    }
-                }
+            *out.offset(rep as isize) = 0x7ffffffe as libc::c_int;
+            if !out2.is_null() {
+                *out2.offset(rep as isize) = 0x7ffffffe as libc::c_int;
             }
             rep += 1;
             rep;
         }
-        ftotal = ftotal.wrapping_add(1);
-        ftotal;
-    }
-    rep = outpos;
-    while rep < endpos {
-        if *out.offset(rep as isize) == 0x7ffffffe as libc::c_int {
-            *out.offset(rep as isize) = 0x7fffffff as libc::c_int;
+        ftotal = 0 as libc::c_int as libc::c_uint;
+        while left_0 > 0 as libc::c_int && ftotal < tries {
+            rep = outpos;
+            while rep < endpos {
+                if *out.offset(rep as isize) == 0x7ffffffe as libc::c_int {
+                    in_0 = bucket;
+                    loop {
+                        r = rep + parent_r;
+                        if (*in_0).alg as libc::c_int == CRUSH_BUCKET_UNIFORM as libc::c_int
+                            && (*in_0).size % numrep as __u32 == 0 as libc::c_int as __u32
+                        {
+                            r = (r as libc::c_uint).wrapping_add(
+                                ((numrep + 1 as libc::c_int) as libc::c_uint).wrapping_mul(ftotal),
+                            ) as libc::c_int as libc::c_int;
+                        } else {
+                            r = (r as libc::c_uint)
+                                .wrapping_add((numrep as libc::c_uint).wrapping_mul(ftotal))
+                                as libc::c_int as libc::c_int;
+                        }
+                        if (*in_0).size == 0 as libc::c_int as __u32 {
+                            break;
+                        }
+                        item = crush_bucket_choose(
+                            in_0,
+                            *((*work).work).offset((-(1 as libc::c_int) - (*in_0).id) as isize),
+                            x,
+                            r,
+                            if !choose_args.is_null() {
+                                &*choose_args.offset((-(1 as libc::c_int) - (*in_0).id) as isize)
+                            } else {
+                                std::ptr::null::<CrushChooseArg>()
+                            },
+                            outpos,
+                        );
+                        if item >= (*map).max_devices {
+                            *out.offset(rep as isize) = 0x7fffffff as libc::c_int;
+                            if !out2.is_null() {
+                                *out2.offset(rep as isize) = 0x7fffffff as libc::c_int;
+                            }
+                            left_0 -= 1;
+                            left_0;
+                            break;
+                        } else {
+                            if item < 0 as libc::c_int {
+                                itemtype = (**((*map).buckets)
+                                    .offset((-(1 as libc::c_int) - item) as isize))
+                                .type_0 as libc::c_int;
+                            } else {
+                                itemtype = 0 as libc::c_int;
+                            }
+                            if itemtype != type_0 {
+                                if item >= 0 as libc::c_int
+                                    || -(1 as libc::c_int) - item >= (*map).max_buckets
+                                {
+                                    *out.offset(rep as isize) = 0x7fffffff as libc::c_int;
+                                    if !out2.is_null() {
+                                        *out2.offset(rep as isize) = 0x7fffffff as libc::c_int;
+                                    }
+                                    left_0 -= 1;
+                                    left_0;
+                                    break;
+                                } else {
+                                    in_0 = *((*map).buckets)
+                                        .offset((-(1 as libc::c_int) - item) as isize);
+                                }
+                            } else {
+                                collide = 0 as libc::c_int;
+                                i = outpos;
+                                while i < endpos {
+                                    if *out.offset(i as isize) == item {
+                                        collide = 1 as libc::c_int;
+                                        break;
+                                    } else {
+                                        i += 1;
+                                        i;
+                                    }
+                                }
+                                if collide != 0 {
+                                    break;
+                                }
+                                if recurse_to_leaf != 0 {
+                                    if item < 0 as libc::c_int {
+                                        crush_choose_indep(
+                                            map,
+                                            work,
+                                            *((*map).buckets)
+                                                .offset((-(1 as libc::c_int) - item) as isize),
+                                            weight,
+                                            weight_max,
+                                            x,
+                                            1 as libc::c_int,
+                                            numrep,
+                                            0 as libc::c_int,
+                                            out2,
+                                            rep,
+                                            recurse_tries,
+                                            0 as libc::c_int as libc::c_uint,
+                                            0 as libc::c_int,
+                                            std::ptr::null_mut::<libc::c_int>(),
+                                            r,
+                                            choose_args,
+                                        );
+                                        if *out2.offset(rep as isize) == 0x7fffffff as libc::c_int {
+                                            break;
+                                        }
+                                    } else {
+                                        *out2.offset(rep as isize) = item;
+                                    }
+                                }
+                                if itemtype == 0 as libc::c_int
+                                    && is_out(map, weight, weight_max, item, x) != 0
+                                {
+                                    break;
+                                }
+                                *out.offset(rep as isize) = item;
+                                left_0 -= 1;
+                                left_0;
+                                break;
+                            }
+                        }
+                    }
+                }
+                rep += 1;
+                rep;
+            }
+            ftotal = ftotal.wrapping_add(1);
+            ftotal;
         }
-        if !out2.is_null() && *out2.offset(rep as isize) == 0x7ffffffe as libc::c_int {
-            *out2.offset(rep as isize) = 0x7fffffff as libc::c_int;
+        rep = outpos;
+        while rep < endpos {
+            if *out.offset(rep as isize) == 0x7ffffffe as libc::c_int {
+                *out.offset(rep as isize) = 0x7fffffff as libc::c_int;
+            }
+            if !out2.is_null() && *out2.offset(rep as isize) == 0x7ffffffe as libc::c_int {
+                *out2.offset(rep as isize) = 0x7fffffff as libc::c_int;
+            }
+            rep += 1;
+            rep;
         }
-        rep += 1;
-        rep;
-    }
-    if !((*map).choose_tries).is_null() && ftotal <= (*map).choose_total_tries {
-        let fresh1 = &mut (*((*map).choose_tries).offset(ftotal as isize));
-        *fresh1 = (*fresh1).wrapping_add(1);
-        *fresh1;
+        if !((*map).choose_tries).is_null() && ftotal <= (*map).choose_total_tries {
+            let fresh1 = &mut (*((*map).choose_tries).offset(ftotal as isize));
+            *fresh1 = (*fresh1).wrapping_add(1);
+            *fresh1;
+        }
     }
 }
-#[no_mangle]
-pub unsafe extern "C" fn crush_init_workspace(mut m: *const crush_map, mut v: *mut libc::c_void) {
-    let mut w: *mut crush_work = v as *mut crush_work;
-    let mut point: *mut libc::c_char = v as *mut libc::c_char;
-    let mut b: __s32 = 0;
-    point = point.offset(::core::mem::size_of::<crush_work>() as libc::c_ulong as isize);
-    (*w).work = point as *mut *mut crush_work_bucket;
-    point = point.offset(
-        ((*m).max_buckets as libc::c_ulong)
-            .wrapping_mul(::core::mem::size_of::<*mut crush_work_bucket>() as libc::c_ulong)
-            as isize,
-    );
-    b = 0 as libc::c_int;
-    while b < (*m).max_buckets {
-        if !(*((*m).buckets).offset(b as isize)).is_null() {
-            let fresh2 = &mut (*((*w).work).offset(b as isize));
-            *fresh2 = point as *mut crush_work_bucket;
-            match (**((*m).buckets).offset(b as isize)).alg as libc::c_int {
-                _ => {}
-            }
-            point =
-                point.offset(::core::mem::size_of::<crush_work_bucket>() as libc::c_ulong as isize);
-            (**((*w).work).offset(b as isize)).perm_x = 0 as libc::c_int as __u32;
-            (**((*w).work).offset(b as isize)).perm_n = 0 as libc::c_int as __u32;
-            let fresh3 = &mut (**((*w).work).offset(b as isize)).perm;
-            *fresh3 = point as *mut __u32;
-            point = point.offset(
-                ((**((*m).buckets).offset(b as isize)).size as libc::c_ulong)
-                    .wrapping_mul(::core::mem::size_of::<__u32>() as libc::c_ulong)
-                    as isize,
-            );
-        }
-        b += 1;
-        b;
-    }
-    if point.offset_from(w as *mut libc::c_char) as libc::c_long as size_t == (*m).working_size {
-    } else {
-        __assert_fail(
-            b"!((char *)point - (char *)w != m->working_size)\0" as *const u8
-                as *const libc::c_char,
-            b"/home/sevki/src/libcrush/crush/mapper.c\0" as *const u8 as *const libc::c_char,
-            870 as libc::c_int as libc::c_uint,
-            (*::core::mem::transmute::<&[u8; 60], &[libc::c_char; 60]>(
-                b"void crush_init_workspace(const struct crush_map *, void *)\0",
-            ))
-            .as_ptr(),
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn crush_init_workspace(mut m: *const CrushMap, mut v: *mut libc::c_void) {
+    unsafe {
+        let mut w: *mut CrushWork = v as *mut CrushWork;
+        let mut point: *mut libc::c_char = v as *mut libc::c_char;
+        let mut b: __s32 = 0;
+        point = point.offset(::core::mem::size_of::<CrushWork>() as libc::c_ulong as isize);
+        (*w).work = point as *mut *mut CrushWorkBucket;
+        point = point.offset(
+            ((*m).max_buckets as libc::c_ulong)
+                .wrapping_mul(::core::mem::size_of::<*mut CrushWorkBucket>() as libc::c_ulong)
+                as isize,
         );
-    }
-    'c_6672: {
+        b = 0 as libc::c_int;
+        while b < (*m).max_buckets {
+            if !(*((*m).buckets).offset(b as isize)).is_null() {
+                let fresh2 = &mut (*((*w).work).offset(b as isize));
+                *fresh2 = point as *mut CrushWorkBucket;
+                match (**((*m).buckets).offset(b as isize)).alg as libc::c_int {
+                    _ => {}
+                }
+                point = point
+                    .offset(::core::mem::size_of::<CrushWorkBucket>() as libc::c_ulong as isize);
+                (**((*w).work).offset(b as isize)).perm_x = 0 as libc::c_int as __u32;
+                (**((*w).work).offset(b as isize)).perm_n = 0 as libc::c_int as __u32;
+                let fresh3 = &mut (**((*w).work).offset(b as isize)).perm;
+                *fresh3 = point as *mut __u32;
+                point = point.offset(
+                    ((**((*m).buckets).offset(b as isize)).size as libc::c_ulong)
+                        .wrapping_mul(::core::mem::size_of::<__u32>() as libc::c_ulong)
+                        as isize,
+                );
+            }
+            b += 1;
+            b;
+        }
         if point.offset_from(w as *mut libc::c_char) as libc::c_long as size_t == (*m).working_size
         {
         } else {
@@ -1396,11 +1412,29 @@ pub unsafe extern "C" fn crush_init_workspace(mut m: *const crush_map, mut v: *m
                 .as_ptr(),
             );
         }
-    };
+        'c_6672: {
+            if point.offset_from(w as *mut libc::c_char) as libc::c_long as size_t
+                == (*m).working_size
+            {
+            } else {
+                __assert_fail(
+                    b"!((char *)point - (char *)w != m->working_size)\0" as *const u8
+                        as *const libc::c_char,
+                    b"/home/sevki/src/libcrush/crush/mapper.c\0" as *const u8
+                        as *const libc::c_char,
+                    870 as libc::c_int as libc::c_uint,
+                    (*::core::mem::transmute::<&[u8; 60], &[libc::c_char; 60]>(
+                        b"void crush_init_workspace(const struct crush_map *, void *)\0",
+                    ))
+                    .as_ptr(),
+                );
+            }
+        };
+    }
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_do_rule(
-    mut map: *const crush_map,
+    mut map: *const CrushMap,
     mut ruleno: libc::c_int,
     mut x: libc::c_int,
     mut result: *mut libc::c_int,
@@ -1408,120 +1442,120 @@ pub unsafe extern "C" fn crush_do_rule(
     mut weight: *const __u32,
     mut weight_max: libc::c_int,
     mut cwin: *mut libc::c_void,
-    mut choose_args: *const crush_choose_arg,
+    mut choose_args: *const CrushChooseArg,
 ) -> libc::c_int {
-    let mut result_len: libc::c_int = 0;
-    let mut cw: *mut crush_work = cwin as *mut crush_work;
-    let mut a: *mut libc::c_int =
-        (cw as *mut libc::c_char).offset((*map).working_size as isize) as *mut libc::c_int;
-    let mut b: *mut libc::c_int = a.offset(result_max as isize);
-    let mut c: *mut libc::c_int = b.offset(result_max as isize);
-    let mut w: *mut libc::c_int = a;
-    let mut o: *mut libc::c_int = b;
-    let mut recurse_to_leaf: libc::c_int = 0;
-    let mut wsize: libc::c_int = 0 as libc::c_int;
-    let mut osize: libc::c_int = 0;
-    let mut tmp: *mut libc::c_int = std::ptr::null_mut::<libc::c_int>();
-    let mut rule: *const crush_rule = std::ptr::null::<crush_rule>();
-    let mut step: __u32 = 0;
-    let mut i: libc::c_int = 0;
-    let mut j: libc::c_int = 0;
-    let mut numrep: libc::c_int = 0;
-    let mut out_size: libc::c_int = 0;
-    let mut choose_tries: libc::c_int =
-        ((*map).choose_total_tries).wrapping_add(1 as libc::c_int as __u32) as libc::c_int;
-    let mut choose_leaf_tries: libc::c_int = 0 as libc::c_int;
-    let mut choose_local_retries: libc::c_int = (*map).choose_local_tries as libc::c_int;
-    let mut choose_local_fallback_retries: libc::c_int =
-        (*map).choose_local_fallback_tries as libc::c_int;
-    let mut vary_r: libc::c_int = (*map).chooseleaf_vary_r as libc::c_int;
-    let mut stable: libc::c_int = (*map).chooseleaf_stable as libc::c_int;
-    if ruleno as __u32 >= (*map).max_rules {
-        return 0 as libc::c_int;
-    }
-    rule = *((*map).rules).offset(ruleno as isize);
-    result_len = 0 as libc::c_int;
-    step = 0 as libc::c_int as __u32;
-    while step < (*rule).len {
-        let mut firstn: libc::c_int = 0 as libc::c_int;
-        let mut curstep: *const crush_rule_step =
-            &*((*rule).steps).as_ptr().offset(step as isize) as *const crush_rule_step;
-        let mut current_block_59: u64;
-        match (*curstep).op {
-            1 => {
-                if (*curstep).arg1 >= 0 as libc::c_int && (*curstep).arg1 < (*map).max_devices
-                    || -(1 as libc::c_int) - (*curstep).arg1 >= 0 as libc::c_int
-                        && -(1 as libc::c_int) - (*curstep).arg1 < (*map).max_buckets
-                        && !(*((*map).buckets)
-                            .offset((-(1 as libc::c_int) - (*curstep).arg1) as isize))
-                        .is_null()
-                {
-                    *w.offset(0 as libc::c_int as isize) = (*curstep).arg1;
-                    wsize = 1 as libc::c_int;
-                }
-                current_block_59 = 15462640364611497761;
-            }
-            8 => {
-                if (*curstep).arg1 > 0 as libc::c_int {
-                    choose_tries = (*curstep).arg1;
-                }
-                current_block_59 = 15462640364611497761;
-            }
-            9 => {
-                if (*curstep).arg1 > 0 as libc::c_int {
-                    choose_leaf_tries = (*curstep).arg1;
-                }
-                current_block_59 = 15462640364611497761;
-            }
-            10 => {
-                if (*curstep).arg1 >= 0 as libc::c_int {
-                    choose_local_retries = (*curstep).arg1;
-                }
-                current_block_59 = 15462640364611497761;
-            }
-            11 => {
-                if (*curstep).arg1 >= 0 as libc::c_int {
-                    choose_local_fallback_retries = (*curstep).arg1;
-                }
-                current_block_59 = 15462640364611497761;
-            }
-            12 => {
-                if (*curstep).arg1 >= 0 as libc::c_int {
-                    vary_r = (*curstep).arg1;
-                }
-                current_block_59 = 15462640364611497761;
-            }
-            13 => {
-                if (*curstep).arg1 >= 0 as libc::c_int {
-                    stable = (*curstep).arg1;
-                }
-                current_block_59 = 15462640364611497761;
-            }
-            6 | 2 => {
-                firstn = 1 as libc::c_int;
-                current_block_59 = 7054583439108689069;
-            }
-            7 | 3 => {
-                current_block_59 = 7054583439108689069;
-            }
-            4 => {
-                i = 0 as libc::c_int;
-                while i < wsize && result_len < result_max {
-                    *result.offset(result_len as isize) = *w.offset(i as isize);
-                    result_len += 1;
-                    result_len;
-                    i += 1;
-                    i;
-                }
-                wsize = 0 as libc::c_int;
-                current_block_59 = 15462640364611497761;
-            }
-            _ => {
-                current_block_59 = 15462640364611497761;
-            }
+    unsafe {
+        let mut result_len: libc::c_int = 0;
+        let mut cw: *mut CrushWork = cwin as *mut CrushWork;
+        let mut a: *mut libc::c_int =
+            (cw as *mut libc::c_char).offset((*map).working_size as isize) as *mut libc::c_int;
+        let mut b: *mut libc::c_int = a.offset(result_max as isize);
+        let mut c: *mut libc::c_int = b.offset(result_max as isize);
+        let mut w: *mut libc::c_int = a;
+        let mut o: *mut libc::c_int = b;
+        let mut recurse_to_leaf: libc::c_int = 0;
+        let mut wsize: libc::c_int = 0 as libc::c_int;
+        let mut osize: libc::c_int = 0;
+        let mut tmp: *mut libc::c_int = std::ptr::null_mut::<libc::c_int>();
+        let mut rule: *const CrushRule = std::ptr::null::<CrushRule>();
+        let mut step: __u32 = 0;
+        let mut i: libc::c_int = 0;
+        let mut j: libc::c_int = 0;
+        let mut numrep: libc::c_int = 0;
+        let mut out_size: libc::c_int = 0;
+        let mut choose_tries: libc::c_int =
+            ((*map).choose_total_tries).wrapping_add(1 as libc::c_int as __u32) as libc::c_int;
+        let mut choose_leaf_tries: libc::c_int = 0 as libc::c_int;
+        let mut choose_local_retries: libc::c_int = (*map).choose_local_tries as libc::c_int;
+        let mut choose_local_fallback_retries: libc::c_int =
+            (*map).choose_local_fallback_tries as libc::c_int;
+        let mut vary_r: libc::c_int = (*map).chooseleaf_vary_r as libc::c_int;
+        let mut stable: libc::c_int = (*map).chooseleaf_stable as libc::c_int;
+        if ruleno as __u32 >= (*map).max_rules {
+            return 0 as libc::c_int;
         }
-        if current_block_59 == 7054583439108689069
-            && wsize != 0 as libc::c_int {
+        rule = *((*map).rules).offset(ruleno as isize);
+        result_len = 0 as libc::c_int;
+        step = 0 as libc::c_int as __u32;
+        while step < (*rule).len {
+            let mut firstn: libc::c_int = 0 as libc::c_int;
+            let mut curstep: *const crush_rule_step =
+                &*((*rule).steps).as_ptr().offset(step as isize) as *const crush_rule_step;
+            let mut current_block_59: u64;
+            match (*curstep).op {
+                1 => {
+                    if (*curstep).arg1 >= 0 as libc::c_int && (*curstep).arg1 < (*map).max_devices
+                        || -(1 as libc::c_int) - (*curstep).arg1 >= 0 as libc::c_int
+                            && -(1 as libc::c_int) - (*curstep).arg1 < (*map).max_buckets
+                            && !(*((*map).buckets)
+                                .offset((-(1 as libc::c_int) - (*curstep).arg1) as isize))
+                            .is_null()
+                    {
+                        *w.offset(0 as libc::c_int as isize) = (*curstep).arg1;
+                        wsize = 1 as libc::c_int;
+                    }
+                    current_block_59 = 15462640364611497761;
+                }
+                8 => {
+                    if (*curstep).arg1 > 0 as libc::c_int {
+                        choose_tries = (*curstep).arg1;
+                    }
+                    current_block_59 = 15462640364611497761;
+                }
+                9 => {
+                    if (*curstep).arg1 > 0 as libc::c_int {
+                        choose_leaf_tries = (*curstep).arg1;
+                    }
+                    current_block_59 = 15462640364611497761;
+                }
+                10 => {
+                    if (*curstep).arg1 >= 0 as libc::c_int {
+                        choose_local_retries = (*curstep).arg1;
+                    }
+                    current_block_59 = 15462640364611497761;
+                }
+                11 => {
+                    if (*curstep).arg1 >= 0 as libc::c_int {
+                        choose_local_fallback_retries = (*curstep).arg1;
+                    }
+                    current_block_59 = 15462640364611497761;
+                }
+                12 => {
+                    if (*curstep).arg1 >= 0 as libc::c_int {
+                        vary_r = (*curstep).arg1;
+                    }
+                    current_block_59 = 15462640364611497761;
+                }
+                13 => {
+                    if (*curstep).arg1 >= 0 as libc::c_int {
+                        stable = (*curstep).arg1;
+                    }
+                    current_block_59 = 15462640364611497761;
+                }
+                6 | 2 => {
+                    firstn = 1 as libc::c_int;
+                    current_block_59 = 7054583439108689069;
+                }
+                7 | 3 => {
+                    current_block_59 = 7054583439108689069;
+                }
+                4 => {
+                    i = 0 as libc::c_int;
+                    while i < wsize && result_len < result_max {
+                        *result.offset(result_len as isize) = *w.offset(i as isize);
+                        result_len += 1;
+                        result_len;
+                        i += 1;
+                        i;
+                    }
+                    wsize = 0 as libc::c_int;
+                    current_block_59 = 15462640364611497761;
+                }
+                _ => {
+                    current_block_59 = 15462640364611497761;
+                }
+            }
+            if current_block_59 == 7054583439108689069 && wsize != 0 as libc::c_int {
                 recurse_to_leaf = ((*curstep).op
                     == CRUSH_RULE_CHOOSELEAF_FIRSTN as libc::c_int as __u32
                     || (*curstep).op == CRUSH_RULE_CHOOSELEAF_INDEP as libc::c_int as __u32)
@@ -1601,8 +1635,7 @@ pub unsafe extern "C" fn crush_do_rule(
                                         choose_leaf_tries
                                     } else {
                                         1 as libc::c_int
-                                    })
-                                        as libc::c_uint,
+                                    }) as libc::c_uint,
                                     recurse_to_leaf,
                                     c.offset(osize as isize),
                                     0 as libc::c_int,
@@ -1619,9 +1652,8 @@ pub unsafe extern "C" fn crush_do_rule(
                     memcpy(
                         o as *mut libc::c_void,
                         c as *const libc::c_void,
-                        (osize as libc::c_ulong).wrapping_mul(
-                            ::core::mem::size_of::<libc::c_int>() as libc::c_ulong,
-                        ),
+                        (osize as libc::c_ulong)
+                            .wrapping_mul(::core::mem::size_of::<libc::c_int>() as libc::c_ulong),
                     );
                 }
                 tmp = o;
@@ -1629,8 +1661,9 @@ pub unsafe extern "C" fn crush_do_rule(
                 w = tmp;
                 wsize = osize;
             }
-        step = step.wrapping_add(1);
-        step;
+            step = step.wrapping_add(1);
+            step;
+        }
+        result_len
     }
-    result_len
 }

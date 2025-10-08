@@ -699,50 +699,50 @@ unsafe extern "C" fn crush_hash32_rjenkins1_5(
     hash ^= e >> 15 as libc::c_int;
     hash
 }
-#[no_mangle]
-pub unsafe extern "C" fn crush_hash32(mut type_0: libc::c_int, mut a: __u32) -> __u32 {
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn crush_hash32(mut type_0: libc::c_int, mut a: __u32) -> __u32 { unsafe {
     match type_0 {
         0 => crush_hash32_rjenkins1(a),
         _ => 0 as libc::c_int as __u32,
     }
-}
-#[no_mangle]
+}}
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash32_2(
     mut type_0: libc::c_int,
     mut a: __u32,
     mut b: __u32,
-) -> __u32 {
+) -> __u32 { unsafe {
     match type_0 {
         0 => crush_hash32_rjenkins1_2(a, b),
         _ => 0 as libc::c_int as __u32,
     }
-}
-#[no_mangle]
+}}
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash32_3(
     mut type_0: libc::c_int,
     mut a: __u32,
     mut b: __u32,
     mut c: __u32,
-) -> __u32 {
+) -> __u32 { unsafe {
     match type_0 {
         0 => crush_hash32_rjenkins1_3(a, b, c),
         _ => 0 as libc::c_int as __u32,
     }
-}
-#[no_mangle]
+}}
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash32_4(
     mut type_0: libc::c_int,
     mut a: __u32,
     mut b: __u32,
     mut c: __u32,
     mut d: __u32,
-) -> __u32 {
+) -> __u32 { unsafe {
     match type_0 {
         0 => crush_hash32_rjenkins1_4(a, b, c, d),
         _ => 0 as libc::c_int as __u32,
     }
-}
-#[no_mangle]
+}}
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash32_5(
     mut type_0: libc::c_int,
     mut a: __u32,
@@ -750,13 +750,13 @@ pub unsafe extern "C" fn crush_hash32_5(
     mut c: __u32,
     mut d: __u32,
     mut e: __u32,
-) -> __u32 {
+) -> __u32 { unsafe {
     match type_0 {
         0 => crush_hash32_rjenkins1_5(a, b, c, d, e),
         _ => 0 as libc::c_int as __u32,
     }
-}
-#[no_mangle]
+}}
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash_name(mut type_0: libc::c_int) -> *const libc::c_char {
     match type_0 {
         0 => b"rjenkins1\0" as *const u8 as *const libc::c_char,

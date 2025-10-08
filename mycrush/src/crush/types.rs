@@ -21,25 +21,25 @@ pub struct crush_rule_step {
 }
 
 // CRUSH rule opcodes
-pub type crush_opcodes = libc::c_uint;
-pub const CRUSH_RULE_NOOP: crush_opcodes = 0;
-pub const CRUSH_RULE_TAKE: crush_opcodes = 1;
-pub const CRUSH_RULE_CHOOSE_FIRSTN: crush_opcodes = 2;
-pub const CRUSH_RULE_CHOOSE_INDEP: crush_opcodes = 3;
-pub const CRUSH_RULE_EMIT: crush_opcodes = 4;
-pub const CRUSH_RULE_CHOOSELEAF_FIRSTN: crush_opcodes = 6;
-pub const CRUSH_RULE_CHOOSELEAF_INDEP: crush_opcodes = 7;
-pub const CRUSH_RULE_SET_CHOOSE_TRIES: crush_opcodes = 8;
-pub const CRUSH_RULE_SET_CHOOSELEAF_TRIES: crush_opcodes = 9;
-pub const CRUSH_RULE_SET_CHOOSE_LOCAL_TRIES: crush_opcodes = 10;
-pub const CRUSH_RULE_SET_CHOOSE_LOCAL_FALLBACK_TRIES: crush_opcodes = 11;
-pub const CRUSH_RULE_SET_CHOOSELEAF_VARY_R: crush_opcodes = 12;
-pub const CRUSH_RULE_SET_CHOOSELEAF_STABLE: crush_opcodes = 13;
+pub type CrushOpcodes = libc::c_uint;
+pub const CRUSH_RULE_NOOP: CrushOpcodes = 0;
+pub const CRUSH_RULE_TAKE: CrushOpcodes = 1;
+pub const CRUSH_RULE_CHOOSE_FIRSTN: CrushOpcodes = 2;
+pub const CRUSH_RULE_CHOOSE_INDEP: CrushOpcodes = 3;
+pub const CRUSH_RULE_EMIT: CrushOpcodes = 4;
+pub const CRUSH_RULE_CHOOSELEAF_FIRSTN: CrushOpcodes = 6;
+pub const CRUSH_RULE_CHOOSELEAF_INDEP: CrushOpcodes = 7;
+pub const CRUSH_RULE_SET_CHOOSE_TRIES: CrushOpcodes = 8;
+pub const CRUSH_RULE_SET_CHOOSELEAF_TRIES: CrushOpcodes = 9;
+pub const CRUSH_RULE_SET_CHOOSE_LOCAL_TRIES: CrushOpcodes = 10;
+pub const CRUSH_RULE_SET_CHOOSE_LOCAL_FALLBACK_TRIES: CrushOpcodes = 11;
+pub const CRUSH_RULE_SET_CHOOSELEAF_VARY_R: CrushOpcodes = 12;
+pub const CRUSH_RULE_SET_CHOOSELEAF_STABLE: CrushOpcodes = 13;
 
 // CRUSH rule mask
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_rule_mask {
+pub struct CrushRuleMask {
     pub ruleset: __u8,
     pub type_0: __u8,
     pub min_size: __u8,
@@ -49,24 +49,24 @@ pub struct crush_rule_mask {
 // CRUSH rule
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_rule {
+pub struct CrushRule {
     pub len: __u32,
-    pub mask: crush_rule_mask,
+    pub mask: CrushRuleMask,
     pub steps: [crush_rule_step; 0],
 }
 
 // CRUSH bucket algorithms
-pub type crush_algorithm = libc::c_uint;
-pub const CRUSH_BUCKET_UNIFORM: crush_algorithm = 1;
-pub const CRUSH_BUCKET_LIST: crush_algorithm = 2;
-pub const CRUSH_BUCKET_TREE: crush_algorithm = 3;
-pub const CRUSH_BUCKET_STRAW: crush_algorithm = 4;
-pub const CRUSH_BUCKET_STRAW2: crush_algorithm = 5;
+pub type CrushAlgorithm = libc::c_uint;
+pub const CRUSH_BUCKET_UNIFORM: CrushAlgorithm = 1;
+pub const CRUSH_BUCKET_LIST: CrushAlgorithm = 2;
+pub const CRUSH_BUCKET_TREE: CrushAlgorithm = 3;
+pub const CRUSH_BUCKET_STRAW: CrushAlgorithm = 4;
+pub const CRUSH_BUCKET_STRAW2: CrushAlgorithm = 5;
 
 // Base CRUSH bucket
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_bucket {
+pub struct CrushBucket {
     pub id: __s32,
     pub type_0: __u16,
     pub alg: __u8,
@@ -79,7 +79,7 @@ pub struct crush_bucket {
 // Weight set for choose args
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_weight_set {
+pub struct CrushWeightSet {
     pub weights: *mut __u32,
     pub size: __u32,
 }
@@ -87,26 +87,26 @@ pub struct crush_weight_set {
 // Choose args
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_choose_arg {
+pub struct CrushChooseArg {
     pub ids: *mut libc::c_int,
     pub ids_size: __u32,
-    pub weight_set: *mut crush_weight_set,
+    pub weight_set: *mut CrushWeightSet,
     pub weight_set_size: __u32,
 }
 
 // Uniform bucket
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_bucket_uniform {
-    pub h: crush_bucket,
+pub struct CrushBucketUniform {
+    pub h: CrushBucket,
     pub item_weight: __u32,
 }
 
 // List bucket
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_bucket_list {
-    pub h: crush_bucket,
+pub struct CrushBucketList {
+    pub h: CrushBucket,
     pub item_weights: *mut __u32,
     pub sum_weights: *mut __u32,
 }
@@ -114,8 +114,8 @@ pub struct crush_bucket_list {
 // Tree bucket
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_bucket_tree {
-    pub h: crush_bucket,
+pub struct CrushBucketTree {
+    pub h: CrushBucket,
     pub num_nodes: __u8,
     pub node_weights: *mut __u32,
 }
@@ -123,8 +123,8 @@ pub struct crush_bucket_tree {
 // Straw bucket
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_bucket_straw {
-    pub h: crush_bucket,
+pub struct CrushBucketStraw {
+    pub h: CrushBucket,
     pub item_weights: *mut __u32,
     pub straws: *mut __u32,
 }
@@ -132,17 +132,17 @@ pub struct crush_bucket_straw {
 // Straw2 bucket
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_bucket_straw2 {
-    pub h: crush_bucket,
+pub struct CrushBucketStraw2 {
+    pub h: CrushBucket,
     pub item_weights: *mut __u32,
 }
 
 // CRUSH map
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_map {
-    pub buckets: *mut *mut crush_bucket,
-    pub rules: *mut *mut crush_rule,
+pub struct CrushMap {
+    pub buckets: *mut *mut CrushBucket,
+    pub rules: *mut *mut CrushRule,
     pub max_buckets: __s32,
     pub max_rules: __u32,
     pub max_devices: __s32,
@@ -161,7 +161,7 @@ pub struct crush_map {
 // Work bucket for mapper
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_work_bucket {
+pub struct CrushWorkBucket {
     pub perm_x: __u32,
     pub perm_n: __u32,
     pub perm: *mut __u32,
@@ -170,6 +170,6 @@ pub struct crush_work_bucket {
 // Work structure for mapper
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct crush_work {
-    pub work: *mut *mut crush_work_bucket,
+pub struct CrushWork {
+    pub work: *mut *mut CrushWorkBucket,
 }

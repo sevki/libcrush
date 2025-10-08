@@ -22,6 +22,7 @@ fn main() {
         .compile("crush");
 
     let bindings = bindgen::Builder::default()
+        .rust_edition(bindgen::RustEdition::Edition2024)
         .header("wrapper.h")
         .clang_arg("-I..")
         .clang_arg("-I.")
