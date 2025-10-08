@@ -58,7 +58,7 @@ impl Map {
     pub fn new_legacy() -> Self {
         let map = Self::new();
         unsafe {
-            set_legacy_crush_map(map.ptr);
+            crate::crush::builder::set_legacy_crush_map(&mut *map.ptr);
         }
         map
     }
@@ -463,5 +463,5 @@ pub struct WeightSet<'a> {
 
 // Helper function for testing
 pub fn is_multiplication_unsafe(a: i64, b: i64) -> bool {
-    crush_multiplication_is_unsafe(a as u32, b as u32) != 0
+    crate::crush::builder::crush_multiplication_is_unsafe(a as u32, b as u32)
 }
