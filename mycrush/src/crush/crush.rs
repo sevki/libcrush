@@ -14,7 +14,7 @@ unsafe extern "C" {
     fn free(_: *mut ffi::c_void);
 }
 #[inline]
-unsafe extern "C" fn crush_calc_tree_node(i: ffi::c_int) -> ffi::c_int {
+fn crush_calc_tree_node(i: i32) -> i32 {
     ((i + 1) << 1) - 1
 }
 #[unsafe(no_mangle)]

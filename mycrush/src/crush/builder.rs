@@ -26,7 +26,7 @@ unsafe extern "C" {
     fn crush_destroy_bucket(b: *mut CrushBucket);
 }
 #[inline]
-unsafe extern "C" fn crush_calc_tree_node(mut i: ffi::c_int) -> ffi::c_int {
+fn crush_calc_tree_node(i: i32) -> i32 {
     ((i + 1) << 1) - 1
 }
 #[unsafe(no_mangle)]
