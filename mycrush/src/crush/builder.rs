@@ -205,15 +205,12 @@ pub unsafe extern "C" fn crush_rule_set_step(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_get_next_bucket_id(mut map: *mut CrushMap) -> libc::c_int {
     unsafe {
-        let mut pos: libc::c_int = 0;
-        pos = 0 as libc::c_int;
-        while pos < (*map).max_buckets {
+        for pos in 0..(*map).max_buckets {
             if (*((*map).buckets).offset(pos as isize)).is_null() {
-                break;
+                return -1 - pos;
             }
-            pos += 1;
         }
-        -(1 as libc::c_int) - pos
+        -1 - (*map).max_buckets
     }
 }
 #[unsafe(no_mangle)]
@@ -1972,31 +1969,29 @@ pub unsafe extern "C" fn crush_make_choose_args(
     }
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_destroy_choose_args(mut args: *mut CrushChooseArg) {
-    unsafe {
-        free(args as *mut libc::c_void);
-    }
+pub unsafe extern "C" fn crush_destroy_choose_args(args: *mut CrushChooseArg) {
+    free(args as *mut libc::c_void);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_addition_is_unsafe(mut a: U32, mut b: U32) -> libc::c_int {
-    if (-(1 as libc::c_int) as U32).wrapping_sub(b) < a {
-        1 as libc::c_int
+pub unsafe extern "C" fn crush_addition_is_unsafe(a: U32, b: U32) -> libc::c_int {
+    if U32::MAX.wrapping_sub(b) < a {
+        1
     } else {
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_multiplication_is_unsafe(mut a: U32, mut b: U32) -> libc::c_int {
+pub unsafe extern "C" fn crush_multiplication_is_unsafe(a: U32, b: U32) -> libc::c_int {
     if a == 0 {
-        return 0 as libc::c_int;
+        return 0;
     }
     if b == 0 {
-        return 1 as libc::c_int;
+        return 1;
     }
-    if -(1 as libc::c_int) as U32 / b < a {
-        1 as libc::c_int
+    if U32::MAX / b < a {
+        1
     } else {
-        0 as libc::c_int
+        0
     }
 }
 #[unsafe(no_mangle)]
