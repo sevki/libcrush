@@ -10,12 +10,10 @@
 
 use crate::crush::types::*;
 use crate::crush::types::ffi;
+use crate::crush::hash::{crush_hash32_2, crush_hash32_3, crush_hash32_4};
 
 unsafe extern "C" {
     fn memcpy(_: *mut ffi::c_void, _: *const ffi::c_void, _: ffi::c_ulong) -> *mut ffi::c_void;
-    fn crush_hash32_2(type_0: ffi::c_int, a: U32, b: U32) -> U32;
-    fn crush_hash32_3(type_0: ffi::c_int, a: U32, b: U32, c: U32) -> U32;
-    fn crush_hash32_4(type_0: ffi::c_int, a: U32, b: U32, c: U32, d: U32) -> U32;
 }
 static mut __RH_LH_tbl: [S64; 258] = [
     0x1000000000000 as ffi::c_longlong,
@@ -535,8 +533,7 @@ static mut __LL_tbl: [S64; 256] = [
     0x2da102d63b0 as ffi::c_ulonglong as S64,
     0x2dced24f814 as ffi::c_ulonglong as S64,
 ];
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_find_rule(
+pub unsafe fn crush_find_rule(
     mut map: *const CrushMap,
     mut ruleset: ffi::c_int,
     mut type_0: ffi::c_int,
@@ -1300,8 +1297,7 @@ unsafe extern "C" fn crush_choose_indep(
         }
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_init_workspace(m: *const CrushMap, v: *mut ffi::c_void) {
+pub unsafe fn crush_init_workspace(m: *const CrushMap, v: *mut ffi::c_void) {
     let w: *mut CrushWork = v as *mut CrushWork;
     let mut point: *mut ffi::c_char = v as *mut ffi::c_char;
     
@@ -1338,8 +1334,7 @@ pub unsafe extern "C" fn crush_init_workspace(m: *const CrushMap, v: *mut ffi::c
         panic!("Assertion failed: !((char *)point - (char *)w != m->working_size)");
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_do_rule(
+pub unsafe fn crush_do_rule(
     mut map: *const CrushMap,
     mut ruleno: ffi::c_int,
     mut x: ffi::c_int,
