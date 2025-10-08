@@ -8,7 +8,7 @@
     unused_mut
 )]
 use crate::crush::types::*;
-use ::libc;
+use crate::crush::types::ffi;
 unsafe extern "C" fn crush_hash32_rjenkins1(mut a: U32) -> U32 {
     let mut hash: U32 = 1315423911 as U32 ^ a;
     let mut b: U32 = a;
@@ -700,14 +700,14 @@ unsafe extern "C" fn crush_hash32_rjenkins1_5(
     hash
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_hash32(type_0: libc::c_int, a: U32) -> U32 {
+pub unsafe extern "C" fn crush_hash32(type_0: ffi::c_int, a: U32) -> U32 {
     match type_0 {
         0 => crush_hash32_rjenkins1(a),
         _ => 0,
     }
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_hash32_2(type_0: libc::c_int, a: U32, b: U32) -> U32 {
+pub unsafe extern "C" fn crush_hash32_2(type_0: ffi::c_int, a: U32, b: U32) -> U32 {
     match type_0 {
         0 => crush_hash32_rjenkins1_2(a, b),
         _ => 0,
@@ -715,7 +715,7 @@ pub unsafe extern "C" fn crush_hash32_2(type_0: libc::c_int, a: U32, b: U32) -> 
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash32_3(
-    type_0: libc::c_int,
+    type_0: ffi::c_int,
     a: U32,
     b: U32,
     c: U32,
@@ -727,7 +727,7 @@ pub unsafe extern "C" fn crush_hash32_3(
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash32_4(
-    type_0: libc::c_int,
+    type_0: ffi::c_int,
     a: U32,
     b: U32,
     c: U32,
@@ -740,7 +740,7 @@ pub unsafe extern "C" fn crush_hash32_4(
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash32_5(
-    type_0: libc::c_int,
+    type_0: ffi::c_int,
     a: U32,
     b: U32,
     c: U32,
@@ -753,9 +753,9 @@ pub unsafe extern "C" fn crush_hash32_5(
     }
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_hash_name(type_0: libc::c_int) -> *const libc::c_char {
+pub unsafe extern "C" fn crush_hash_name(type_0: ffi::c_int) -> *const ffi::c_char {
     match type_0 {
-        0 => b"rjenkins1\0" as *const u8 as *const libc::c_char,
-        _ => b"unknown\0" as *const u8 as *const libc::c_char,
+        0 => b"rjenkins1\0" as *const u8 as *const ffi::c_char,
+        _ => b"unknown\0" as *const u8 as *const ffi::c_char,
     }
 }

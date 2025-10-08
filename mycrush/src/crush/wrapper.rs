@@ -163,7 +163,7 @@ impl Map {
                 Ok(vec![])
             } else {
                 let result = slice::from_raw_parts(roots, count as usize).to_vec();
-                libc::free(roots as *mut libc::c_void);
+                libc::free(roots as *mut ffi::c_void);
                 Ok(result)
             }
         }
