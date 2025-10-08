@@ -254,3 +254,8 @@ fn open_output_safely(name: &Path) -> Option<*mut libc::FILE> {
 3. **Legacy Compatibility:** Test with old file formats (10+ years old)
 4. **Performance Benchmarking:** Track metrics continuously
 5. **Memory Safety:** Regular `miri` runs during development
+
+---
+
+<!-- Commits in this repository follow Conventional Commits specification -->
+
