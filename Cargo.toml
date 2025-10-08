@@ -1,5 +1,5 @@
 [workspace]
-members = ["crush-sys", "libcrush"]
+members = ["libcrush", "mycrush"]
 
 resolver = "2"
 
@@ -15,7 +15,7 @@ categories = ["algorithms", "data-structures"]
 description = "Rust implementation of the CRUSH (Controlled Replication Under Scalable Hashing) algorithm"
 
 [package]
-name = "mycrush"
+name = "crush-sys"
 version = "0.1.0"
 edition.workspace = true
 license.workspace = true
@@ -27,14 +27,12 @@ keywords.workspace = true
 categories.workspace = true
 description.workspace = true
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-libc = "0.2.176"
-num = { version = "0.4", features = ["std"] }
-num-derive = "0.3"
-num-traits = "0.2" # Explicitly add num-traits
+libc = "0.2"
+
+[build-dependencies]
+bindgen = "0.68"
+cc = "1.2.25"
 
 [dev-dependencies]
-crush-sys = { path = "crush-sys" }
 googletest = "0.14.1"
