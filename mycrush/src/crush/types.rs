@@ -14,6 +14,55 @@ pub mod ffi {
     pub type c_long = i32;
 }
 
+/// Error type for CRUSH operations
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CrushError {
+    InvalidArgument,
+    OutOfMemory,
+    NotFound,
+    AlreadyExists,
+    InvalidOperation,
+    Other(i32),
+}
+
+impl CrushError {
+    pub fn from_errno(errno: i32) -> Self {
+        match errno {
+            -22 => CrushError::InvalidArgument, // EINVAL
+            -12 => CrushError::OutOfMemory,     // ENOMEM
+            -2 => CrushError::NotFound,         // ENOENT
+            -17 => CrushError::AlreadyExists,   // EEXIST
+            other => CrushError::Other(other),
+        }
+    }
+
+    pub fn to_errno(&self) -> i32 {
+        match self {
+            CrushError::InvalidArgument => -22,
+            CrushError::OutOfMemory => -12,
+            CrushError::NotFound => -2,
+            CrushError::AlreadyExists => -17,
+            CrushError::InvalidOperation => -22,
+            CrushError::Other(code) => *code,
+        }
+    }
+}
+
+impl std::fmt::Display for CrushError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CrushError::InvalidArgument => write!(f, "Invalid argument"),
+            CrushError::OutOfMemory => write!(f, "Out of memory"),
+            CrushError::NotFound => write!(f, "Not found"),
+            CrushError::AlreadyExists => write!(f, "Already exists"),
+            CrushError::InvalidOperation => write!(f, "Invalid operation"),
+            CrushError::Other(code) => write!(f, "Error code: {}", code),
+        }
+    }
+}
+
+impl std::error::Error for CrushError {}
+
 // Basic C types - using core::ffi instead of libc
 pub type SizeT = ffi::c_ulong;
 pub type U8 = ffi::c_uchar;

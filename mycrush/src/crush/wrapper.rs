@@ -1,6 +1,5 @@
 use crate::crush::builder::*;
 use crate::crush::crush::*;
-use crate::crush::helpers::crush_find_roots;
 use crate::crush::mapper::{crush_do_rule, crush_init_workspace};
 use crate::crush::types::*;
 
@@ -154,17 +153,9 @@ impl Map {
 
     pub fn find_roots(&self) -> Result<Vec<i32>, i32> {
         unsafe {
-            let mut roots: *mut i32 = ptr::null_mut();
-            let count = crush_find_roots(self.ptr, &mut roots);
-
-            if count < 0 {
-                Err(count)
-            } else if count == 0 {
-                Ok(vec![])
-            } else {
-                let result = slice::from_raw_parts(roots, count as usize).to_vec();
-                libc::free(roots as *mut ffi::c_void);
-                Ok(result)
+            match crate::crush::helpers::crush_find_roots_safe(&*self.ptr) {
+                Ok(roots) => Ok(roots),
+                Err(e) => Err(e.to_errno()),
             }
         }
     }
