@@ -17,6 +17,8 @@ pub fn crush_find_roots_safe(map: &CrushMap) -> Result<Vec<i32>, CrushError> {
     let mut root_count = map.max_buckets;
     
     // Count references to each bucket
+    // Safety: CrushMap contains raw pointers from C FFI. We must use unsafe to dereference them.
+    // The map structure guarantees buckets array has max_buckets elements.
     unsafe {
         for pos in 0..map.max_buckets {
             let b: *mut CrushBucket = *(map.buckets).offset(pos as isize);
@@ -42,6 +44,7 @@ pub fn crush_find_roots_safe(map: &CrushMap) -> Result<Vec<i32>, CrushError> {
     
     // Collect root buckets (those with zero references)
     let mut roots = Vec::with_capacity(root_count as usize);
+    // Safety: Same as above - accessing raw pointers from C FFI
     unsafe {
         for pos in 0..map.max_buckets {
             if !(*(map.buckets).offset(pos as isize)).is_null()
