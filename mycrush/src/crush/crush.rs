@@ -17,7 +17,7 @@ unsafe extern "C" {
 fn crush_calc_tree_node(i: i32) -> i32 {
     ((i + 1) << 1) - 1
 }
-pub unsafe fn crush_bucket_alg_name(alg: ffi::c_int) -> *const ffi::c_char {
+pub fn crush_bucket_alg_name(alg: ffi::c_int) -> *const ffi::c_char {
     match alg {
         1 => b"uniform\0" as *const u8 as *const ffi::c_char,
         2 => b"list\0" as *const u8 as *const ffi::c_char,
