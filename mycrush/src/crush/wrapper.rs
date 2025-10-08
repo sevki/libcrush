@@ -56,7 +56,8 @@ impl Map {
     }
 
     pub fn new_legacy() -> Self {
-        let map = Self::new();
+        let mut map = Self::new();
+        // Safety: map.ptr is valid and we have mutable access to Map
         unsafe {
             crate::crush::builder::set_legacy_crush_map(&mut *map.ptr);
         }
@@ -152,11 +153,10 @@ impl Map {
     }
 
     pub fn find_roots(&self) -> Result<Vec<i32>, i32> {
-        unsafe {
-            match crate::crush::helpers::crush_find_roots_safe(&*self.ptr) {
-                Ok(roots) => Ok(roots),
-                Err(e) => Err(e.to_errno()),
-            }
+        // Safety: self.ptr is valid for the lifetime of Map
+        match unsafe { crate::crush::helpers::crush_find_roots_safe(&*self.ptr) } {
+            Ok(roots) => Ok(roots),
+            Err(e) => Err(e.to_errno()),
         }
     }
 
