@@ -12,12 +12,6 @@ use crate::crush::types::*;
 use crate::crush::types::ffi;
 
 unsafe extern "C" {
-    fn __assert_fail(
-        __assertion: *const ffi::c_char,
-        __file: *const ffi::c_char,
-        __line: ffi::c_uint,
-        __function: *const ffi::c_char,
-    ) -> !;
     fn memcpy(_: *mut ffi::c_void, _: *const ffi::c_void, _: ffi::c_ulong) -> *mut ffi::c_void;
     fn crush_hash32_2(type_0: ffi::c_int, a: U32, b: U32) -> U32;
     fn crush_hash32_3(type_0: ffi::c_int, a: U32, b: U32, c: U32) -> U32;
@@ -882,19 +876,7 @@ unsafe extern "C" fn crush_bucket_choose(
     unsafe {
         if (*in_0).size != 0 as ffi::c_int as U32 {
         } else {
-            __assert_fail(
-            b"!(in->size == 0)\0" as *const u8 as *const ffi::c_char,
-            b"/home/sevki/src/libcrush/crush/mapper.c\0" as *const u8
-                as *const ffi::c_char,
-            378 as ffi::c_int as ffi::c_uint,
-            (*::core::mem::transmute::<
-                &[u8; 129],
-                &[ffi::c_char; 129],
-            >(
-                b"int crush_bucket_choose(const struct crush_bucket *, struct crush_work_bucket *, int, int, const struct crush_choose_arg *, int)\0",
-            ))
-                .as_ptr(),
-        );
+            panic!("Assertion failed: !(in->size == 0)");
         }
 
         match (*in_0).alg as ffi::c_int {
@@ -1353,16 +1335,7 @@ pub unsafe extern "C" fn crush_init_workspace(m: *const CrushMap, v: *mut ffi::c
     
     if point.offset_from(w as *mut ffi::c_char) as ffi::c_long as SizeT == (*m).working_size {
     } else {
-        __assert_fail(
-            b"!((char *)point - (char *)w != m->working_size)\0" as *const u8
-                as *const ffi::c_char,
-            b"/home/sevki/src/libcrush/crush/mapper.c\0" as *const u8 as *const ffi::c_char,
-            870 as ffi::c_uint,
-            (*::core::mem::transmute::<&[u8; 60], &[ffi::c_char; 60]>(
-                b"void crush_init_workspace(const struct crush_map *, void *)\0",
-            ))
-            .as_ptr(),
-        );
+        panic!("Assertion failed: !((char *)point - (char *)w != m->working_size)");
     }
 }
 #[unsafe(no_mangle)]

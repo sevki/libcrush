@@ -10,12 +10,6 @@
 use crate::crush::types::*;
 use crate::crush::types::ffi;
 unsafe extern "C" {
-    fn __assert_fail(
-        __assertion: *const ffi::c_char,
-        __file: *const ffi::c_char,
-        __line: ffi::c_uint,
-        __function: *const ffi::c_char,
-    ) -> !;
     fn malloc(_: ffi::c_ulong) -> *mut ffi::c_void;
 }
 #[unsafe(no_mangle)]
@@ -69,15 +63,7 @@ pub unsafe extern "C" fn crush_find_roots(
     }
     
     if roots_length != root_count {
-        __assert_fail(
-            b"roots_length == root_count\0" as *const u8 as *const ffi::c_char,
-            b"/home/sevki/src/libcrush/crush/helpers.c\0" as *const u8 as *const ffi::c_char,
-            38 as ffi::c_uint,
-            (*::core::mem::transmute::<&[u8; 49], &[ffi::c_char; 49]>(
-                b"int crush_find_roots(struct crush_map *, int **)\0",
-            ))
-            .as_ptr(),
-        );
+        panic!("Assertion failed: roots_length == root_count");
     }
 
     *buckets = roots;
