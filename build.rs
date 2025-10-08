@@ -2,20 +2,22 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    println!("cargo:rerun-if-changed=../crush/libcrush.h");
-    println!("cargo:rerun-if-changed=../crush/crush.h");
-    println!("cargo:rerun-if-changed=../crush/builder.h");
-    println!("cargo:rerun-if-changed=../crush/mapper.h");
-    println!("cargo:rerun-if-changed=../crush/helpers.h");
-    println!("cargo:rerun-if-changed=../crush/hash.h");
-    
+    let cargo_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+
+    println!("cargo:rerun-if-changed={cargo_dir}/crush/libcrush.h");
+    println!("cargo:rerun-if-changed={cargo_dir}/crush/crush.h");
+    println!("cargo:rerun-if-changed={cargo_dir}/crush/builder.h");
+    println!("cargo:rerun-if-changed={cargo_dir}/crush/mapper.h");
+    println!("cargo:rerun-if-changed={cargo_dir}/crush/helpers.h");
+    println!("cargo:rerun-if-changed={cargo_dir}/crush/hash.h");
+
     // Compile CRUSH C library
     cc::Build::new()
-        .file("../crush/crush.c")
-        .file("../crush/builder.c")
-        .file("../crush/mapper.c")
-        .file("../crush/hash.c")
-        .file("../crush/helpers.c")
+        .file(format!("{}/crush/crush.c", cargo_dir))
+        .file(format!("{}/crush/builder.c", cargo_dir))
+        .file(format!("{}/crush/mapper.c", cargo_dir))
+        .file(format!("{}/crush/hash.c", cargo_dir))
+        .file(format!("{}/crush/helpers.c", cargo_dir))
         .include("..")
         .compile("crush");
 

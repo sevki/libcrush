@@ -1,5 +1,5 @@
 [package]
-name = "libcrush"
+name = "mycrush"
 version = "0.1.0"
 edition.workspace = true
 license.workspace = true
@@ -11,9 +11,14 @@ keywords.workspace = true
 categories.workspace = true
 description.workspace = true
 
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
 [dependencies]
-crush-sys = { version = "0.1.0", path = ".." }
 libc = "0.2.176"
+num = { version = "0.4", features = ["std"] }
+num-derive = "0.3"
+num-traits = "0.2" # Explicitly add num-traits
 
 [dev-dependencies]
-googletest = "0.14.2"
+crush-sys = { path = ".." }
+googletest = "0.14.1"
