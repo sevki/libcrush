@@ -356,7 +356,7 @@ pub unsafe fn crush_make_tree_bucket(
         }
         
         // Allocate items array
-        let items_slice = std::slice::from_raw_parts(items, size as usize);
+        let _items_slice = std::slice::from_raw_parts(items, size as usize);
         let mut items_vec: Vec<S32> = vec![0; size as usize];
         (*bucket).h.items = items_vec.as_mut_ptr();
         std::mem::forget(items_vec);
@@ -383,7 +383,7 @@ pub unsafe fn crush_make_tree_bucket(
             }
             (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(*weights.offset(i as isize) as U32);
             
-            for j in 1..depth {
+            for _j in 1..depth {
                 node = parent(node);
                 if crush_addition_is_unsafe(
                     *((*bucket).node_weights).offset(node as isize),
@@ -679,8 +679,6 @@ pub unsafe fn crush_add_uniform_bucket_item(
     mut weight: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
-        let newsize: ffi::c_int =
-            ((*bucket).h.size).wrapping_add(1 as U32) as ffi::c_int;
         if (*bucket).item_weight != weight as U32 {
             return -(22 as ffi::c_int);
         }
@@ -832,9 +830,6 @@ pub unsafe fn crush_add_straw_bucket_item(
     mut weight: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
-        let newsize: ffi::c_int =
-            ((*bucket).h.size).wrapping_add(1 as U32) as ffi::c_int;
-        
         // Reconstruct and resize items
         let mut items_vec = Vec::from_raw_parts(
             (*bucket).h.items,
