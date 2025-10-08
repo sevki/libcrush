@@ -370,7 +370,7 @@ pub unsafe fn crush_make_list_bucket(
         std::ptr::null_mut::<CrushBucketList>()
     }
 }
-unsafe fn height(mut n: ffi::c_int) -> ffi::c_int {
+fn height(mut n: ffi::c_int) -> ffi::c_int {
     let mut h: ffi::c_int = 0;
     while n & 1 == 0 {
         h += 1;
@@ -378,20 +378,18 @@ unsafe fn height(mut n: ffi::c_int) -> ffi::c_int {
     }
     h
 }
-unsafe fn on_right(mut n: ffi::c_int, mut h: ffi::c_int) -> ffi::c_int {
+fn on_right(mut n: ffi::c_int, mut h: ffi::c_int) -> ffi::c_int {
     n & (1) << (h + 1)
 }
-unsafe fn parent(mut n: ffi::c_int) -> ffi::c_int {
-    unsafe {
-        let mut h: ffi::c_int = height(n);
-        if on_right(n, h) != 0 {
-            n - ((1) << h)
-        } else {
-            n + ((1) << h)
-        }
+fn parent(mut n: ffi::c_int) -> ffi::c_int {
+    let mut h: ffi::c_int = height(n);
+    if on_right(n, h) != 0 {
+        n - ((1) << h)
+    } else {
+        n + ((1) << h)
     }
 }
-unsafe fn calc_depth(mut size: ffi::c_int) -> ffi::c_int {
+fn calc_depth(mut size: ffi::c_int) -> ffi::c_int {
     if size == 0 {
         return 0;
     }

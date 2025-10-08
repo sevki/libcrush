@@ -9,7 +9,7 @@
 )]
 use crate::crush::types::*;
 use crate::crush::types::ffi;
-unsafe fn crush_hash32_rjenkins1(mut a: U32) -> U32 {
+fn crush_hash32_rjenkins1(mut a: U32) -> U32 {
     let mut hash: U32 = 1315423911 as U32 ^ a;
     let mut b: U32 = a;
     let mut x: U32 = 231232 as U32;
@@ -70,7 +70,7 @@ unsafe fn crush_hash32_rjenkins1(mut a: U32) -> U32 {
     hash ^= a >> 15;
     hash
 }
-unsafe fn crush_hash32_rjenkins1_2(mut a: U32, mut b: U32) -> U32 {
+fn crush_hash32_rjenkins1_2(mut a: U32, mut b: U32) -> U32 {
     let mut hash: U32 = 1315423911 as U32 ^ a ^ b;
     let mut x: U32 = 231232 as U32;
     let mut y: U32 = 1232 as U32;
@@ -157,7 +157,7 @@ unsafe fn crush_hash32_rjenkins1_2(mut a: U32, mut b: U32) -> U32 {
     hash ^= y >> 15;
     hash
 }
-unsafe fn crush_hash32_rjenkins1_3(mut a: U32, mut b: U32, mut c: U32) -> U32 {
+fn crush_hash32_rjenkins1_3(mut a: U32, mut b: U32, mut c: U32) -> U32 {
     let mut hash: U32 = 1315423911 as U32 ^ a ^ b ^ c;
     let mut x: U32 = 231232 as U32;
     let mut y: U32 = 1232 as U32;
@@ -298,7 +298,7 @@ unsafe fn crush_hash32_rjenkins1_3(mut a: U32, mut b: U32, mut c: U32) -> U32 {
     hash ^= c >> 15;
     hash
 }
-unsafe fn crush_hash32_rjenkins1_4(
+fn crush_hash32_rjenkins1_4(
     mut a: U32,
     mut b: U32,
     mut c: U32,
@@ -471,7 +471,7 @@ unsafe fn crush_hash32_rjenkins1_4(
     hash ^= d >> 15;
     hash
 }
-unsafe fn crush_hash32_rjenkins1_5(
+fn crush_hash32_rjenkins1_5(
     mut a: U32,
     mut b: U32,
     mut c: U32,
@@ -699,19 +699,19 @@ unsafe fn crush_hash32_rjenkins1_5(
     hash ^= e >> 15;
     hash
 }
-pub unsafe fn crush_hash32(type_0: ffi::c_int, a: U32) -> U32 {
+pub fn crush_hash32(type_0: ffi::c_int, a: U32) -> U32 {
     match type_0 {
         0 => crush_hash32_rjenkins1(a),
         _ => 0,
     }
 }
-pub unsafe fn crush_hash32_2(type_0: ffi::c_int, a: U32, b: U32) -> U32 {
+pub fn crush_hash32_2(type_0: ffi::c_int, a: U32, b: U32) -> U32 {
     match type_0 {
         0 => crush_hash32_rjenkins1_2(a, b),
         _ => 0,
     }
 }
-pub unsafe fn crush_hash32_3(
+pub fn crush_hash32_3(
     type_0: ffi::c_int,
     a: U32,
     b: U32,
@@ -722,7 +722,7 @@ pub unsafe fn crush_hash32_3(
         _ => 0,
     }
 }
-pub unsafe fn crush_hash32_4(
+pub fn crush_hash32_4(
     type_0: ffi::c_int,
     a: U32,
     b: U32,
@@ -734,7 +734,7 @@ pub unsafe fn crush_hash32_4(
         _ => 0,
     }
 }
-pub unsafe fn crush_hash32_5(
+pub fn crush_hash32_5(
     type_0: ffi::c_int,
     a: U32,
     b: U32,
@@ -747,7 +747,7 @@ pub unsafe fn crush_hash32_5(
         _ => 0,
     }
 }
-pub unsafe fn crush_hash_name(type_0: ffi::c_int) -> *const ffi::c_char {
+pub fn crush_hash_name(type_0: ffi::c_int) -> *const ffi::c_char {
     match type_0 {
         0 => b"rjenkins1\0" as *const u8 as *const ffi::c_char,
         _ => b"unknown\0" as *const u8 as *const ffi::c_char,
