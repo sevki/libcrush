@@ -1808,18 +1808,16 @@ unsafe extern "C" fn crush_reweight_straw2_bucket(
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_reweight_bucket(
-    mut map: *mut CrushMap,
-    mut b: *mut CrushBucket,
+    map: *mut CrushMap,
+    b: *mut CrushBucket,
 ) -> libc::c_int {
-    unsafe {
-        match (*b).alg as libc::c_int {
-            1 => crush_reweight_uniform_bucket(map, b as *mut CrushBucketUniform),
-            2 => crush_reweight_list_bucket(map, b as *mut CrushBucketList),
-            3 => crush_reweight_tree_bucket(map, b as *mut CrushBucketTree),
-            4 => crush_reweight_straw_bucket(map, b as *mut CrushBucketStraw),
-            5 => crush_reweight_straw2_bucket(map, b as *mut CrushBucketStraw2),
-            _ => -(1 as libc::c_int),
-        }
+    match (*b).alg as libc::c_int {
+        1 => crush_reweight_uniform_bucket(map, b as *mut CrushBucketUniform),
+        2 => crush_reweight_list_bucket(map, b as *mut CrushBucketList),
+        3 => crush_reweight_tree_bucket(map, b as *mut CrushBucketTree),
+        4 => crush_reweight_straw_bucket(map, b as *mut CrushBucketStraw),
+        5 => crush_reweight_straw2_bucket(map, b as *mut CrushBucketStraw2),
+        _ => -1,
     }
 }
 #[unsafe(no_mangle)]
@@ -1995,34 +1993,30 @@ pub unsafe extern "C" fn crush_multiplication_is_unsafe(a: U32, b: U32) -> libc:
     }
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn set_legacy_crush_map(mut map: *mut CrushMap) {
-    unsafe {
-        (*map).choose_local_tries = 2 as libc::c_int as U32;
-        (*map).choose_local_fallback_tries = 5 as libc::c_int as U32;
-        (*map).choose_total_tries = 19 as libc::c_int as U32;
-        (*map).chooseleaf_descend_once = 0 as libc::c_int as U32;
-        (*map).chooseleaf_vary_r = 0 as libc::c_int as U8;
-        (*map).chooseleaf_stable = 0 as libc::c_int as U8;
-        (*map).straw_calc_version = 0 as libc::c_int as U8;
-        (*map).allowed_bucket_algs = ((1 as libc::c_int) << CRUSH_BUCKET_UNIFORM as libc::c_int
-            | (1 as libc::c_int) << CRUSH_BUCKET_LIST as libc::c_int
-            | (1 as libc::c_int) << CRUSH_BUCKET_STRAW as libc::c_int)
-            as U32;
-    }
+pub unsafe extern "C" fn set_legacy_crush_map(map: *mut CrushMap) {
+    (*map).choose_local_tries = 2;
+    (*map).choose_local_fallback_tries = 5;
+    (*map).choose_total_tries = 19;
+    (*map).chooseleaf_descend_once = 0;
+    (*map).chooseleaf_vary_r = 0;
+    (*map).chooseleaf_stable = 0;
+    (*map).straw_calc_version = 0;
+    (*map).allowed_bucket_algs = ((1 << CRUSH_BUCKET_UNIFORM as libc::c_int)
+        | (1 << CRUSH_BUCKET_LIST as libc::c_int)
+        | (1 << CRUSH_BUCKET_STRAW as libc::c_int))
+        as U32;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn set_optimal_crush_map(mut map: *mut CrushMap) {
-    unsafe {
-        (*map).choose_local_tries = 0 as libc::c_int as U32;
-        (*map).choose_local_fallback_tries = 0 as libc::c_int as U32;
-        (*map).choose_total_tries = 50 as libc::c_int as U32;
-        (*map).chooseleaf_descend_once = 1 as libc::c_int as U32;
-        (*map).chooseleaf_vary_r = 1 as libc::c_int as U8;
-        (*map).chooseleaf_stable = 1 as libc::c_int as U8;
-        (*map).allowed_bucket_algs = ((1 as libc::c_int) << CRUSH_BUCKET_UNIFORM as libc::c_int
-            | (1 as libc::c_int) << CRUSH_BUCKET_LIST as libc::c_int
-            | (1 as libc::c_int) << CRUSH_BUCKET_STRAW as libc::c_int
-            | (1 as libc::c_int) << CRUSH_BUCKET_STRAW2 as libc::c_int)
-            as U32;
-    }
+pub unsafe extern "C" fn set_optimal_crush_map(map: *mut CrushMap) {
+    (*map).choose_local_tries = 0;
+    (*map).choose_local_fallback_tries = 0;
+    (*map).choose_total_tries = 50;
+    (*map).chooseleaf_descend_once = 1;
+    (*map).chooseleaf_vary_r = 1;
+    (*map).chooseleaf_stable = 1;
+    (*map).allowed_bucket_algs = ((1 << CRUSH_BUCKET_UNIFORM as libc::c_int)
+        | (1 << CRUSH_BUCKET_LIST as libc::c_int)
+        | (1 << CRUSH_BUCKET_STRAW as libc::c_int)
+        | (1 << CRUSH_BUCKET_STRAW2 as libc::c_int))
+        as U32;
 }
