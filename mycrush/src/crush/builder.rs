@@ -17,12 +17,6 @@ unsafe extern "C" {
     fn malloc(_: ffi::c_ulong) -> *mut ffi::c_void;
     fn realloc(_: *mut ffi::c_void, _: ffi::c_ulong) -> *mut ffi::c_void;
     fn free(_: *mut ffi::c_void);
-    fn __assert_fail(
-        __assertion: *const ffi::c_char,
-        __file: *const ffi::c_char,
-        __line: ffi::c_uint,
-        __function: *const ffi::c_char,
-    ) -> !;
     fn crush_destroy_bucket(b: *mut CrushBucket);
 }
 #[inline]
@@ -102,16 +96,7 @@ pub unsafe extern "C" fn crush_add_rule(
             }
             if r < ((1) << 8 as ffi::c_int) as U32 {
             } else {
-                __assert_fail(
-                    b"r < CRUSH_MAX_RULES\0" as *const u8 as *const ffi::c_char,
-                    b"/home/sevki/src/libcrush/crush/builder.c\0" as *const u8
-                        as *const ffi::c_char,
-                    78 as ffi::c_int as ffi::c_uint,
-                    (*::core::mem::transmute::<&[u8; 65], &[ffi::c_char; 65]>(
-                        b"int crush_add_rule(struct crush_map *, struct crush_rule *, int)\0",
-                    ))
-                    .as_ptr(),
-                );
+                panic!("Assertion failed: r < CRUSH_MAX_RULES");
             }
         } else {
             r = ruleno as U32;
@@ -186,15 +171,7 @@ pub unsafe extern "C" fn crush_rule_set_step(
     unsafe {
         if (n as U32) < (*rule).len {
         } else {
-            __assert_fail(
-                b"(__u32)n < rule->len\0" as *const u8 as *const ffi::c_char,
-                b"/home/sevki/src/libcrush/crush/builder.c\0" as *const u8 as *const ffi::c_char,
-                123 as ffi::c_int as ffi::c_uint,
-                (*::core::mem::transmute::<&[u8; 66], &[ffi::c_char; 66]>(
-                    b"void crush_rule_set_step(struct crush_rule *, int, int, int, int)\0",
-                ))
-                .as_ptr(),
-            );
+            panic!("Assertion failed: (__u32)n < rule->len");
         }
 
         (*((*rule).steps).as_mut_ptr().offset(n as isize)).op = op as U32;
@@ -272,15 +249,7 @@ pub unsafe extern "C" fn crush_remove_bucket(
         let mut pos: ffi::c_int = (-1) - (*bucket).id;
         if pos < (*map).max_buckets {
         } else {
-            __assert_fail(
-                b"pos < map->max_buckets\0" as *const u8 as *const ffi::c_char,
-                b"/home/sevki/src/libcrush/crush/builder.c\0" as *const u8 as *const ffi::c_char,
-                184 as ffi::c_int as ffi::c_uint,
-                (*::core::mem::transmute::<&[u8; 67], &[ffi::c_char; 67]>(
-                    b"int crush_remove_bucket(struct crush_map *, struct crush_bucket *)\0",
-                ))
-                .as_ptr(),
-            );
+            panic!("Assertion failed: pos < map->max_buckets");
         }
         let fresh2 = &mut (*((*map).buckets).offset(pos as isize));
         *fresh2 = std::ptr::null_mut::<CrushBucket>();
@@ -549,20 +518,7 @@ pub unsafe extern "C" fn crush_make_tree_bucket(
                         ) == (*bucket).h.weight
                         {
                         } else {
-                            __assert_fail(
-                            b"!(bucket->node_weights[bucket->num_nodes/2] != bucket->h.weight)\0"
-                                as *const u8 as *const ffi::c_char,
-                            b"/home/sevki/src/libcrush/crush/builder.c\0" as *const u8
-                                as *const ffi::c_char,
-                            389 as ffi::c_int as ffi::c_uint,
-                            (*::core::mem::transmute::<
-                                &[u8; 78],
-                                &[ffi::c_char; 78],
-                            >(
-                                b"struct crush_bucket_tree *crush_make_tree_bucket(int, int, int, int *, int *)\0",
-                            ))
-                                .as_ptr(),
-                        );
+                            panic!("Assertion failed: !(bucket->node_weights[bucket->num_nodes/2] != bucket->h.weight)");
                         }
 
                         return bucket;
@@ -1869,15 +1825,7 @@ pub unsafe extern "C" fn crush_make_choose_args(
             ids.offset(sum_bucket_size as isize) as *mut ffi::c_char;
         if space.offset(size as isize) == ids_end {
         } else {
-            __assert_fail(
-                b"!(space + size != ids_end)\0" as *const u8 as *const ffi::c_char,
-                b"/home/sevki/src/libcrush/crush/builder.c\0" as *const u8 as *const ffi::c_char,
-                1428 as ffi::c_int as ffi::c_uint,
-                (*::core::mem::transmute::<&[u8; 73], &[ffi::c_char; 73]>(
-                    b"struct crush_choose_arg *crush_make_choose_args(struct crush_map *, int)\0",
-                ))
-                .as_ptr(),
-            );
+            panic!("Assertion failed: !(space + size != ids_end)");
         }
 
         b = 0;
@@ -1925,42 +1873,17 @@ pub unsafe extern "C" fn crush_make_choose_args(
         }
         if weight_set_ends == weight_set as *mut ffi::c_char {
         } else {
-            __assert_fail(
-                b"!((char*)weight_set_ends != (char*)weight_set)\0" as *const u8
-                    as *const ffi::c_char,
-                b"/home/sevki/src/libcrush/crush/builder.c\0" as *const u8 as *const ffi::c_char,
-                1453 as ffi::c_int as ffi::c_uint,
-                (*::core::mem::transmute::<&[u8; 73], &[ffi::c_char; 73]>(
-                    b"struct crush_choose_arg *crush_make_choose_args(struct crush_map *, int)\0",
-                ))
-                .as_ptr(),
-            );
+            panic!("Assertion failed: !((char*)weight_set_ends != (char*)weight_set)");
         }
 
         if weights_end == weights as *mut ffi::c_char {
         } else {
-            __assert_fail(
-                b"!((char*)weights_end != (char*)weights)\0" as *const u8 as *const ffi::c_char,
-                b"/home/sevki/src/libcrush/crush/builder.c\0" as *const u8 as *const ffi::c_char,
-                1454 as ffi::c_int as ffi::c_uint,
-                (*::core::mem::transmute::<&[u8; 73], &[ffi::c_char; 73]>(
-                    b"struct crush_choose_arg *crush_make_choose_args(struct crush_map *, int)\0",
-                ))
-                .as_ptr(),
-            );
+            panic!("Assertion failed: !((char*)weights_end != (char*)weights)");
         }
 
         if ids as *mut ffi::c_char == ids_end {
         } else {
-            __assert_fail(
-                b"!((char*)ids != (char*)ids_end)\0" as *const u8 as *const ffi::c_char,
-                b"/home/sevki/src/libcrush/crush/builder.c\0" as *const u8 as *const ffi::c_char,
-                1455 as ffi::c_int as ffi::c_uint,
-                (*::core::mem::transmute::<&[u8; 73], &[ffi::c_char; 73]>(
-                    b"struct crush_choose_arg *crush_make_choose_args(struct crush_map *, int)\0",
-                ))
-                .as_ptr(),
-            );
+            panic!("Assertion failed: !((char*)ids != (char*)ids_end)");
         }
 
         arg
