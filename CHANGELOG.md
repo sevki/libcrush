@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/sevki/libcrush/compare/v0.1.1...v0.1.2) (2025-10-08)
+
+
+### Bug Fixes
+
+* lots of clippy lints ([301c2e3](https://github.com/sevki/libcrush/commit/301c2e3210b969a4c2c0f239bb0b84f4ed56957b))
+
 ## [0.1.1](https://github.com/sevki/libcrush/compare/v0.1.0...v0.1.1) (2025-10-08)
 
 
