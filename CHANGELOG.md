@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/sevki/libcrush/compare/v0.1.0...v0.1.1) (2025-10-08)
+
+
+### Bug Fixes
+
+* lint errors and rename things to match rust naming ([8766d18](https://github.com/sevki/libcrush/commit/8766d18bf94285b5a00afaa9d531d1fabf9aedb6))
+* packaging ([cf0dfce](https://github.com/sevki/libcrush/commit/cf0dfce771990a1a26e50fa790d56f741e3e6faf))
+
 ## 0.1.0 (2025-10-07)
 
 
