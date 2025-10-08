@@ -23,8 +23,7 @@ unsafe extern "C" {
 fn crush_calc_tree_node(i: i32) -> i32 {
     ((i + 1) << 1) - 1
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_create() -> *mut CrushMap {
+pub unsafe fn crush_create() -> *mut CrushMap {
     unsafe {
         let mut m: *mut CrushMap = std::ptr::null_mut::<CrushMap>();
         m = malloc(::core::mem::size_of::<CrushMap>() as ffi::c_ulong) as *mut CrushMap;
@@ -40,8 +39,7 @@ pub unsafe extern "C" fn crush_create() -> *mut CrushMap {
         m
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_finalize(mut map: *mut CrushMap) {
+pub unsafe fn crush_finalize(mut map: *mut CrushMap) {
     unsafe {
         let mut b: ffi::c_int = 0;
         let mut i: U32 = 0;
@@ -78,8 +76,7 @@ pub unsafe extern "C" fn crush_finalize(mut map: *mut CrushMap) {
         }
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_add_rule(
+pub unsafe fn crush_add_rule(
     mut map: *mut CrushMap,
     mut rule: *mut CrushRule,
     mut ruleno: ffi::c_int,
@@ -133,8 +130,7 @@ pub unsafe extern "C" fn crush_add_rule(
         r as ffi::c_int
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_make_rule(
+pub unsafe fn crush_make_rule(
     mut len: ffi::c_int,
     mut ruleset: ffi::c_int,
     mut type_0: ffi::c_int,
@@ -160,8 +156,7 @@ pub unsafe extern "C" fn crush_make_rule(
         rule
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_rule_set_step(
+pub unsafe fn crush_rule_set_step(
     mut rule: *mut CrushRule,
     mut n: ffi::c_int,
     mut op: ffi::c_int,
@@ -179,8 +174,7 @@ pub unsafe extern "C" fn crush_rule_set_step(
         (*((*rule).steps).as_mut_ptr().offset(n as isize)).arg2 = arg2;
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_get_next_bucket_id(mut map: *mut CrushMap) -> ffi::c_int {
+pub unsafe fn crush_get_next_bucket_id(mut map: *mut CrushMap) -> ffi::c_int {
     unsafe {
         for pos in 0..(*map).max_buckets {
             if (*((*map).buckets).offset(pos as isize)).is_null() {
@@ -190,8 +184,7 @@ pub unsafe extern "C" fn crush_get_next_bucket_id(mut map: *mut CrushMap) -> ffi
         -1 - (*map).max_buckets
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_add_bucket(
+pub unsafe fn crush_add_bucket(
     mut map: *mut CrushMap,
     mut id: ffi::c_int,
     mut bucket: *mut CrushBucket,
@@ -240,8 +233,7 @@ pub unsafe extern "C" fn crush_add_bucket(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_remove_bucket(
+pub unsafe fn crush_remove_bucket(
     mut map: *mut CrushMap,
     mut bucket: *mut CrushBucket,
 ) -> ffi::c_int {
@@ -257,8 +249,7 @@ pub unsafe extern "C" fn crush_remove_bucket(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_make_uniform_bucket(
+pub unsafe fn crush_make_uniform_bucket(
     mut hash: ffi::c_int,
     mut type_0: ffi::c_int,
     mut size: ffi::c_int,
@@ -303,8 +294,7 @@ pub unsafe extern "C" fn crush_make_uniform_bucket(
         std::ptr::null_mut::<CrushBucketUniform>()
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_make_list_bucket(
+pub unsafe fn crush_make_list_bucket(
     mut hash: ffi::c_int,
     mut type_0: ffi::c_int,
     mut size: ffi::c_int,
@@ -413,8 +403,7 @@ unsafe extern "C" fn calc_depth(mut size: ffi::c_int) -> ffi::c_int {
     }
     depth
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_make_tree_bucket(
+pub unsafe fn crush_make_tree_bucket(
     mut hash: ffi::c_int,
     mut type_0: ffi::c_int,
     mut size: ffi::c_int,
@@ -529,8 +518,7 @@ pub unsafe extern "C" fn crush_make_tree_bucket(
         std::ptr::null_mut::<CrushBucketTree>()
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_calc_straw(
+pub unsafe fn crush_calc_straw(
     mut map: *mut CrushMap,
     mut bucket: *mut CrushBucketStraw,
 ) -> ffi::c_int {
@@ -672,8 +660,7 @@ pub unsafe extern "C" fn crush_calc_straw(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_make_straw_bucket(
+pub unsafe fn crush_make_straw_bucket(
     mut map: *mut CrushMap,
     mut hash: ffi::c_int,
     mut type_0: ffi::c_int,
@@ -735,8 +722,7 @@ pub unsafe extern "C" fn crush_make_straw_bucket(
         std::ptr::null_mut::<CrushBucketStraw>()
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_make_straw2_bucket(
+pub unsafe fn crush_make_straw2_bucket(
     mut _map: *mut CrushMap,
     mut hash: ffi::c_int,
     mut type_0: ffi::c_int,
@@ -789,8 +775,7 @@ pub unsafe extern "C" fn crush_make_straw2_bucket(
         std::ptr::null_mut::<CrushBucketStraw2>()
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_make_bucket(
+pub unsafe fn crush_make_bucket(
     mut map: *mut CrushMap,
     mut alg: ffi::c_int,
     mut hash: ffi::c_int,
@@ -832,8 +817,7 @@ pub unsafe extern "C" fn crush_make_bucket(
         std::ptr::null_mut::<CrushBucket>()
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_add_uniform_bucket_item(
+pub unsafe fn crush_add_uniform_bucket_item(
     mut bucket: *mut CrushBucketUniform,
     mut item: ffi::c_int,
     mut weight: ffi::c_int,
@@ -863,8 +847,7 @@ pub unsafe extern "C" fn crush_add_uniform_bucket_item(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_add_list_bucket_item(
+pub unsafe fn crush_add_list_bucket_item(
     mut bucket: *mut CrushBucketList,
     mut item: ffi::c_int,
     mut weight: ffi::c_int,
@@ -920,8 +903,7 @@ pub unsafe extern "C" fn crush_add_list_bucket_item(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_add_tree_bucket_item(
+pub unsafe fn crush_add_tree_bucket_item(
     mut bucket: *mut CrushBucketTree,
     mut item: ffi::c_int,
     mut weight: ffi::c_int,
@@ -982,8 +964,7 @@ pub unsafe extern "C" fn crush_add_tree_bucket_item(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_add_straw_bucket_item(
+pub unsafe fn crush_add_straw_bucket_item(
     mut map: *mut CrushMap,
     mut bucket: *mut CrushBucketStraw,
     mut item: ffi::c_int,
@@ -1030,8 +1011,7 @@ pub unsafe extern "C" fn crush_add_straw_bucket_item(
         crush_calc_straw(map, bucket)
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_add_straw2_bucket_item(
+pub unsafe fn crush_add_straw2_bucket_item(
     mut _map: *mut CrushMap,
     mut bucket: *mut CrushBucketStraw2,
     mut item: ffi::c_int,
@@ -1069,9 +1049,8 @@ pub unsafe extern "C" fn crush_add_straw2_bucket_item(
         0
     }
 }
-#[unsafe(no_mangle)]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe extern "C" fn crush_bucket_add_item(
+pub unsafe fn crush_bucket_add_item(
     mut map: *mut CrushMap,
     mut b: *mut CrushBucket,
     mut item: ffi::c_int,
@@ -1088,8 +1067,7 @@ pub unsafe extern "C" fn crush_bucket_add_item(
         }
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_remove_uniform_bucket_item(
+pub unsafe fn crush_remove_uniform_bucket_item(
     mut bucket: *mut CrushBucketUniform,
     mut item: ffi::c_int,
 ) -> ffi::c_int {
@@ -1133,8 +1111,7 @@ pub unsafe extern "C" fn crush_remove_uniform_bucket_item(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_remove_list_bucket_item(
+pub unsafe fn crush_remove_list_bucket_item(
     mut bucket: *mut CrushBucketList,
     mut item: ffi::c_int,
 ) -> ffi::c_int {
@@ -1204,8 +1181,7 @@ pub unsafe extern "C" fn crush_remove_list_bucket_item(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_remove_tree_bucket_item(
+pub unsafe fn crush_remove_tree_bucket_item(
     mut bucket: *mut CrushBucketTree,
     mut item: ffi::c_int,
 ) -> ffi::c_int {
@@ -1288,8 +1264,7 @@ pub unsafe extern "C" fn crush_remove_tree_bucket_item(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_remove_straw_bucket_item(
+pub unsafe fn crush_remove_straw_bucket_item(
     mut map: *mut CrushMap,
     mut bucket: *mut CrushBucketStraw,
     mut item: ffi::c_int,
@@ -1356,8 +1331,7 @@ pub unsafe extern "C" fn crush_remove_straw_bucket_item(
         crush_calc_straw(map, bucket)
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_remove_straw2_bucket_item(
+pub unsafe fn crush_remove_straw2_bucket_item(
     mut _map: *mut CrushMap,
     mut bucket: *mut CrushBucketStraw2,
     mut item: ffi::c_int,
@@ -1415,8 +1389,7 @@ pub unsafe extern "C" fn crush_remove_straw2_bucket_item(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_bucket_remove_item(
+pub unsafe fn crush_bucket_remove_item(
     mut map: *mut CrushMap,
     mut b: *mut CrushBucket,
     mut item: ffi::c_int,
@@ -1432,8 +1405,7 @@ pub unsafe extern "C" fn crush_bucket_remove_item(
         }
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_adjust_uniform_bucket_item_weight(
+pub unsafe fn crush_adjust_uniform_bucket_item_weight(
     mut bucket: *mut CrushBucketUniform,
     mut _item: ffi::c_int,
     mut weight: ffi::c_int,
@@ -1446,8 +1418,7 @@ pub unsafe extern "C" fn crush_adjust_uniform_bucket_item_weight(
         diff
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_adjust_list_bucket_item_weight(
+pub unsafe fn crush_adjust_list_bucket_item_weight(
     mut bucket: *mut CrushBucketList,
     mut item: ffi::c_int,
     mut weight: ffi::c_int,
@@ -1479,8 +1450,7 @@ pub unsafe extern "C" fn crush_adjust_list_bucket_item_weight(
         diff
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_adjust_tree_bucket_item_weight(
+pub unsafe fn crush_adjust_tree_bucket_item_weight(
     mut bucket: *mut CrushBucketTree,
     mut item: ffi::c_int,
     mut weight: ffi::c_int,
@@ -1516,8 +1486,7 @@ pub unsafe extern "C" fn crush_adjust_tree_bucket_item_weight(
         diff
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_adjust_straw_bucket_item_weight(
+pub unsafe fn crush_adjust_straw_bucket_item_weight(
     mut map: *mut CrushMap,
     mut bucket: *mut CrushBucketStraw,
     mut item: ffi::c_int,
@@ -1548,8 +1517,7 @@ pub unsafe extern "C" fn crush_adjust_straw_bucket_item_weight(
         diff
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_adjust_straw2_bucket_item_weight(
+pub unsafe fn crush_adjust_straw2_bucket_item_weight(
     mut _map: *mut CrushMap,
     mut bucket: *mut CrushBucketStraw2,
     mut item: ffi::c_int,
@@ -1575,8 +1543,7 @@ pub unsafe extern "C" fn crush_adjust_straw2_bucket_item_weight(
         diff
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_bucket_adjust_item_weight(
+pub unsafe fn crush_bucket_adjust_item_weight(
     mut map: *mut CrushMap,
     mut b: *mut CrushBucket,
     mut item: ffi::c_int,
@@ -1753,8 +1720,7 @@ unsafe extern "C" fn crush_reweight_straw2_bucket(
         0
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_reweight_bucket(
+pub unsafe fn crush_reweight_bucket(
     map: *mut CrushMap,
     b: *mut CrushBucket,
 ) -> ffi::c_int {
@@ -1767,8 +1733,7 @@ pub unsafe extern "C" fn crush_reweight_bucket(
         _ => -1,
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_make_choose_args(
+pub unsafe fn crush_make_choose_args(
     mut map: *mut CrushMap,
     mut num_positions: ffi::c_int,
 ) -> *mut CrushChooseArg {
@@ -1880,8 +1845,7 @@ pub unsafe extern "C" fn crush_make_choose_args(
         arg
     }
 }
-#[unsafe(no_mangle)]
-pub extern "C" fn crush_destroy_choose_args(args: *mut CrushChooseArg) {
+pub fn crush_destroy_choose_args(args: *mut CrushChooseArg) {
     unsafe {
         free(args as *mut ffi::c_void);
     }

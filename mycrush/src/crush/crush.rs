@@ -17,8 +17,7 @@ unsafe extern "C" {
 fn crush_calc_tree_node(i: i32) -> i32 {
     ((i + 1) << 1) - 1
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_bucket_alg_name(alg: ffi::c_int) -> *const ffi::c_char {
+pub unsafe fn crush_bucket_alg_name(alg: ffi::c_int) -> *const ffi::c_char {
     match alg {
         1 => b"uniform\0" as *const u8 as *const ffi::c_char,
         2 => b"list\0" as *const u8 as *const ffi::c_char,
@@ -28,8 +27,7 @@ pub unsafe extern "C" fn crush_bucket_alg_name(alg: ffi::c_int) -> *const ffi::c
         _ => b"unknown\0" as *const u8 as *const ffi::c_char,
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_get_bucket_item_weight(
+pub unsafe fn crush_get_bucket_item_weight(
     b: *const CrushBucket,
     p: ffi::c_int,
 ) -> ffi::c_int {
@@ -46,8 +44,7 @@ pub unsafe extern "C" fn crush_get_bucket_item_weight(
         _ => 0,
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_destroy_bucket_uniform(b: *mut CrushBucketUniform) {
+pub unsafe fn crush_destroy_bucket_uniform(b: *mut CrushBucketUniform) {
     if !((*b).h.items).is_null() {
         free((*b).h.items as *mut ffi::c_void);
     }
@@ -55,8 +52,7 @@ pub unsafe extern "C" fn crush_destroy_bucket_uniform(b: *mut CrushBucketUniform
         free(b as *mut ffi::c_void);
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_destroy_bucket_list(b: *mut CrushBucketList) {
+pub unsafe fn crush_destroy_bucket_list(b: *mut CrushBucketList) {
     if !((*b).item_weights).is_null() {
         free((*b).item_weights as *mut ffi::c_void);
     }
@@ -70,8 +66,7 @@ pub unsafe extern "C" fn crush_destroy_bucket_list(b: *mut CrushBucketList) {
         free(b as *mut ffi::c_void);
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_destroy_bucket_tree(b: *mut CrushBucketTree) {
+pub unsafe fn crush_destroy_bucket_tree(b: *mut CrushBucketTree) {
     if !((*b).h.items).is_null() {
         free((*b).h.items as *mut ffi::c_void);
     }
@@ -82,8 +77,7 @@ pub unsafe extern "C" fn crush_destroy_bucket_tree(b: *mut CrushBucketTree) {
         free(b as *mut ffi::c_void);
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_destroy_bucket_straw(b: *mut CrushBucketStraw) {
+pub unsafe fn crush_destroy_bucket_straw(b: *mut CrushBucketStraw) {
     if !((*b).straws).is_null() {
         free((*b).straws as *mut ffi::c_void);
     }
@@ -97,8 +91,7 @@ pub unsafe extern "C" fn crush_destroy_bucket_straw(b: *mut CrushBucketStraw) {
         free(b as *mut ffi::c_void);
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_destroy_bucket_straw2(b: *mut CrushBucketStraw2) {
+pub unsafe fn crush_destroy_bucket_straw2(b: *mut CrushBucketStraw2) {
     if !((*b).item_weights).is_null() {
         free((*b).item_weights as *mut ffi::c_void);
     }
@@ -109,8 +102,7 @@ pub unsafe extern "C" fn crush_destroy_bucket_straw2(b: *mut CrushBucketStraw2) 
         free(b as *mut ffi::c_void);
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_destroy_bucket(b: *mut CrushBucket) {
+pub unsafe fn crush_destroy_bucket(b: *mut CrushBucket) {
     match (*b).alg as ffi::c_int {
         1 => crush_destroy_bucket_uniform(b as *mut CrushBucketUniform),
         2 => crush_destroy_bucket_list(b as *mut CrushBucketList),
@@ -120,8 +112,7 @@ pub unsafe extern "C" fn crush_destroy_bucket(b: *mut CrushBucket) {
         _ => {}
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_destroy(map: *mut CrushMap) {
+pub unsafe fn crush_destroy(map: *mut CrushMap) {
     if !((*map).buckets).is_null() {
         for b in 0..(*map).max_buckets {
             if !(*((*map).buckets).offset(b as isize)).is_null() {
@@ -147,8 +138,7 @@ pub unsafe extern "C" fn crush_destroy(map: *mut CrushMap) {
         free(map as *mut ffi::c_void);
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_destroy_rule(rule: *mut CrushRule) {
+pub unsafe fn crush_destroy_rule(rule: *mut CrushRule) {
     if !rule.is_null() {
         free(rule as *mut ffi::c_void);
     }
