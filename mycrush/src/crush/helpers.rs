@@ -40,10 +40,9 @@ pub unsafe extern "C" fn crush_find_roots(
             let mut b: *mut CrushBucket = *((*map).buckets).offset(pos as isize);
             if b.is_null() {
                 root_count -= 1;
-                root_count;
             } else {
                 i = 0 as libc::c_int;
-                while (i as __u32) < (*b).size {
+                while (i as U32) < (*b).size {
                     if *((*b).items).offset(i as isize) < 0 as libc::c_int {
                         let mut item: libc::c_int =
                             -(1 as libc::c_int) - *((*b).items).offset(i as isize);
@@ -52,18 +51,14 @@ pub unsafe extern "C" fn crush_find_roots(
                         }
                         if *ref_0.as_mut_ptr().offset(item as isize) == 0 as libc::c_int {
                             root_count -= 1;
-                            root_count;
                         }
                         let fresh0 = &mut (*ref_0.as_mut_ptr().offset(item as isize));
                         *fresh0 += 1;
-                        *fresh0;
                     }
                     i += 1;
-                    i;
                 }
             }
             pos += 1;
-            pos;
         }
         let mut roots: *mut libc::c_int = malloc(
             (root_count as libc::c_ulong)
@@ -83,7 +78,6 @@ pub unsafe extern "C" fn crush_find_roots(
                 *roots.offset(fresh1 as isize) = -(1 as libc::c_int) - pos;
             }
             pos += 1;
-            pos;
         }
         if roots_length == root_count {
         } else {
@@ -97,21 +91,7 @@ pub unsafe extern "C" fn crush_find_roots(
                 .as_ptr(),
             );
         }
-        'c_2267: {
-            if roots_length == root_count {
-            } else {
-                __assert_fail(
-                    b"roots_length == root_count\0" as *const u8 as *const libc::c_char,
-                    b"/home/sevki/src/libcrush/crush/helpers.c\0" as *const u8
-                        as *const libc::c_char,
-                    38 as libc::c_int as libc::c_uint,
-                    (*::core::mem::transmute::<&[u8; 49], &[libc::c_char; 49]>(
-                        b"int crush_find_roots(struct crush_map *, int **)\0",
-                    ))
-                    .as_ptr(),
-                );
-            }
-        };
+
         *buckets = roots;
         root_count
     }

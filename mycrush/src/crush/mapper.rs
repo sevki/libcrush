@@ -19,11 +19,11 @@ unsafe extern "C" {
         __function: *const libc::c_char,
     ) -> !;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn crush_hash32_2(type_0: libc::c_int, a: __u32, b: __u32) -> __u32;
-    fn crush_hash32_3(type_0: libc::c_int, a: __u32, b: __u32, c: __u32) -> __u32;
-    fn crush_hash32_4(type_0: libc::c_int, a: __u32, b: __u32, c: __u32, d: __u32) -> __u32;
+    fn crush_hash32_2(type_0: libc::c_int, a: U32, b: U32) -> U32;
+    fn crush_hash32_3(type_0: libc::c_int, a: U32, b: U32, c: U32) -> U32;
+    fn crush_hash32_4(type_0: libc::c_int, a: U32, b: U32, c: U32, d: U32) -> U32;
 }
-static mut __RH_LH_tbl: [__s64; 258] = [
+static mut __RH_LH_tbl: [S64; 258] = [
     0x1000000000000 as libc::c_longlong,
     0 as libc::c_longlong,
     0xfe03f80fe040 as libc::c_longlong,
@@ -283,263 +283,263 @@ static mut __RH_LH_tbl: [__s64; 258] = [
     0x800000000000 as libc::c_longlong,
     0xffff00000000 as libc::c_longlong,
 ];
-static mut __LL_tbl: [__s64; 256] = [
-    0 as libc::c_ulonglong as __s64,
-    0x2e2a60a00 as libc::c_ulonglong as __s64,
-    0x70cb64ec5 as libc::c_ulonglong as __s64,
-    0x9ef50ce67 as libc::c_ulonglong as __s64,
-    0xcd1e588fd as libc::c_ulonglong as __s64,
-    0xfb4747e9c as libc::c_ulonglong as __s64,
-    0x1296fdaf5e as libc::c_ulonglong as __s64,
-    0x1579811b58 as libc::c_ulonglong as __s64,
-    0x185bfec2a1 as libc::c_ulonglong as __s64,
-    0x1b3e76a552 as libc::c_ulonglong as __s64,
-    0x1e20e8c380 as libc::c_ulonglong as __s64,
-    0x2103551d43 as libc::c_ulonglong as __s64,
-    0x23e5bbb2b2 as libc::c_ulonglong as __s64,
-    0x26c81c83e4 as libc::c_ulonglong as __s64,
-    0x29aa7790f0 as libc::c_ulonglong as __s64,
-    0x2c8cccd9ed as libc::c_ulonglong as __s64,
-    0x2f6f1c5ef2 as libc::c_ulonglong as __s64,
-    0x3251662017 as libc::c_ulonglong as __s64,
-    0x3533aa1d71 as libc::c_ulonglong as __s64,
-    0x3815e8571a as libc::c_ulonglong as __s64,
-    0x3af820cd26 as libc::c_ulonglong as __s64,
-    0x3dda537fae as libc::c_ulonglong as __s64,
-    0x40bc806ec8 as libc::c_ulonglong as __s64,
-    0x439ea79a8c as libc::c_ulonglong as __s64,
-    0x4680c90310 as libc::c_ulonglong as __s64,
-    0x4962e4a86c as libc::c_ulonglong as __s64,
-    0x4c44fa8ab6 as libc::c_ulonglong as __s64,
-    0x4f270aaa06 as libc::c_ulonglong as __s64,
-    0x5209150672 as libc::c_ulonglong as __s64,
-    0x54eb19a013 as libc::c_ulonglong as __s64,
-    0x57cd1876fd as libc::c_ulonglong as __s64,
-    0x5aaf118b4a as libc::c_ulonglong as __s64,
-    0x5d9104dd0f as libc::c_ulonglong as __s64,
-    0x6072f26c64 as libc::c_ulonglong as __s64,
-    0x6354da3960 as libc::c_ulonglong as __s64,
-    0x6636bc441a as libc::c_ulonglong as __s64,
-    0x6918988ca8 as libc::c_ulonglong as __s64,
-    0x6bfa6f1322 as libc::c_ulonglong as __s64,
-    0x6edc3fd79f as libc::c_ulonglong as __s64,
-    0x71be0ada35 as libc::c_ulonglong as __s64,
-    0x749fd01afd as libc::c_ulonglong as __s64,
-    0x77818f9a0c as libc::c_ulonglong as __s64,
-    0x7a6349577a as libc::c_ulonglong as __s64,
-    0x7d44fd535e as libc::c_ulonglong as __s64,
-    0x8026ab8dce as libc::c_ulonglong as __s64,
-    0x83085406e3 as libc::c_ulonglong as __s64,
-    0x85e9f6beb2 as libc::c_ulonglong as __s64,
-    0x88cb93b552 as libc::c_ulonglong as __s64,
-    0x8bad2aeadc as libc::c_ulonglong as __s64,
-    0x8e8ebc5f65 as libc::c_ulonglong as __s64,
-    0x9170481305 as libc::c_ulonglong as __s64,
-    0x9451ce05d3 as libc::c_ulonglong as __s64,
-    0x97334e37e5 as libc::c_ulonglong as __s64,
-    0x9a14c8a953 as libc::c_ulonglong as __s64,
-    0x9cf63d5a33 as libc::c_ulonglong as __s64,
-    0x9fd7ac4a9d as libc::c_ulonglong as __s64,
-    0xa2b07f3458 as libc::c_ulonglong as __s64,
-    0xa59a78ea6a as libc::c_ulonglong as __s64,
-    0xa87bd699fb as libc::c_ulonglong as __s64,
-    0xab5d2e8970 as libc::c_ulonglong as __s64,
-    0xae3e80b8e3 as libc::c_ulonglong as __s64,
-    0xb11fcd2869 as libc::c_ulonglong as __s64,
-    0xb40113d818 as libc::c_ulonglong as __s64,
-    0xb6e254c80a as libc::c_ulonglong as __s64,
-    0xb9c38ff853 as libc::c_ulonglong as __s64,
-    0xbca4c5690c as libc::c_ulonglong as __s64,
-    0xbf85f51a4a as libc::c_ulonglong as __s64,
-    0xc2671f0c26 as libc::c_ulonglong as __s64,
-    0xc548433eb6 as libc::c_ulonglong as __s64,
-    0xc82961b211 as libc::c_ulonglong as __s64,
-    0xcb0a7a664d as libc::c_ulonglong as __s64,
-    0xcdeb8d5b82 as libc::c_ulonglong as __s64,
-    0xd0cc9a91c8 as libc::c_ulonglong as __s64,
-    0xd3ada20933 as libc::c_ulonglong as __s64,
-    0xd68ea3c1dd as libc::c_ulonglong as __s64,
-    0xd96f9fbbdb as libc::c_ulonglong as __s64,
-    0xdc5095f744 as libc::c_ulonglong as __s64,
-    0xdf31867430 as libc::c_ulonglong as __s64,
-    0xe2127132b5 as libc::c_ulonglong as __s64,
-    0xe4f35632ea as libc::c_ulonglong as __s64,
-    0xe7d43574e6 as libc::c_ulonglong as __s64,
-    0xeab50ef8c1 as libc::c_ulonglong as __s64,
-    0xed95e2be90 as libc::c_ulonglong as __s64,
-    0xf076b0c66c as libc::c_ulonglong as __s64,
-    0xf35779106a as libc::c_ulonglong as __s64,
-    0xf6383b9ca2 as libc::c_ulonglong as __s64,
-    0xf918f86b2a as libc::c_ulonglong as __s64,
-    0xfbf9af7c1a as libc::c_ulonglong as __s64,
-    0xfeda60cf88 as libc::c_ulonglong as __s64,
-    0x101bb0c658c as libc::c_ulonglong as __s64,
-    0x1049bb23e3c as libc::c_ulonglong as __s64,
-    0x1077c5259af as libc::c_ulonglong as __s64,
-    0x10a5cecb7fc as libc::c_ulonglong as __s64,
-    0x10d3d81593a as libc::c_ulonglong as __s64,
-    0x1101e103d7f as libc::c_ulonglong as __s64,
-    0x112fe9964e4 as libc::c_ulonglong as __s64,
-    0x115df1ccf7e as libc::c_ulonglong as __s64,
-    0x118bf9a7d64 as libc::c_ulonglong as __s64,
-    0x11ba0126ead as libc::c_ulonglong as __s64,
-    0x11e8084a371 as libc::c_ulonglong as __s64,
-    0x12160f11bc6 as libc::c_ulonglong as __s64,
-    0x1244157d7c3 as libc::c_ulonglong as __s64,
-    0x12721b8d77f as libc::c_ulonglong as __s64,
-    0x12a02141b10 as libc::c_ulonglong as __s64,
-    0x12ce269a28e as libc::c_ulonglong as __s64,
-    0x12fc2b96e0f as libc::c_ulonglong as __s64,
-    0x132a3037daa as libc::c_ulonglong as __s64,
-    0x1358347d177 as libc::c_ulonglong as __s64,
-    0x1386386698c as libc::c_ulonglong as __s64,
-    0x13b43bf45ff as libc::c_ulonglong as __s64,
-    0x13e23f266e9 as libc::c_ulonglong as __s64,
-    0x141041fcc5e as libc::c_ulonglong as __s64,
-    0x143e4477678 as libc::c_ulonglong as __s64,
-    0x146c469654b as libc::c_ulonglong as __s64,
-    0x149a48598f0 as libc::c_ulonglong as __s64,
-    0x14c849c117c as libc::c_ulonglong as __s64,
-    0x14f64accf08 as libc::c_ulonglong as __s64,
-    0x15244b7d1a9 as libc::c_ulonglong as __s64,
-    0x15524bd1976 as libc::c_ulonglong as __s64,
-    0x15804bca687 as libc::c_ulonglong as __s64,
-    0x15ae4b678f2 as libc::c_ulonglong as __s64,
-    0x15dc4aa90ce as libc::c_ulonglong as __s64,
-    0x160a498ee31 as libc::c_ulonglong as __s64,
-    0x16384819134 as libc::c_ulonglong as __s64,
-    0x166646479ec as libc::c_ulonglong as __s64,
-    0x1694441a870 as libc::c_ulonglong as __s64,
-    0x16c24191cd7 as libc::c_ulonglong as __s64,
-    0x16df6ca19bd as libc::c_ulonglong as __s64,
-    0x171e3b6d7aa as libc::c_ulonglong as __s64,
-    0x174c37d1e44 as libc::c_ulonglong as __s64,
-    0x177a33dab1c as libc::c_ulonglong as __s64,
-    0x17a82f87e49 as libc::c_ulonglong as __s64,
-    0x17d62ad97e2 as libc::c_ulonglong as __s64,
-    0x180425cf7fe as libc::c_ulonglong as __s64,
-    0x182b07f3458 as libc::c_ulonglong as __s64,
-    0x18601aa8c19 as libc::c_ulonglong as __s64,
-    0x188e148c046 as libc::c_ulonglong as __s64,
-    0x18bc0e13b52 as libc::c_ulonglong as __s64,
-    0x18ea073fd52 as libc::c_ulonglong as __s64,
-    0x1918001065d as libc::c_ulonglong as __s64,
-    0x1945f88568b as libc::c_ulonglong as __s64,
-    0x1973f09edf2 as libc::c_ulonglong as __s64,
-    0x19a1e85ccaa as libc::c_ulonglong as __s64,
-    0x19cfdfbf2c8 as libc::c_ulonglong as __s64,
-    0x19fdd6c6063 as libc::c_ulonglong as __s64,
-    0x1a2bcd71593 as libc::c_ulonglong as __s64,
-    0x1a59c3c126e as libc::c_ulonglong as __s64,
-    0x1a87b9b570b as libc::c_ulonglong as __s64,
-    0x1ab5af4e380 as libc::c_ulonglong as __s64,
-    0x1ae3a48b7e5 as libc::c_ulonglong as __s64,
-    0x1b11996d450 as libc::c_ulonglong as __s64,
-    0x1b3f8df38d9 as libc::c_ulonglong as __s64,
-    0x1b6d821e595 as libc::c_ulonglong as __s64,
-    0x1b9b75eda9b as libc::c_ulonglong as __s64,
-    0x1bc96961803 as libc::c_ulonglong as __s64,
-    0x1bf75c79de3 as libc::c_ulonglong as __s64,
-    0x1c254f36c51 as libc::c_ulonglong as __s64,
-    0x1c534198365 as libc::c_ulonglong as __s64,
-    0x1c81339e336 as libc::c_ulonglong as __s64,
-    0x1caf2548bd9 as libc::c_ulonglong as __s64,
-    0x1cdd1697d67 as libc::c_ulonglong as __s64,
-    0x1d0b078b7f5 as libc::c_ulonglong as __s64,
-    0x1d38f823b9a as libc::c_ulonglong as __s64,
-    0x1d66e86086d as libc::c_ulonglong as __s64,
-    0x1d94d841e86 as libc::c_ulonglong as __s64,
-    0x1dc2c7c7df9 as libc::c_ulonglong as __s64,
-    0x1df0b6f26df as libc::c_ulonglong as __s64,
-    0x1e1ea5c194e as libc::c_ulonglong as __s64,
-    0x1e4c943555d as libc::c_ulonglong as __s64,
-    0x1e7a824db23 as libc::c_ulonglong as __s64,
-    0x1ea8700aab5 as libc::c_ulonglong as __s64,
-    0x1ed65d6c42b as libc::c_ulonglong as __s64,
-    0x1f044a7279d as libc::c_ulonglong as __s64,
-    0x1f32371d51f as libc::c_ulonglong as __s64,
-    0x1f60236ccca as libc::c_ulonglong as __s64,
-    0x1f8e0f60eb3 as libc::c_ulonglong as __s64,
-    0x1fbbfaf9af3 as libc::c_ulonglong as __s64,
-    0x1fe9e63719e as libc::c_ulonglong as __s64,
-    0x2017d1192cc as libc::c_ulonglong as __s64,
-    0x2045bb9fe94 as libc::c_ulonglong as __s64,
-    0x2073a5cb50d as libc::c_ulonglong as __s64,
-    0x209c06e6212 as libc::c_ulonglong as __s64,
-    0x20cf791026a as libc::c_ulonglong as __s64,
-    0x20fd622997c as libc::c_ulonglong as __s64,
-    0x212b07f3458 as libc::c_ulonglong as __s64,
-    0x2159334a8d8 as libc::c_ulonglong as __s64,
-    0x21871b52150 as libc::c_ulonglong as __s64,
-    0x21b502fe517 as libc::c_ulonglong as __s64,
-    0x21d6a73a78f as libc::c_ulonglong as __s64,
-    0x2210d144eee as libc::c_ulonglong as __s64,
-    0x223eb7df52c as libc::c_ulonglong as __s64,
-    0x226c9e1e713 as libc::c_ulonglong as __s64,
-    0x229a84024bb as libc::c_ulonglong as __s64,
-    0x22c23679b4e as libc::c_ulonglong as __s64,
-    0x22f64eb83a8 as libc::c_ulonglong as __s64,
-    0x2324338a51b as libc::c_ulonglong as __s64,
-    0x235218012a9 as libc::c_ulonglong as __s64,
-    0x237ffc1cc69 as libc::c_ulonglong as __s64,
-    0x23a2c3b0ea4 as libc::c_ulonglong as __s64,
-    0x23d13ee805b as libc::c_ulonglong as __s64,
-    0x24035e9221f as libc::c_ulonglong as __s64,
-    0x243788faf25 as libc::c_ulonglong as __s64,
-    0x24656b4e735 as libc::c_ulonglong as __s64,
-    0x247ed646bfe as libc::c_ulonglong as __s64,
-    0x24c12ee3d98 as libc::c_ulonglong as __s64,
-    0x24ef1025c1a as libc::c_ulonglong as __s64,
-    0x251cf10c799 as libc::c_ulonglong as __s64,
-    0x25492644d65 as libc::c_ulonglong as __s64,
-    0x2578b1c85ee as libc::c_ulonglong as __s64,
-    0x25a6919d8f0 as libc::c_ulonglong as __s64,
-    0x25d13ee805b as libc::c_ulonglong as __s64,
-    0x26025036716 as libc::c_ulonglong as __s64,
-    0x26296453882 as libc::c_ulonglong as __s64,
-    0x265e0d62b53 as libc::c_ulonglong as __s64,
-    0x268beb701f3 as libc::c_ulonglong as __s64,
-    0x26b9c92265e as libc::c_ulonglong as __s64,
-    0x26d32f798a9 as libc::c_ulonglong as __s64,
-    0x271583758eb as libc::c_ulonglong as __s64,
-    0x2743601673b as libc::c_ulonglong as __s64,
-    0x27713c5c3b0 as libc::c_ulonglong as __s64,
-    0x279f1846e5f as libc::c_ulonglong as __s64,
-    0x27ccf3d6761 as libc::c_ulonglong as __s64,
-    0x27e6580aecb as libc::c_ulonglong as __s64,
-    0x2828a9e44b3 as libc::c_ulonglong as __s64,
-    0x28568462932 as libc::c_ulonglong as __s64,
-    0x287bdbf5255 as libc::c_ulonglong as __s64,
-    0x28b2384de4a as libc::c_ulonglong as __s64,
-    0x28d13ee805b as libc::c_ulonglong as __s64,
-    0x29035e9221f as libc::c_ulonglong as __s64,
-    0x29296453882 as libc::c_ulonglong as __s64,
-    0x29699bdfb61 as libc::c_ulonglong as __s64,
-    0x29902a37aab as libc::c_ulonglong as __s64,
-    0x29c54b864c9 as libc::c_ulonglong as __s64,
-    0x29deabd1083 as libc::c_ulonglong as __s64,
-    0x2a20f9c0bb5 as libc::c_ulonglong as __s64,
-    0x2a4c7605d61 as libc::c_ulonglong as __s64,
-    0x2a7bdbf5255 as libc::c_ulonglong as __s64,
-    0x2a96056dafc as libc::c_ulonglong as __s64,
-    0x2ac3daf14ef as libc::c_ulonglong as __s64,
-    0x2af1b019eca as libc::c_ulonglong as __s64,
-    0x2b296453882 as libc::c_ulonglong as __s64,
-    0x2b5d022d80f as libc::c_ulonglong as __s64,
-    0x2b8fa471cb3 as libc::c_ulonglong as __s64,
-    0x2ba9012e713 as libc::c_ulonglong as __s64,
-    0x2bd6d4901cc as libc::c_ulonglong as __s64,
-    0x2c04a796cf6 as libc::c_ulonglong as __s64,
-    0x2c327a428a6 as libc::c_ulonglong as __s64,
-    0x2c61a5e8f4c as libc::c_ulonglong as __s64,
-    0x2c8e1e891f6 as libc::c_ulonglong as __s64,
-    0x2cbbf023fc2 as libc::c_ulonglong as __s64,
-    0x2ce9c163e6e as libc::c_ulonglong as __s64,
-    0x2d179248e13 as libc::c_ulonglong as __s64,
-    0x2d4562d2ec6 as libc::c_ulonglong as __s64,
-    0x2d73330209d as libc::c_ulonglong as __s64,
-    0x2da102d63b0 as libc::c_ulonglong as __s64,
-    0x2dced24f814 as libc::c_ulonglong as __s64,
+static mut __LL_tbl: [S64; 256] = [
+    0 as libc::c_ulonglong as S64,
+    0x2e2a60a00 as libc::c_ulonglong as S64,
+    0x70cb64ec5 as libc::c_ulonglong as S64,
+    0x9ef50ce67 as libc::c_ulonglong as S64,
+    0xcd1e588fd as libc::c_ulonglong as S64,
+    0xfb4747e9c as libc::c_ulonglong as S64,
+    0x1296fdaf5e as libc::c_ulonglong as S64,
+    0x1579811b58 as libc::c_ulonglong as S64,
+    0x185bfec2a1 as libc::c_ulonglong as S64,
+    0x1b3e76a552 as libc::c_ulonglong as S64,
+    0x1e20e8c380 as libc::c_ulonglong as S64,
+    0x2103551d43 as libc::c_ulonglong as S64,
+    0x23e5bbb2b2 as libc::c_ulonglong as S64,
+    0x26c81c83e4 as libc::c_ulonglong as S64,
+    0x29aa7790f0 as libc::c_ulonglong as S64,
+    0x2c8cccd9ed as libc::c_ulonglong as S64,
+    0x2f6f1c5ef2 as libc::c_ulonglong as S64,
+    0x3251662017 as libc::c_ulonglong as S64,
+    0x3533aa1d71 as libc::c_ulonglong as S64,
+    0x3815e8571a as libc::c_ulonglong as S64,
+    0x3af820cd26 as libc::c_ulonglong as S64,
+    0x3dda537fae as libc::c_ulonglong as S64,
+    0x40bc806ec8 as libc::c_ulonglong as S64,
+    0x439ea79a8c as libc::c_ulonglong as S64,
+    0x4680c90310 as libc::c_ulonglong as S64,
+    0x4962e4a86c as libc::c_ulonglong as S64,
+    0x4c44fa8ab6 as libc::c_ulonglong as S64,
+    0x4f270aaa06 as libc::c_ulonglong as S64,
+    0x5209150672 as libc::c_ulonglong as S64,
+    0x54eb19a013 as libc::c_ulonglong as S64,
+    0x57cd1876fd as libc::c_ulonglong as S64,
+    0x5aaf118b4a as libc::c_ulonglong as S64,
+    0x5d9104dd0f as libc::c_ulonglong as S64,
+    0x6072f26c64 as libc::c_ulonglong as S64,
+    0x6354da3960 as libc::c_ulonglong as S64,
+    0x6636bc441a as libc::c_ulonglong as S64,
+    0x6918988ca8 as libc::c_ulonglong as S64,
+    0x6bfa6f1322 as libc::c_ulonglong as S64,
+    0x6edc3fd79f as libc::c_ulonglong as S64,
+    0x71be0ada35 as libc::c_ulonglong as S64,
+    0x749fd01afd as libc::c_ulonglong as S64,
+    0x77818f9a0c as libc::c_ulonglong as S64,
+    0x7a6349577a as libc::c_ulonglong as S64,
+    0x7d44fd535e as libc::c_ulonglong as S64,
+    0x8026ab8dce as libc::c_ulonglong as S64,
+    0x83085406e3 as libc::c_ulonglong as S64,
+    0x85e9f6beb2 as libc::c_ulonglong as S64,
+    0x88cb93b552 as libc::c_ulonglong as S64,
+    0x8bad2aeadc as libc::c_ulonglong as S64,
+    0x8e8ebc5f65 as libc::c_ulonglong as S64,
+    0x9170481305 as libc::c_ulonglong as S64,
+    0x9451ce05d3 as libc::c_ulonglong as S64,
+    0x97334e37e5 as libc::c_ulonglong as S64,
+    0x9a14c8a953 as libc::c_ulonglong as S64,
+    0x9cf63d5a33 as libc::c_ulonglong as S64,
+    0x9fd7ac4a9d as libc::c_ulonglong as S64,
+    0xa2b07f3458 as libc::c_ulonglong as S64,
+    0xa59a78ea6a as libc::c_ulonglong as S64,
+    0xa87bd699fb as libc::c_ulonglong as S64,
+    0xab5d2e8970 as libc::c_ulonglong as S64,
+    0xae3e80b8e3 as libc::c_ulonglong as S64,
+    0xb11fcd2869 as libc::c_ulonglong as S64,
+    0xb40113d818 as libc::c_ulonglong as S64,
+    0xb6e254c80a as libc::c_ulonglong as S64,
+    0xb9c38ff853 as libc::c_ulonglong as S64,
+    0xbca4c5690c as libc::c_ulonglong as S64,
+    0xbf85f51a4a as libc::c_ulonglong as S64,
+    0xc2671f0c26 as libc::c_ulonglong as S64,
+    0xc548433eb6 as libc::c_ulonglong as S64,
+    0xc82961b211 as libc::c_ulonglong as S64,
+    0xcb0a7a664d as libc::c_ulonglong as S64,
+    0xcdeb8d5b82 as libc::c_ulonglong as S64,
+    0xd0cc9a91c8 as libc::c_ulonglong as S64,
+    0xd3ada20933 as libc::c_ulonglong as S64,
+    0xd68ea3c1dd as libc::c_ulonglong as S64,
+    0xd96f9fbbdb as libc::c_ulonglong as S64,
+    0xdc5095f744 as libc::c_ulonglong as S64,
+    0xdf31867430 as libc::c_ulonglong as S64,
+    0xe2127132b5 as libc::c_ulonglong as S64,
+    0xe4f35632ea as libc::c_ulonglong as S64,
+    0xe7d43574e6 as libc::c_ulonglong as S64,
+    0xeab50ef8c1 as libc::c_ulonglong as S64,
+    0xed95e2be90 as libc::c_ulonglong as S64,
+    0xf076b0c66c as libc::c_ulonglong as S64,
+    0xf35779106a as libc::c_ulonglong as S64,
+    0xf6383b9ca2 as libc::c_ulonglong as S64,
+    0xf918f86b2a as libc::c_ulonglong as S64,
+    0xfbf9af7c1a as libc::c_ulonglong as S64,
+    0xfeda60cf88 as libc::c_ulonglong as S64,
+    0x101bb0c658c as libc::c_ulonglong as S64,
+    0x1049bb23e3c as libc::c_ulonglong as S64,
+    0x1077c5259af as libc::c_ulonglong as S64,
+    0x10a5cecb7fc as libc::c_ulonglong as S64,
+    0x10d3d81593a as libc::c_ulonglong as S64,
+    0x1101e103d7f as libc::c_ulonglong as S64,
+    0x112fe9964e4 as libc::c_ulonglong as S64,
+    0x115df1ccf7e as libc::c_ulonglong as S64,
+    0x118bf9a7d64 as libc::c_ulonglong as S64,
+    0x11ba0126ead as libc::c_ulonglong as S64,
+    0x11e8084a371 as libc::c_ulonglong as S64,
+    0x12160f11bc6 as libc::c_ulonglong as S64,
+    0x1244157d7c3 as libc::c_ulonglong as S64,
+    0x12721b8d77f as libc::c_ulonglong as S64,
+    0x12a02141b10 as libc::c_ulonglong as S64,
+    0x12ce269a28e as libc::c_ulonglong as S64,
+    0x12fc2b96e0f as libc::c_ulonglong as S64,
+    0x132a3037daa as libc::c_ulonglong as S64,
+    0x1358347d177 as libc::c_ulonglong as S64,
+    0x1386386698c as libc::c_ulonglong as S64,
+    0x13b43bf45ff as libc::c_ulonglong as S64,
+    0x13e23f266e9 as libc::c_ulonglong as S64,
+    0x141041fcc5e as libc::c_ulonglong as S64,
+    0x143e4477678 as libc::c_ulonglong as S64,
+    0x146c469654b as libc::c_ulonglong as S64,
+    0x149a48598f0 as libc::c_ulonglong as S64,
+    0x14c849c117c as libc::c_ulonglong as S64,
+    0x14f64accf08 as libc::c_ulonglong as S64,
+    0x15244b7d1a9 as libc::c_ulonglong as S64,
+    0x15524bd1976 as libc::c_ulonglong as S64,
+    0x15804bca687 as libc::c_ulonglong as S64,
+    0x15ae4b678f2 as libc::c_ulonglong as S64,
+    0x15dc4aa90ce as libc::c_ulonglong as S64,
+    0x160a498ee31 as libc::c_ulonglong as S64,
+    0x16384819134 as libc::c_ulonglong as S64,
+    0x166646479ec as libc::c_ulonglong as S64,
+    0x1694441a870 as libc::c_ulonglong as S64,
+    0x16c24191cd7 as libc::c_ulonglong as S64,
+    0x16df6ca19bd as libc::c_ulonglong as S64,
+    0x171e3b6d7aa as libc::c_ulonglong as S64,
+    0x174c37d1e44 as libc::c_ulonglong as S64,
+    0x177a33dab1c as libc::c_ulonglong as S64,
+    0x17a82f87e49 as libc::c_ulonglong as S64,
+    0x17d62ad97e2 as libc::c_ulonglong as S64,
+    0x180425cf7fe as libc::c_ulonglong as S64,
+    0x182b07f3458 as libc::c_ulonglong as S64,
+    0x18601aa8c19 as libc::c_ulonglong as S64,
+    0x188e148c046 as libc::c_ulonglong as S64,
+    0x18bc0e13b52 as libc::c_ulonglong as S64,
+    0x18ea073fd52 as libc::c_ulonglong as S64,
+    0x1918001065d as libc::c_ulonglong as S64,
+    0x1945f88568b as libc::c_ulonglong as S64,
+    0x1973f09edf2 as libc::c_ulonglong as S64,
+    0x19a1e85ccaa as libc::c_ulonglong as S64,
+    0x19cfdfbf2c8 as libc::c_ulonglong as S64,
+    0x19fdd6c6063 as libc::c_ulonglong as S64,
+    0x1a2bcd71593 as libc::c_ulonglong as S64,
+    0x1a59c3c126e as libc::c_ulonglong as S64,
+    0x1a87b9b570b as libc::c_ulonglong as S64,
+    0x1ab5af4e380 as libc::c_ulonglong as S64,
+    0x1ae3a48b7e5 as libc::c_ulonglong as S64,
+    0x1b11996d450 as libc::c_ulonglong as S64,
+    0x1b3f8df38d9 as libc::c_ulonglong as S64,
+    0x1b6d821e595 as libc::c_ulonglong as S64,
+    0x1b9b75eda9b as libc::c_ulonglong as S64,
+    0x1bc96961803 as libc::c_ulonglong as S64,
+    0x1bf75c79de3 as libc::c_ulonglong as S64,
+    0x1c254f36c51 as libc::c_ulonglong as S64,
+    0x1c534198365 as libc::c_ulonglong as S64,
+    0x1c81339e336 as libc::c_ulonglong as S64,
+    0x1caf2548bd9 as libc::c_ulonglong as S64,
+    0x1cdd1697d67 as libc::c_ulonglong as S64,
+    0x1d0b078b7f5 as libc::c_ulonglong as S64,
+    0x1d38f823b9a as libc::c_ulonglong as S64,
+    0x1d66e86086d as libc::c_ulonglong as S64,
+    0x1d94d841e86 as libc::c_ulonglong as S64,
+    0x1dc2c7c7df9 as libc::c_ulonglong as S64,
+    0x1df0b6f26df as libc::c_ulonglong as S64,
+    0x1e1ea5c194e as libc::c_ulonglong as S64,
+    0x1e4c943555d as libc::c_ulonglong as S64,
+    0x1e7a824db23 as libc::c_ulonglong as S64,
+    0x1ea8700aab5 as libc::c_ulonglong as S64,
+    0x1ed65d6c42b as libc::c_ulonglong as S64,
+    0x1f044a7279d as libc::c_ulonglong as S64,
+    0x1f32371d51f as libc::c_ulonglong as S64,
+    0x1f60236ccca as libc::c_ulonglong as S64,
+    0x1f8e0f60eb3 as libc::c_ulonglong as S64,
+    0x1fbbfaf9af3 as libc::c_ulonglong as S64,
+    0x1fe9e63719e as libc::c_ulonglong as S64,
+    0x2017d1192cc as libc::c_ulonglong as S64,
+    0x2045bb9fe94 as libc::c_ulonglong as S64,
+    0x2073a5cb50d as libc::c_ulonglong as S64,
+    0x209c06e6212 as libc::c_ulonglong as S64,
+    0x20cf791026a as libc::c_ulonglong as S64,
+    0x20fd622997c as libc::c_ulonglong as S64,
+    0x212b07f3458 as libc::c_ulonglong as S64,
+    0x2159334a8d8 as libc::c_ulonglong as S64,
+    0x21871b52150 as libc::c_ulonglong as S64,
+    0x21b502fe517 as libc::c_ulonglong as S64,
+    0x21d6a73a78f as libc::c_ulonglong as S64,
+    0x2210d144eee as libc::c_ulonglong as S64,
+    0x223eb7df52c as libc::c_ulonglong as S64,
+    0x226c9e1e713 as libc::c_ulonglong as S64,
+    0x229a84024bb as libc::c_ulonglong as S64,
+    0x22c23679b4e as libc::c_ulonglong as S64,
+    0x22f64eb83a8 as libc::c_ulonglong as S64,
+    0x2324338a51b as libc::c_ulonglong as S64,
+    0x235218012a9 as libc::c_ulonglong as S64,
+    0x237ffc1cc69 as libc::c_ulonglong as S64,
+    0x23a2c3b0ea4 as libc::c_ulonglong as S64,
+    0x23d13ee805b as libc::c_ulonglong as S64,
+    0x24035e9221f as libc::c_ulonglong as S64,
+    0x243788faf25 as libc::c_ulonglong as S64,
+    0x24656b4e735 as libc::c_ulonglong as S64,
+    0x247ed646bfe as libc::c_ulonglong as S64,
+    0x24c12ee3d98 as libc::c_ulonglong as S64,
+    0x24ef1025c1a as libc::c_ulonglong as S64,
+    0x251cf10c799 as libc::c_ulonglong as S64,
+    0x25492644d65 as libc::c_ulonglong as S64,
+    0x2578b1c85ee as libc::c_ulonglong as S64,
+    0x25a6919d8f0 as libc::c_ulonglong as S64,
+    0x25d13ee805b as libc::c_ulonglong as S64,
+    0x26025036716 as libc::c_ulonglong as S64,
+    0x26296453882 as libc::c_ulonglong as S64,
+    0x265e0d62b53 as libc::c_ulonglong as S64,
+    0x268beb701f3 as libc::c_ulonglong as S64,
+    0x26b9c92265e as libc::c_ulonglong as S64,
+    0x26d32f798a9 as libc::c_ulonglong as S64,
+    0x271583758eb as libc::c_ulonglong as S64,
+    0x2743601673b as libc::c_ulonglong as S64,
+    0x27713c5c3b0 as libc::c_ulonglong as S64,
+    0x279f1846e5f as libc::c_ulonglong as S64,
+    0x27ccf3d6761 as libc::c_ulonglong as S64,
+    0x27e6580aecb as libc::c_ulonglong as S64,
+    0x2828a9e44b3 as libc::c_ulonglong as S64,
+    0x28568462932 as libc::c_ulonglong as S64,
+    0x287bdbf5255 as libc::c_ulonglong as S64,
+    0x28b2384de4a as libc::c_ulonglong as S64,
+    0x28d13ee805b as libc::c_ulonglong as S64,
+    0x29035e9221f as libc::c_ulonglong as S64,
+    0x29296453882 as libc::c_ulonglong as S64,
+    0x29699bdfb61 as libc::c_ulonglong as S64,
+    0x29902a37aab as libc::c_ulonglong as S64,
+    0x29c54b864c9 as libc::c_ulonglong as S64,
+    0x29deabd1083 as libc::c_ulonglong as S64,
+    0x2a20f9c0bb5 as libc::c_ulonglong as S64,
+    0x2a4c7605d61 as libc::c_ulonglong as S64,
+    0x2a7bdbf5255 as libc::c_ulonglong as S64,
+    0x2a96056dafc as libc::c_ulonglong as S64,
+    0x2ac3daf14ef as libc::c_ulonglong as S64,
+    0x2af1b019eca as libc::c_ulonglong as S64,
+    0x2b296453882 as libc::c_ulonglong as S64,
+    0x2b5d022d80f as libc::c_ulonglong as S64,
+    0x2b8fa471cb3 as libc::c_ulonglong as S64,
+    0x2ba9012e713 as libc::c_ulonglong as S64,
+    0x2bd6d4901cc as libc::c_ulonglong as S64,
+    0x2c04a796cf6 as libc::c_ulonglong as S64,
+    0x2c327a428a6 as libc::c_ulonglong as S64,
+    0x2c61a5e8f4c as libc::c_ulonglong as S64,
+    0x2c8e1e891f6 as libc::c_ulonglong as S64,
+    0x2cbbf023fc2 as libc::c_ulonglong as S64,
+    0x2ce9c163e6e as libc::c_ulonglong as S64,
+    0x2d179248e13 as libc::c_ulonglong as S64,
+    0x2d4562d2ec6 as libc::c_ulonglong as S64,
+    0x2d73330209d as libc::c_ulonglong as S64,
+    0x2da102d63b0 as libc::c_ulonglong as S64,
+    0x2dced24f814 as libc::c_ulonglong as S64,
 ];
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_find_rule(
@@ -549,8 +549,8 @@ pub unsafe extern "C" fn crush_find_rule(
     mut size: libc::c_int,
 ) -> libc::c_int {
     unsafe {
-        let mut i: __u32 = 0;
-        i = 0 as libc::c_int as __u32;
+        let mut i: U32 = 0;
+        i = 0 as libc::c_int as U32;
         while i < (*map).max_rules {
             if !(*((*map).rules).offset(i as isize)).is_null()
                 && (**((*map).rules).offset(i as isize)).mask.ruleset as libc::c_int == ruleset
@@ -561,7 +561,6 @@ pub unsafe extern "C" fn crush_find_rule(
                 return i as libc::c_int;
             }
             i = i.wrapping_add(1);
-            i;
         }
         -(1 as libc::c_int)
     }
@@ -574,43 +573,41 @@ unsafe extern "C" fn bucket_perm_choose(
 ) -> libc::c_int {
     unsafe {
         let mut current_block: u64;
-        let mut pr: libc::c_uint = r as __u32 % (*bucket).size;
+        let mut pr: libc::c_uint = r as U32 % (*bucket).size;
         let mut i: libc::c_uint = 0;
         let mut s: libc::c_uint = 0;
-        if (*work).perm_x != x as __u32 || (*work).perm_n == 0 as libc::c_int as __u32 {
-            (*work).perm_x = x as __u32;
+        if (*work).perm_x != x as U32 || (*work).perm_n == 0 as libc::c_int as U32 {
+            (*work).perm_x = x as U32;
             if pr == 0 as libc::c_int as libc::c_uint {
                 s = crush_hash32_3(
                     (*bucket).hash as libc::c_int,
-                    x as __u32,
-                    (*bucket).id as __u32,
-                    0 as libc::c_int as __u32,
+                    x as U32,
+                    (*bucket).id as U32,
+                    0 as libc::c_int as U32,
                 ) % (*bucket).size;
                 *((*work).perm).offset(0 as libc::c_int as isize) = s;
-                (*work).perm_n = 0xffff as libc::c_int as __u32;
+                (*work).perm_n = 0xffff as libc::c_int as U32;
                 current_block = 3275366147856559585;
             } else {
                 i = 0 as libc::c_int as libc::c_uint;
                 while i < (*bucket).size {
                     *((*work).perm).offset(i as isize) = i;
                     i = i.wrapping_add(1);
-                    i;
                 }
-                (*work).perm_n = 0 as libc::c_int as __u32;
+                (*work).perm_n = 0 as libc::c_int as U32;
                 current_block = 13056961889198038528;
             }
         } else {
-            if (*work).perm_n == 0xffff as libc::c_int as __u32 {
+            if (*work).perm_n == 0xffff as libc::c_int as U32 {
                 i = 1 as libc::c_int as libc::c_uint;
                 while i < (*bucket).size {
                     *((*work).perm).offset(i as isize) = i;
                     i = i.wrapping_add(1);
-                    i;
                 }
                 *((*work).perm)
                     .offset(*((*work).perm).offset(0 as libc::c_int as isize) as isize) =
-                    0 as libc::c_int as __u32;
-                (*work).perm_n = 1 as libc::c_int as __u32;
+                    0 as libc::c_int as U32;
+                (*work).perm_n = 1 as libc::c_int as U32;
             }
             current_block = 13056961889198038528;
         }
@@ -618,15 +615,14 @@ unsafe extern "C" fn bucket_perm_choose(
             i = 0 as libc::c_int as libc::c_uint;
             while i < (*work).perm_n {
                 i = i.wrapping_add(1);
-                i;
             }
             while (*work).perm_n <= pr {
                 let mut p: libc::c_uint = (*work).perm_n;
-                if p < ((*bucket).size).wrapping_sub(1 as libc::c_int as __u32) {
+                if p < ((*bucket).size).wrapping_sub(1 as libc::c_int as U32) {
                     i = (crush_hash32_3(
                         (*bucket).hash as libc::c_int,
-                        x as __u32,
-                        (*bucket).id as __u32,
+                        x as U32,
+                        (*bucket).id as U32,
                         p,
                     ))
                     .wrapping_rem(((*bucket).size).wrapping_sub(p));
@@ -639,12 +635,10 @@ unsafe extern "C" fn bucket_perm_choose(
                     }
                 }
                 (*work).perm_n = ((*work).perm_n).wrapping_add(1);
-                (*work).perm_n;
             }
             i = 0 as libc::c_int as libc::c_uint;
             while i < (*bucket).size {
                 i = i.wrapping_add(1);
-                i;
             }
             s = *((*work).perm).offset(pr as isize);
         }
@@ -666,23 +660,22 @@ unsafe extern "C" fn bucket_list_choose(
 ) -> libc::c_int {
     unsafe {
         let mut i: libc::c_int = 0;
-        i = ((*bucket).h.size).wrapping_sub(1 as libc::c_int as __u32) as libc::c_int;
+        i = ((*bucket).h.size).wrapping_sub(1 as libc::c_int as U32) as libc::c_int;
         while i >= 0 as libc::c_int {
-            let mut w: __u64 = crush_hash32_4(
+            let mut w: U64 = crush_hash32_4(
                 (*bucket).h.hash as libc::c_int,
-                x as __u32,
-                *((*bucket).h.items).offset(i as isize) as __u32,
-                r as __u32,
-                (*bucket).h.id as __u32,
-            ) as __u64;
-            w &= 0xffff as libc::c_int as __u64;
-            w *= *((*bucket).sum_weights).offset(i as isize) as __u64;
+                x as U32,
+                *((*bucket).h.items).offset(i as isize) as U32,
+                r as U32,
+                (*bucket).h.id as U32,
+            ) as U64;
+            w &= 0xffff as libc::c_int as U64;
+            w *= *((*bucket).sum_weights).offset(i as isize) as U64;
             w >>= 16 as libc::c_int;
-            if w < *((*bucket).item_weights).offset(i as isize) as __u64 {
+            if w < *((*bucket).item_weights).offset(i as isize) as U64 {
                 return *((*bucket).h.items).offset(i as isize);
             }
             i -= 1;
-            i;
         }
         *((*bucket).h.items).offset(0 as libc::c_int as isize)
     }
@@ -691,7 +684,6 @@ unsafe extern "C" fn height(mut n: libc::c_int) -> libc::c_int {
     let mut h: libc::c_int = 0 as libc::c_int;
     while n & 1 as libc::c_int == 0 as libc::c_int {
         h += 1;
-        h;
         n >>= 1 as libc::c_int;
     }
     h
@@ -718,23 +710,23 @@ unsafe extern "C" fn bucket_tree_choose(
 ) -> libc::c_int {
     unsafe {
         let mut n: libc::c_int = 0;
-        let mut w: __u32 = 0;
-        let mut t: __u64 = 0;
+        let mut w: U32 = 0;
+        let mut t: U64 = 0;
         n = (*bucket).num_nodes as libc::c_int >> 1 as libc::c_int;
         while terminal(n) == 0 {
             let mut l: libc::c_int = 0;
             w = *((*bucket).node_weights).offset(n as isize);
             t = crush_hash32_4(
                 (*bucket).h.hash as libc::c_int,
-                x as __u32,
-                n as __u32,
-                r as __u32,
-                (*bucket).h.id as __u32,
-            ) as __u64
-                * w as __u64;
+                x as U32,
+                n as U32,
+                r as U32,
+                (*bucket).h.id as U32,
+            ) as U64
+                * w as U64;
             t >>= 32 as libc::c_int;
             l = left(n);
-            if t < *((*bucket).node_weights).offset(l as isize) as __u64 {
+            if t < *((*bucket).node_weights).offset(l as isize) as U64 {
                 n = l;
             } else {
                 n = right(n);
@@ -749,43 +741,41 @@ unsafe extern "C" fn bucket_straw_choose(
     mut r: libc::c_int,
 ) -> libc::c_int {
     unsafe {
-        let mut i: __u32 = 0;
+        let mut i: U32 = 0;
         let mut high: libc::c_int = 0 as libc::c_int;
-        let mut high_draw: __u64 = 0 as libc::c_int as __u64;
-        let mut draw: __u64 = 0;
-        i = 0 as libc::c_int as __u32;
+        let mut high_draw: U64 = 0 as libc::c_int as U64;
+        let mut draw: U64 = 0;
+        i = 0 as libc::c_int as U32;
         while i < (*bucket).h.size {
             draw = crush_hash32_3(
                 (*bucket).h.hash as libc::c_int,
-                x as __u32,
-                *((*bucket).h.items).offset(i as isize) as __u32,
-                r as __u32,
-            ) as __u64;
-            draw &= 0xffff as libc::c_int as __u64;
-            draw *= *((*bucket).straws).offset(i as isize) as __u64;
-            if i == 0 as libc::c_int as __u32 || draw > high_draw {
+                x as U32,
+                *((*bucket).h.items).offset(i as isize) as U32,
+                r as U32,
+            ) as U64;
+            draw &= 0xffff as libc::c_int as U64;
+            draw *= *((*bucket).straws).offset(i as isize) as U64;
+            if i == 0 as libc::c_int as U32 || draw > high_draw {
                 high = i as libc::c_int;
                 high_draw = draw;
             }
             i = i.wrapping_add(1);
-            i;
         }
         *((*bucket).h.items).offset(high as isize)
     }
 }
-unsafe extern "C" fn crush_ln(mut xin: libc::c_uint) -> __u64 {
+unsafe extern "C" fn crush_ln(mut xin: libc::c_uint) -> U64 {
     unsafe {
         let mut x: libc::c_uint = xin;
         let mut iexpon: libc::c_int = 0;
         let mut index1: libc::c_int = 0;
         let mut index2: libc::c_int = 0;
-        let mut RH: __u64 = 0;
-        let mut LH: __u64 = 0;
-        let mut LL: __u64 = 0;
-        let mut xl64: __u64 = 0;
-        let mut result: __u64 = 0;
+        let mut RH: U64 = 0;
+        let mut LH: U64 = 0;
+        let mut LL: U64 = 0;
+        let mut xl64: U64 = 0;
+        let mut result: U64 = 0;
         x = x.wrapping_add(1);
-        x;
         iexpon = 15 as libc::c_int;
         if x & 0x18000 as libc::c_int as libc::c_uint == 0 {
             let mut bits: libc::c_int = (x & 0x1ffff as libc::c_int as libc::c_uint).leading_zeros()
@@ -795,14 +785,14 @@ unsafe extern "C" fn crush_ln(mut xin: libc::c_uint) -> __u64 {
             iexpon = 15 as libc::c_int - bits;
         }
         index1 = ((x >> 8 as libc::c_int) << 1 as libc::c_int) as libc::c_int;
-        RH = __RH_LH_tbl[(index1 - 256 as libc::c_int) as usize] as __u64;
-        LH = __RH_LH_tbl[(index1 + 1 as libc::c_int - 256 as libc::c_int) as usize] as __u64;
-        xl64 = x as __s64 as __u64 * RH;
+        RH = __RH_LH_tbl[(index1 - 256 as libc::c_int) as usize] as U64;
+        LH = __RH_LH_tbl[(index1 + 1 as libc::c_int - 256 as libc::c_int) as usize] as U64;
+        xl64 = x as S64 as U64 * RH;
         xl64 >>= 48 as libc::c_int;
-        result = iexpon as __u64;
+        result = iexpon as U64;
         result <<= 12 as libc::c_int + 32 as libc::c_int;
-        index2 = (xl64 & 0xff as libc::c_int as __u64) as libc::c_int;
-        LL = __LL_tbl[index2 as usize] as __u64;
+        index2 = (xl64 & 0xff as libc::c_int as U64) as libc::c_int;
+        LL = __LL_tbl[index2 as usize] as U64;
         LH = LH.wrapping_add(LL);
         LH >>= 48 as libc::c_int - 12 as libc::c_int - 32 as libc::c_int;
         result = result.wrapping_add(LH);
@@ -814,17 +804,17 @@ unsafe extern "C" fn get_choose_arg_weights(
     mut bucket: *const CrushBucketStraw2,
     mut arg: *const CrushChooseArg,
     mut position: libc::c_int,
-) -> *mut __u32 {
+) -> *mut U32 {
     unsafe {
         if arg.is_null()
             || ((*arg).weight_set).is_null()
-            || (*arg).weight_set_size == 0 as libc::c_int as __u32
+            || (*arg).weight_set_size == 0 as libc::c_int as U32
         {
             return (*bucket).item_weights;
         }
-        if position as __u32 >= (*arg).weight_set_size {
+        if position as U32 >= (*arg).weight_set_size {
             position =
-                ((*arg).weight_set_size).wrapping_sub(1 as libc::c_int as __u32) as libc::c_int;
+                ((*arg).weight_set_size).wrapping_sub(1 as libc::c_int as U32) as libc::c_int;
         }
         (*((*arg).weight_set).offset(position as isize)).weights
     }
@@ -852,34 +842,32 @@ unsafe extern "C" fn bucket_straw2_choose(
         let mut i: libc::c_uint = 0;
         let mut high: libc::c_uint = 0 as libc::c_int as libc::c_uint;
         let mut u: libc::c_uint = 0;
-        let mut ln: __s64 = 0;
-        let mut draw: __s64 = 0;
-        let mut high_draw: __s64 = 0 as libc::c_int as __s64;
-        let mut weights: *mut __u32 = get_choose_arg_weights(bucket, arg, position);
+        let mut ln: S64 = 0;
+        let mut draw: S64 = 0;
+        let mut high_draw: S64 = 0 as libc::c_int as S64;
+        let mut weights: *mut U32 = get_choose_arg_weights(bucket, arg, position);
         let mut ids: *mut libc::c_int = get_choose_arg_ids(bucket, arg);
         i = 0 as libc::c_int as libc::c_uint;
         while i < (*bucket).h.size {
             if *weights.offset(i as isize) != 0 {
                 u = crush_hash32_3(
                     (*bucket).h.hash as libc::c_int,
-                    x as __u32,
-                    *ids.offset(i as isize) as __u32,
-                    r as __u32,
+                    x as U32,
+                    *ids.offset(i as isize) as U32,
+                    r as U32,
                 );
                 u &= 0xffff as libc::c_int as libc::c_uint;
-                ln = (crush_ln(u)).wrapping_sub(0x1000000000000 as libc::c_longlong as __u64)
-                    as __s64;
-                draw = ln / *weights.offset(i as isize) as __s64;
+                ln = (crush_ln(u)).wrapping_sub(0x1000000000000 as libc::c_longlong as U64) as S64;
+                draw = ln / *weights.offset(i as isize) as S64;
             } else {
-                draw = -((!(0 as libc::c_ulonglong) >> 1 as libc::c_int) as __s64)
-                    - 1 as libc::c_int as __s64;
+                draw = -((!(0 as libc::c_ulonglong) >> 1 as libc::c_int) as S64)
+                    - 1 as libc::c_int as S64;
             }
             if i == 0 as libc::c_int as libc::c_uint || draw > high_draw {
                 high = i;
                 high_draw = draw;
             }
             i = i.wrapping_add(1);
-            i;
         }
         *((*bucket).h.items).offset(high as isize)
     }
@@ -893,7 +881,7 @@ unsafe extern "C" fn crush_bucket_choose(
     mut position: libc::c_int,
 ) -> libc::c_int {
     unsafe {
-        if (*in_0).size != 0 as libc::c_int as __u32 {
+        if (*in_0).size != 0 as libc::c_int as U32 {
         } else {
             __assert_fail(
             b"!(in->size == 0)\0" as *const u8 as *const libc::c_char,
@@ -909,24 +897,7 @@ unsafe extern "C" fn crush_bucket_choose(
                 .as_ptr(),
         );
         }
-        'c_5383: {
-            if (*in_0).size != 0 as libc::c_int as __u32 {
-            } else {
-                __assert_fail(
-                b"!(in->size == 0)\0" as *const u8 as *const libc::c_char,
-                b"/home/sevki/src/libcrush/crush/mapper.c\0" as *const u8
-                    as *const libc::c_char,
-                378 as libc::c_int as libc::c_uint,
-                (*::core::mem::transmute::<
-                    &[u8; 129],
-                    &[libc::c_char; 129],
-                >(
-                    b"int crush_bucket_choose(const struct crush_bucket *, struct crush_work_bucket *, int, int, const struct crush_choose_arg *, int)\0",
-                ))
-                    .as_ptr(),
-            );
-            }
-        };
+
         match (*in_0).alg as libc::c_int {
             1 => bucket_uniform_choose(in_0 as *const CrushBucketUniform, work, x, r),
             2 => bucket_list_choose(in_0 as *const CrushBucketList, x, r),
@@ -938,8 +909,8 @@ unsafe extern "C" fn crush_bucket_choose(
     }
 }
 unsafe extern "C" fn is_out(
-    mut map: *const CrushMap,
-    mut weight: *const __u32,
+    mut _map: *const CrushMap,
+    mut weight: *const U32,
     mut weight_max: libc::c_int,
     mut item: libc::c_int,
     mut x: libc::c_int,
@@ -948,14 +919,13 @@ unsafe extern "C" fn is_out(
         if item >= weight_max {
             return 1 as libc::c_int;
         }
-        if *weight.offset(item as isize) >= 0x10000 as libc::c_int as __u32 {
+        if *weight.offset(item as isize) >= 0x10000 as libc::c_int as U32 {
             return 0 as libc::c_int;
         }
-        if *weight.offset(item as isize) == 0 as libc::c_int as __u32 {
+        if *weight.offset(item as isize) == 0 as libc::c_int as U32 {
             return 1 as libc::c_int;
         }
-        if (crush_hash32_2(0 as libc::c_int, x as __u32, item as __u32)
-            & 0xffff as libc::c_int as __u32)
+        if (crush_hash32_2(0 as libc::c_int, x as U32, item as U32) & 0xffff as libc::c_int as U32)
             < *weight.offset(item as isize)
         {
             return 0 as libc::c_int;
@@ -967,7 +937,7 @@ unsafe extern "C" fn crush_choose_firstn(
     mut map: *const CrushMap,
     mut work: *mut CrushWork,
     mut bucket: *const CrushBucket,
-    mut weight: *const __u32,
+    mut weight: *const U32,
     mut weight_max: libc::c_int,
     mut x: libc::c_int,
     mut numrep: libc::c_int,
@@ -1019,7 +989,7 @@ unsafe extern "C" fn crush_choose_firstn(
                     retry_bucket = 0 as libc::c_int;
                     r = rep + parent_r;
                     r = (r as libc::c_uint).wrapping_add(ftotal) as libc::c_int as libc::c_int;
-                    if (*in_0).size == 0 as libc::c_int as __u32 {
+                    if (*in_0).size == 0 as libc::c_int as U32 {
                         reject = 1 as libc::c_int;
                         current_block_55 = 5532067231413442433;
                     } else {
@@ -1079,7 +1049,6 @@ unsafe extern "C" fn crush_choose_firstn(
                                         break;
                                     } else {
                                         i += 1;
-                                        i;
                                     }
                                 }
                                 reject = 0 as libc::c_int;
@@ -1137,9 +1106,10 @@ unsafe extern "C" fn crush_choose_firstn(
                     }
                     if current_block_55 == 5532067231413442433 && (reject != 0 || collide != 0) {
                         ftotal = ftotal.wrapping_add(1);
-                        ftotal;
                         flocal = flocal.wrapping_add(1);
-                        flocal;
+
+                        #[allow(clippy::if_same_then_else)]
+                        // TODO(sevki): remove this later.
                         if collide != 0 && flocal <= local_retries {
                             retry_bucket = 1 as libc::c_int;
                         } else if local_fallback_retries > 0 as libc::c_int as libc::c_uint
@@ -1163,17 +1133,13 @@ unsafe extern "C" fn crush_choose_firstn(
             if skip_rep == 0 {
                 *out.offset(outpos as isize) = item;
                 outpos += 1;
-                outpos;
                 count -= 1;
-                count;
                 if !((*map).choose_tries).is_null() && ftotal <= (*map).choose_total_tries {
                     let fresh0 = &mut (*((*map).choose_tries).offset(ftotal as isize));
                     *fresh0 = (*fresh0).wrapping_add(1);
-                    *fresh0;
                 }
             }
             rep += 1;
-            rep;
         }
         outpos
     }
@@ -1182,7 +1148,7 @@ unsafe extern "C" fn crush_choose_indep(
     mut map: *const CrushMap,
     mut work: *mut CrushWork,
     mut bucket: *const CrushBucket,
-    mut weight: *const __u32,
+    mut weight: *const U32,
     mut weight_max: libc::c_int,
     mut x: libc::c_int,
     mut left_0: libc::c_int,
@@ -1214,7 +1180,6 @@ unsafe extern "C" fn crush_choose_indep(
                 *out2.offset(rep as isize) = 0x7ffffffe as libc::c_int;
             }
             rep += 1;
-            rep;
         }
         ftotal = 0 as libc::c_int as libc::c_uint;
         while left_0 > 0 as libc::c_int && ftotal < tries {
@@ -1225,7 +1190,7 @@ unsafe extern "C" fn crush_choose_indep(
                     loop {
                         r = rep + parent_r;
                         if (*in_0).alg as libc::c_int == CRUSH_BUCKET_UNIFORM as libc::c_int
-                            && (*in_0).size % numrep as __u32 == 0 as libc::c_int as __u32
+                            && (*in_0).size % numrep as U32 == 0 as libc::c_int as U32
                         {
                             r = (r as libc::c_uint).wrapping_add(
                                 ((numrep + 1 as libc::c_int) as libc::c_uint).wrapping_mul(ftotal),
@@ -1235,7 +1200,7 @@ unsafe extern "C" fn crush_choose_indep(
                                 .wrapping_add((numrep as libc::c_uint).wrapping_mul(ftotal))
                                 as libc::c_int as libc::c_int;
                         }
-                        if (*in_0).size == 0 as libc::c_int as __u32 {
+                        if (*in_0).size == 0 as libc::c_int as U32 {
                             break;
                         }
                         item = crush_bucket_choose(
@@ -1256,7 +1221,6 @@ unsafe extern "C" fn crush_choose_indep(
                                 *out2.offset(rep as isize) = 0x7fffffff as libc::c_int;
                             }
                             left_0 -= 1;
-                            left_0;
                             break;
                         } else {
                             if item < 0 as libc::c_int {
@@ -1275,7 +1239,6 @@ unsafe extern "C" fn crush_choose_indep(
                                         *out2.offset(rep as isize) = 0x7fffffff as libc::c_int;
                                     }
                                     left_0 -= 1;
-                                    left_0;
                                     break;
                                 } else {
                                     in_0 = *((*map).buckets)
@@ -1290,7 +1253,6 @@ unsafe extern "C" fn crush_choose_indep(
                                         break;
                                     } else {
                                         i += 1;
-                                        i;
                                     }
                                 }
                                 if collide != 0 {
@@ -1332,17 +1294,14 @@ unsafe extern "C" fn crush_choose_indep(
                                 }
                                 *out.offset(rep as isize) = item;
                                 left_0 -= 1;
-                                left_0;
                                 break;
                             }
                         }
                     }
                 }
                 rep += 1;
-                rep;
             }
             ftotal = ftotal.wrapping_add(1);
-            ftotal;
         }
         rep = outpos;
         while rep < endpos {
@@ -1353,12 +1312,10 @@ unsafe extern "C" fn crush_choose_indep(
                 *out2.offset(rep as isize) = 0x7fffffff as libc::c_int;
             }
             rep += 1;
-            rep;
         }
         if !((*map).choose_tries).is_null() && ftotal <= (*map).choose_total_tries {
             let fresh1 = &mut (*((*map).choose_tries).offset(ftotal as isize));
             *fresh1 = (*fresh1).wrapping_add(1);
-            *fresh1;
         }
     }
 }
@@ -1367,7 +1324,7 @@ pub unsafe extern "C" fn crush_init_workspace(mut m: *const CrushMap, mut v: *mu
     unsafe {
         let mut w: *mut CrushWork = v as *mut CrushWork;
         let mut point: *mut libc::c_char = v as *mut libc::c_char;
-        let mut b: __s32 = 0;
+        let mut b: S32 = 0;
         point = point.offset(::core::mem::size_of::<CrushWork>() as libc::c_ulong as isize);
         (*w).work = point as *mut *mut CrushWorkBucket;
         point = point.offset(
@@ -1380,26 +1337,23 @@ pub unsafe extern "C" fn crush_init_workspace(mut m: *const CrushMap, mut v: *mu
             if !(*((*m).buckets).offset(b as isize)).is_null() {
                 let fresh2 = &mut (*((*w).work).offset(b as isize));
                 *fresh2 = point as *mut CrushWorkBucket;
-                match (**((*m).buckets).offset(b as isize)).alg as libc::c_int {
-                    _ => {}
-                }
+                let _ = ((*m).buckets).offset(b as isize);
+                {}
                 point = point
                     .offset(::core::mem::size_of::<CrushWorkBucket>() as libc::c_ulong as isize);
-                (**((*w).work).offset(b as isize)).perm_x = 0 as libc::c_int as __u32;
-                (**((*w).work).offset(b as isize)).perm_n = 0 as libc::c_int as __u32;
+                (**((*w).work).offset(b as isize)).perm_x = 0 as libc::c_int as U32;
+                (**((*w).work).offset(b as isize)).perm_n = 0 as libc::c_int as U32;
                 let fresh3 = &mut (**((*w).work).offset(b as isize)).perm;
-                *fresh3 = point as *mut __u32;
+                *fresh3 = point as *mut U32;
                 point = point.offset(
                     ((**((*m).buckets).offset(b as isize)).size as libc::c_ulong)
-                        .wrapping_mul(::core::mem::size_of::<__u32>() as libc::c_ulong)
+                        .wrapping_mul(::core::mem::size_of::<U32>() as libc::c_ulong)
                         as isize,
                 );
             }
             b += 1;
-            b;
         }
-        if point.offset_from(w as *mut libc::c_char) as libc::c_long as size_t == (*m).working_size
-        {
+        if point.offset_from(w as *mut libc::c_char) as libc::c_long as SizeT == (*m).working_size {
         } else {
             __assert_fail(
                 b"!((char *)point - (char *)w != m->working_size)\0" as *const u8
@@ -1412,24 +1366,6 @@ pub unsafe extern "C" fn crush_init_workspace(mut m: *const CrushMap, mut v: *mu
                 .as_ptr(),
             );
         }
-        'c_6672: {
-            if point.offset_from(w as *mut libc::c_char) as libc::c_long as size_t
-                == (*m).working_size
-            {
-            } else {
-                __assert_fail(
-                    b"!((char *)point - (char *)w != m->working_size)\0" as *const u8
-                        as *const libc::c_char,
-                    b"/home/sevki/src/libcrush/crush/mapper.c\0" as *const u8
-                        as *const libc::c_char,
-                    870 as libc::c_int as libc::c_uint,
-                    (*::core::mem::transmute::<&[u8; 60], &[libc::c_char; 60]>(
-                        b"void crush_init_workspace(const struct crush_map *, void *)\0",
-                    ))
-                    .as_ptr(),
-                );
-            }
-        };
     }
 }
 #[unsafe(no_mangle)]
@@ -1439,7 +1375,7 @@ pub unsafe extern "C" fn crush_do_rule(
     mut x: libc::c_int,
     mut result: *mut libc::c_int,
     mut result_max: libc::c_int,
-    mut weight: *const __u32,
+    mut weight: *const U32,
     mut weight_max: libc::c_int,
     mut cwin: *mut libc::c_void,
     mut choose_args: *const CrushChooseArg,
@@ -1458,29 +1394,29 @@ pub unsafe extern "C" fn crush_do_rule(
         let mut osize: libc::c_int = 0;
         let mut tmp: *mut libc::c_int = std::ptr::null_mut::<libc::c_int>();
         let mut rule: *const CrushRule = std::ptr::null::<CrushRule>();
-        let mut step: __u32 = 0;
+        let mut step: U32 = 0;
         let mut i: libc::c_int = 0;
         let mut j: libc::c_int = 0;
         let mut numrep: libc::c_int = 0;
         let mut out_size: libc::c_int = 0;
         let mut choose_tries: libc::c_int =
-            ((*map).choose_total_tries).wrapping_add(1 as libc::c_int as __u32) as libc::c_int;
+            ((*map).choose_total_tries).wrapping_add(1 as libc::c_int as U32) as libc::c_int;
         let mut choose_leaf_tries: libc::c_int = 0 as libc::c_int;
         let mut choose_local_retries: libc::c_int = (*map).choose_local_tries as libc::c_int;
         let mut choose_local_fallback_retries: libc::c_int =
             (*map).choose_local_fallback_tries as libc::c_int;
         let mut vary_r: libc::c_int = (*map).chooseleaf_vary_r as libc::c_int;
         let mut stable: libc::c_int = (*map).chooseleaf_stable as libc::c_int;
-        if ruleno as __u32 >= (*map).max_rules {
+        if ruleno as U32 >= (*map).max_rules {
             return 0 as libc::c_int;
         }
         rule = *((*map).rules).offset(ruleno as isize);
         result_len = 0 as libc::c_int;
-        step = 0 as libc::c_int as __u32;
+        step = 0 as libc::c_int as U32;
         while step < (*rule).len {
             let mut firstn: libc::c_int = 0 as libc::c_int;
-            let mut curstep: *const crush_rule_step =
-                &*((*rule).steps).as_ptr().offset(step as isize) as *const crush_rule_step;
+            let mut curstep: *const CrushRuleStep =
+                &*((*rule).steps).as_ptr().offset(step as isize) as *const CrushRuleStep;
             let mut current_block_59: u64;
             match (*curstep).op {
                 1 => {
@@ -1544,9 +1480,7 @@ pub unsafe extern "C" fn crush_do_rule(
                     while i < wsize && result_len < result_max {
                         *result.offset(result_len as isize) = *w.offset(i as isize);
                         result_len += 1;
-                        result_len;
                         i += 1;
-                        i;
                     }
                     wsize = 0 as libc::c_int;
                     current_block_59 = 15462640364611497761;
@@ -1557,8 +1491,8 @@ pub unsafe extern "C" fn crush_do_rule(
             }
             if current_block_59 == 7054583439108689069 && wsize != 0 as libc::c_int {
                 recurse_to_leaf = ((*curstep).op
-                    == CRUSH_RULE_CHOOSELEAF_FIRSTN as libc::c_int as __u32
-                    || (*curstep).op == CRUSH_RULE_CHOOSELEAF_INDEP as libc::c_int as __u32)
+                    == CRUSH_RULE_CHOOSELEAF_FIRSTN as libc::c_int as U32
+                    || (*curstep).op == CRUSH_RULE_CHOOSELEAF_INDEP as libc::c_int as U32)
                     as libc::c_int;
                 osize = 0 as libc::c_int;
                 let mut current_block_45: u64;
@@ -1646,7 +1580,6 @@ pub unsafe extern "C" fn crush_do_rule(
                         }
                     }
                     i += 1;
-                    i;
                 }
                 if recurse_to_leaf != 0 {
                     memcpy(
@@ -1662,7 +1595,6 @@ pub unsafe extern "C" fn crush_do_rule(
                 wsize = osize;
             }
             step = step.wrapping_add(1);
-            step;
         }
         result_len
     }

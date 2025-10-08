@@ -1,6 +1,7 @@
 pub mod types;
 
 mod builder;
+#[allow(clippy::module_inception)]
 mod crush;
 mod hash;
 mod helpers;
