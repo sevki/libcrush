@@ -963,69 +963,57 @@ pub unsafe fn crush_remove_list_bucket_item(
     mut item: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
-        let mut i: ffi::c_uint = 0;
-        let mut j: ffi::c_uint = 0;
-        let mut newsize: ffi::c_int = 0;
-        let mut weight: ffi::c_uint = 0;
-        i = 0 as ffi::c_uint;
-        while i < (*bucket).h.size {
-            if *((*bucket).h.items).offset(i as isize) == item {
-                break;
+        // Reconstruct Vecs to modify them
+        let mut items_vec = Vec::from_raw_parts(
+            (*bucket).h.items,
+            (*bucket).h.size as usize,
+            (*bucket).h.size as usize
+        );
+        let mut item_weights_vec = Vec::from_raw_parts(
+            (*bucket).item_weights,
+            (*bucket).h.size as usize,
+            (*bucket).h.size as usize
+        );
+        let mut sum_weights_vec = Vec::from_raw_parts(
+            (*bucket).sum_weights,
+            (*bucket).h.size as usize,
+            (*bucket).h.size as usize
+        );
+        
+        // Find the item
+        if let Some(pos) = items_vec.iter().position(|&x| x == item) {
+            let weight = item_weights_vec[pos];
+            
+            // Remove the item from all arrays
+            items_vec.remove(pos);
+            item_weights_vec.remove(pos);
+            sum_weights_vec.remove(pos);
+            
+            // Adjust sum_weights for items after the removed one
+            for i in pos..sum_weights_vec.len() {
+                sum_weights_vec[i] = sum_weights_vec[i].wrapping_sub(weight);
             }
-            i = i.wrapping_add(1);
-        }
-        if i == (*bucket).h.size {
-            return -(2 as ffi::c_int);
-        }
-        weight = *((*bucket).item_weights).offset(i as isize);
-        j = i;
-        while j < (*bucket).h.size {
-            *((*bucket).h.items).offset(j as isize) = *((*bucket).h.items)
-                .offset(j.wrapping_add(1 as ffi::c_uint) as isize);
-            *((*bucket).item_weights).offset(j as isize) = *((*bucket).item_weights)
-                .offset(j.wrapping_add(1 as ffi::c_uint) as isize);
-            *((*bucket).sum_weights).offset(j as isize) = (*((*bucket).sum_weights)
-                .offset(j.wrapping_add(1 as ffi::c_uint) as isize))
-            .wrapping_sub(weight);
-            j = j.wrapping_add(1);
-        }
-        if weight < (*bucket).h.weight {
-            (*bucket).h.weight =
-                ((*bucket).h.weight as ffi::c_uint).wrapping_sub(weight) as U32 as U32;
+            
+            if weight < (*bucket).h.weight {
+                (*bucket).h.weight = ((*bucket).h.weight as ffi::c_uint).wrapping_sub(weight) as U32 as U32;
+            } else {
+                (*bucket).h.weight = 0 as U32;
+            }
+            (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
+            
+            (*bucket).h.items = items_vec.as_mut_ptr();
+            (*bucket).item_weights = item_weights_vec.as_mut_ptr();
+            (*bucket).sum_weights = sum_weights_vec.as_mut_ptr();
+            std::mem::forget(items_vec);
+            std::mem::forget(item_weights_vec);
+            std::mem::forget(sum_weights_vec);
+            0
         } else {
-            (*bucket).h.weight = 0 as U32;
+            std::mem::forget(items_vec);
+            std::mem::forget(item_weights_vec);
+            std::mem::forget(sum_weights_vec);
+            -(2 as ffi::c_int)
         }
-        (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
-        newsize = (*bucket).h.size as ffi::c_int;
-        let mut _realloc: *mut ffi::c_void = std::ptr::null_mut::<ffi::c_void>();
-        _realloc = realloc(
-            (*bucket).h.items as *mut ffi::c_void,
-            (::core::mem::size_of::<S32>() as ffi::c_ulong).wrapping_mul(newsize as ffi::c_ulong),
-        );
-        if _realloc.is_null() {
-            return -(12 as ffi::c_int);
-        } else {
-            (*bucket).h.items = _realloc as *mut S32;
-        }
-        _realloc = realloc(
-            (*bucket).item_weights as *mut ffi::c_void,
-            (::core::mem::size_of::<U32>() as ffi::c_ulong).wrapping_mul(newsize as ffi::c_ulong),
-        );
-        if _realloc.is_null() {
-            return -(12 as ffi::c_int);
-        } else {
-            (*bucket).item_weights = _realloc as *mut U32;
-        }
-        _realloc = realloc(
-            (*bucket).sum_weights as *mut ffi::c_void,
-            (::core::mem::size_of::<U32>() as ffi::c_ulong).wrapping_mul(newsize as ffi::c_ulong),
-        );
-        if _realloc.is_null() {
-            return -(12 as ffi::c_int);
-        } else {
-            (*bucket).sum_weights = _realloc as *mut U32;
-        }
-        0
     }
 }
 pub unsafe fn crush_remove_tree_bucket_item(
@@ -1034,7 +1022,6 @@ pub unsafe fn crush_remove_tree_bucket_item(
 ) -> ffi::c_int {
     unsafe {
         let mut i: ffi::c_uint = 0;
-        let mut newsize: ffi::c_uint = 0;
         i = 0 as ffi::c_uint;
         while i < (*bucket).h.size {
             let mut node: ffi::c_int = 0;
@@ -1067,7 +1054,8 @@ pub unsafe fn crush_remove_tree_bucket_item(
         if i == (*bucket).h.size {
             return -(2 as ffi::c_int);
         }
-        newsize = (*bucket).h.size;
+        
+        let mut newsize = (*bucket).h.size;
         while newsize > 0 as ffi::c_uint {
             let mut node_0: ffi::c_int = crush_calc_tree_node(
                 newsize.wrapping_sub(1 as ffi::c_uint) as ffi::c_int,
@@ -1078,33 +1066,32 @@ pub unsafe fn crush_remove_tree_bucket_item(
             newsize = newsize.wrapping_sub(1);
         }
         if newsize != (*bucket).h.size {
-            let mut olddepth: ffi::c_int = 0;
-            let mut newdepth: ffi::c_int = 0;
-            let mut _realloc: *mut ffi::c_void = std::ptr::null_mut::<ffi::c_void>();
-            _realloc = realloc(
-                (*bucket).h.items as *mut ffi::c_void,
-                (::core::mem::size_of::<S32>() as ffi::c_ulong)
-                    .wrapping_mul(newsize as ffi::c_ulong),
+            let olddepth: ffi::c_int = calc_depth((*bucket).h.size as ffi::c_int);
+            let newdepth: ffi::c_int = calc_depth(newsize as ffi::c_int);
+            
+            // Reconstruct and resize items
+            let mut items_vec = Vec::from_raw_parts(
+                (*bucket).h.items,
+                (*bucket).h.size as usize,
+                (*bucket).h.size as usize
             );
-            if _realloc.is_null() {
-                return -(12 as ffi::c_int);
-            } else {
-                (*bucket).h.items = _realloc as *mut S32;
-            }
-            olddepth = calc_depth((*bucket).h.size as ffi::c_int);
-            newdepth = calc_depth(newsize as ffi::c_int);
+            items_vec.truncate(newsize as usize);
+            (*bucket).h.items = items_vec.as_mut_ptr();
+            std::mem::forget(items_vec);
+            
             if olddepth != newdepth {
                 (*bucket).num_nodes = ((1) << newdepth) as U8;
-                _realloc = realloc(
-                    (*bucket).node_weights as *mut ffi::c_void,
-                    (::core::mem::size_of::<U32>() as ffi::c_ulong)
-                        .wrapping_mul((*bucket).num_nodes as ffi::c_ulong),
+                
+                // Reconstruct and resize node_weights
+                let old_num_nodes = ((1) << olddepth) as usize;
+                let mut node_weights_vec = Vec::from_raw_parts(
+                    (*bucket).node_weights,
+                    old_num_nodes,
+                    old_num_nodes
                 );
-                if _realloc.is_null() {
-                    return -(12 as ffi::c_int);
-                } else {
-                    (*bucket).node_weights = _realloc as *mut U32;
-                }
+                node_weights_vec.truncate((*bucket).num_nodes as usize);
+                (*bucket).node_weights = node_weights_vec.as_mut_ptr();
+                std::mem::forget(node_weights_vec);
             }
             (*bucket).h.size = newsize;
         }
@@ -1117,65 +1104,53 @@ pub unsafe fn crush_remove_straw_bucket_item(
     mut item: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
-        let mut newsize: ffi::c_int =
-            ((*bucket).h.size).wrapping_sub(1 as U32) as ffi::c_int;
-        let mut i: ffi::c_uint = 0;
-        let mut j: ffi::c_uint = 0;
-        i = 0 as ffi::c_uint;
-        while i < (*bucket).h.size {
-            if *((*bucket).h.items).offset(i as isize) == item {
-                (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
-                if *((*bucket).item_weights).offset(i as isize) < (*bucket).h.weight {
-                    (*bucket).h.weight = ((*bucket).h.weight)
-                        .wrapping_sub(*((*bucket).item_weights).offset(i as isize));
-                } else {
-                    (*bucket).h.weight = 0 as U32;
-                }
-                j = i;
-                while j < (*bucket).h.size {
-                    *((*bucket).h.items).offset(j as isize) = *((*bucket).h.items)
-                        .offset(j.wrapping_add(1 as ffi::c_uint) as isize);
-                    *((*bucket).item_weights).offset(j as isize) = *((*bucket).item_weights)
-                        .offset(j.wrapping_add(1 as ffi::c_uint) as isize);
-                    j = j.wrapping_add(1);
-                }
-                break;
+        // Reconstruct Vecs to modify them
+        let mut items_vec = Vec::from_raw_parts(
+            (*bucket).h.items,
+            (*bucket).h.size as usize,
+            (*bucket).h.size as usize
+        );
+        let mut item_weights_vec = Vec::from_raw_parts(
+            (*bucket).item_weights,
+            (*bucket).h.size as usize,
+            (*bucket).h.size as usize
+        );
+        let mut straws_vec = Vec::from_raw_parts(
+            (*bucket).straws,
+            (*bucket).h.size as usize,
+            (*bucket).h.size as usize
+        );
+        
+        // Find and remove the item
+        if let Some(pos) = items_vec.iter().position(|&x| x == item) {
+            let weight = item_weights_vec[pos];
+            
+            if weight < (*bucket).h.weight {
+                (*bucket).h.weight = ((*bucket).h.weight).wrapping_sub(weight);
             } else {
-                i = i.wrapping_add(1);
+                (*bucket).h.weight = 0 as U32;
             }
-        }
-        if i == (*bucket).h.size {
-            return -(2 as ffi::c_int);
-        }
-        let mut _realloc: *mut ffi::c_void = std::ptr::null_mut::<ffi::c_void>();
-        _realloc = realloc(
-            (*bucket).h.items as *mut ffi::c_void,
-            (::core::mem::size_of::<S32>() as ffi::c_ulong).wrapping_mul(newsize as ffi::c_ulong),
-        );
-        if _realloc.is_null() {
-            return -(12 as ffi::c_int);
+            
+            items_vec.remove(pos);
+            item_weights_vec.remove(pos);
+            straws_vec.remove(pos);
+            
+            (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
+            
+            (*bucket).h.items = items_vec.as_mut_ptr();
+            (*bucket).item_weights = item_weights_vec.as_mut_ptr();
+            (*bucket).straws = straws_vec.as_mut_ptr();
+            std::mem::forget(items_vec);
+            std::mem::forget(item_weights_vec);
+            std::mem::forget(straws_vec);
+            
+            crush_calc_straw(map, bucket)
         } else {
-            (*bucket).h.items = _realloc as *mut S32;
+            std::mem::forget(items_vec);
+            std::mem::forget(item_weights_vec);
+            std::mem::forget(straws_vec);
+            -(2 as ffi::c_int)
         }
-        _realloc = realloc(
-            (*bucket).item_weights as *mut ffi::c_void,
-            (::core::mem::size_of::<U32>() as ffi::c_ulong).wrapping_mul(newsize as ffi::c_ulong),
-        );
-        if _realloc.is_null() {
-            return -(12 as ffi::c_int);
-        } else {
-            (*bucket).item_weights = _realloc as *mut U32;
-        }
-        _realloc = realloc(
-            (*bucket).straws as *mut ffi::c_void,
-            (::core::mem::size_of::<U32>() as ffi::c_ulong).wrapping_mul(newsize as ffi::c_ulong),
-        );
-        if _realloc.is_null() {
-            return -(12 as ffi::c_int);
-        } else {
-            (*bucket).straws = _realloc as *mut U32;
-        }
-        crush_calc_straw(map, bucket)
     }
 }
 pub unsafe fn crush_remove_straw2_bucket_item(
@@ -1184,56 +1159,43 @@ pub unsafe fn crush_remove_straw2_bucket_item(
     mut item: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
-        let mut newsize: ffi::c_int =
-            ((*bucket).h.size).wrapping_sub(1 as U32) as ffi::c_int;
-        let mut i: ffi::c_uint = 0;
-        let mut j: ffi::c_uint = 0;
-        i = 0 as ffi::c_uint;
-        while i < (*bucket).h.size {
-            if *((*bucket).h.items).offset(i as isize) == item {
-                (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
-                if *((*bucket).item_weights).offset(i as isize) < (*bucket).h.weight {
-                    (*bucket).h.weight = ((*bucket).h.weight)
-                        .wrapping_sub(*((*bucket).item_weights).offset(i as isize));
-                } else {
-                    (*bucket).h.weight = 0 as U32;
-                }
-                j = i;
-                while j < (*bucket).h.size {
-                    *((*bucket).h.items).offset(j as isize) = *((*bucket).h.items)
-                        .offset(j.wrapping_add(1 as ffi::c_uint) as isize);
-                    *((*bucket).item_weights).offset(j as isize) = *((*bucket).item_weights)
-                        .offset(j.wrapping_add(1 as ffi::c_uint) as isize);
-                    j = j.wrapping_add(1);
-                }
-                break;
+        // Reconstruct Vecs to modify them
+        let mut items_vec = Vec::from_raw_parts(
+            (*bucket).h.items,
+            (*bucket).h.size as usize,
+            (*bucket).h.size as usize
+        );
+        let mut item_weights_vec = Vec::from_raw_parts(
+            (*bucket).item_weights,
+            (*bucket).h.size as usize,
+            (*bucket).h.size as usize
+        );
+        
+        // Find and remove the item
+        if let Some(pos) = items_vec.iter().position(|&x| x == item) {
+            let weight = item_weights_vec[pos];
+            
+            if weight < (*bucket).h.weight {
+                (*bucket).h.weight = ((*bucket).h.weight).wrapping_sub(weight);
             } else {
-                i = i.wrapping_add(1);
+                (*bucket).h.weight = 0 as U32;
             }
-        }
-        if i == (*bucket).h.size {
-            return -(2 as ffi::c_int);
-        }
-        let mut _realloc: *mut ffi::c_void = std::ptr::null_mut::<ffi::c_void>();
-        _realloc = realloc(
-            (*bucket).h.items as *mut ffi::c_void,
-            (::core::mem::size_of::<S32>() as ffi::c_ulong).wrapping_mul(newsize as ffi::c_ulong),
-        );
-        if _realloc.is_null() {
-            return -(12 as ffi::c_int);
+            
+            items_vec.remove(pos);
+            item_weights_vec.remove(pos);
+            
+            (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
+            
+            (*bucket).h.items = items_vec.as_mut_ptr();
+            (*bucket).item_weights = item_weights_vec.as_mut_ptr();
+            std::mem::forget(items_vec);
+            std::mem::forget(item_weights_vec);
+            0
         } else {
-            (*bucket).h.items = _realloc as *mut S32;
+            std::mem::forget(items_vec);
+            std::mem::forget(item_weights_vec);
+            -(2 as ffi::c_int)
         }
-        _realloc = realloc(
-            (*bucket).item_weights as *mut ffi::c_void,
-            (::core::mem::size_of::<U32>() as ffi::c_ulong).wrapping_mul(newsize as ffi::c_ulong),
-        );
-        if _realloc.is_null() {
-            return -(12 as ffi::c_int);
-        } else {
-            (*bucket).item_weights = _realloc as *mut U32;
-        }
-        0
     }
 }
 pub unsafe fn crush_bucket_remove_item(
