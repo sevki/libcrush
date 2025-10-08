@@ -1319,52 +1319,50 @@ unsafe extern "C" fn crush_choose_indep(
     }
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_init_workspace(mut m: *const CrushMap, mut v: *mut libc::c_void) {
-    unsafe {
-        let mut w: *mut CrushWork = v as *mut CrushWork;
-        let mut point: *mut libc::c_char = v as *mut libc::c_char;
-        let mut b: S32 = 0;
-        point = point.offset(::core::mem::size_of::<CrushWork>() as libc::c_ulong as isize);
-        (*w).work = point as *mut *mut CrushWorkBucket;
-        point = point.offset(
-            ((*m).max_buckets as libc::c_ulong)
-                .wrapping_mul(::core::mem::size_of::<*mut CrushWorkBucket>() as libc::c_ulong)
-                as isize,
-        );
-        b = 0 as libc::c_int;
-        while b < (*m).max_buckets {
-            if !(*((*m).buckets).offset(b as isize)).is_null() {
-                let fresh2 = &mut (*((*w).work).offset(b as isize));
-                *fresh2 = point as *mut CrushWorkBucket;
-                let _ = ((*m).buckets).offset(b as isize);
-                {}
-                point = point
-                    .offset(::core::mem::size_of::<CrushWorkBucket>() as libc::c_ulong as isize);
-                (**((*w).work).offset(b as isize)).perm_x = 0 as libc::c_int as U32;
-                (**((*w).work).offset(b as isize)).perm_n = 0 as libc::c_int as U32;
-                let fresh3 = &mut (**((*w).work).offset(b as isize)).perm;
-                *fresh3 = point as *mut U32;
-                point = point.offset(
-                    ((**((*m).buckets).offset(b as isize)).size as libc::c_ulong)
-                        .wrapping_mul(::core::mem::size_of::<U32>() as libc::c_ulong)
-                        as isize,
-                );
-            }
-            b += 1;
-        }
-        if point.offset_from(w as *mut libc::c_char) as libc::c_long as SizeT == (*m).working_size {
-        } else {
-            __assert_fail(
-                b"!((char *)point - (char *)w != m->working_size)\0" as *const u8
-                    as *const libc::c_char,
-                b"/home/sevki/src/libcrush/crush/mapper.c\0" as *const u8 as *const libc::c_char,
-                870 as libc::c_int as libc::c_uint,
-                (*::core::mem::transmute::<&[u8; 60], &[libc::c_char; 60]>(
-                    b"void crush_init_workspace(const struct crush_map *, void *)\0",
-                ))
-                .as_ptr(),
+pub unsafe extern "C" fn crush_init_workspace(m: *const CrushMap, v: *mut libc::c_void) {
+    let w: *mut CrushWork = v as *mut CrushWork;
+    let mut point: *mut libc::c_char = v as *mut libc::c_char;
+    
+    point = point.offset(::core::mem::size_of::<CrushWork>() as libc::c_ulong as isize);
+    (*w).work = point as *mut *mut CrushWorkBucket;
+    point = point.offset(
+        ((*m).max_buckets as libc::c_ulong)
+            .wrapping_mul(::core::mem::size_of::<*mut CrushWorkBucket>() as libc::c_ulong)
+            as isize,
+    );
+    
+    for b in 0..(*m).max_buckets {
+        if !(*((*m).buckets).offset(b as isize)).is_null() {
+            let fresh2 = &mut (*((*w).work).offset(b as isize));
+            *fresh2 = point as *mut CrushWorkBucket;
+            let _ = ((*m).buckets).offset(b as isize);
+            {}
+            point = point
+                .offset(::core::mem::size_of::<CrushWorkBucket>() as libc::c_ulong as isize);
+            (**((*w).work).offset(b as isize)).perm_x = 0;
+            (**((*w).work).offset(b as isize)).perm_n = 0;
+            let fresh3 = &mut (**((*w).work).offset(b as isize)).perm;
+            *fresh3 = point as *mut U32;
+            point = point.offset(
+                ((**((*m).buckets).offset(b as isize)).size as libc::c_ulong)
+                    .wrapping_mul(::core::mem::size_of::<U32>() as libc::c_ulong)
+                    as isize,
             );
         }
+    }
+    
+    if point.offset_from(w as *mut libc::c_char) as libc::c_long as SizeT == (*m).working_size {
+    } else {
+        __assert_fail(
+            b"!((char *)point - (char *)w != m->working_size)\0" as *const u8
+                as *const libc::c_char,
+            b"/home/sevki/src/libcrush/crush/mapper.c\0" as *const u8 as *const libc::c_char,
+            870 as libc::c_uint,
+            (*::core::mem::transmute::<&[u8; 60], &[libc::c_char; 60]>(
+                b"void crush_init_workspace(const struct crush_map *, void *)\0",
+            ))
+            .as_ptr(),
+        );
     }
 }
 #[unsafe(no_mangle)]

@@ -1133,7 +1133,7 @@ pub unsafe extern "C" fn crush_bucket_add_item(
             3 => crush_add_tree_bucket_item(b as *mut CrushBucketTree, item, weight),
             4 => crush_add_straw_bucket_item(map, b as *mut CrushBucketStraw, item, weight),
             5 => crush_add_straw2_bucket_item(map, b as *mut CrushBucketStraw2, item, weight),
-            _ => (-1),
+            _ => -1,
         }
     }
 }
@@ -1477,7 +1477,7 @@ pub unsafe extern "C" fn crush_bucket_remove_item(
             3 => crush_remove_tree_bucket_item(b as *mut CrushBucketTree, item),
             4 => crush_remove_straw_bucket_item(map, b as *mut CrushBucketStraw, item),
             5 => crush_remove_straw2_bucket_item(map, b as *mut CrushBucketStraw2, item),
-            _ => (-1),
+            _ => -1,
         }
     }
 }
@@ -1647,7 +1647,7 @@ pub unsafe extern "C" fn crush_bucket_adjust_item_weight(
                 item,
                 weight,
             ),
-            _ => (-1),
+            _ => -1,
         }
     }
 }
