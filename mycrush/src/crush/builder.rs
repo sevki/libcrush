@@ -96,7 +96,7 @@ pub unsafe extern "C" fn crush_add_rule(
             }
             if r < ((1) << 8 as ffi::c_int) as U32 {
             } else {
-                panic!("Assertion failed: r < CRUSH_MAX_RULES");
+                panic!("Assertion failed: r({}) < CRUSH_MAX_RULES({})", r, (1 << 8));
             }
         } else {
             r = ruleno as U32;
@@ -171,7 +171,7 @@ pub unsafe extern "C" fn crush_rule_set_step(
     unsafe {
         if (n as U32) < (*rule).len {
         } else {
-            panic!("Assertion failed: (__u32)n < rule->len");
+            panic!("Assertion failed: n({}) < rule->len({})", n, (*rule).len);
         }
 
         (*((*rule).steps).as_mut_ptr().offset(n as isize)).op = op as U32;
@@ -249,7 +249,7 @@ pub unsafe extern "C" fn crush_remove_bucket(
         let mut pos: ffi::c_int = (-1) - (*bucket).id;
         if pos < (*map).max_buckets {
         } else {
-            panic!("Assertion failed: pos < map->max_buckets");
+            panic!("Assertion failed: pos({}) < map->max_buckets({})", pos, (*map).max_buckets);
         }
         let fresh2 = &mut (*((*map).buckets).offset(pos as isize));
         *fresh2 = std::ptr::null_mut::<CrushBucket>();
