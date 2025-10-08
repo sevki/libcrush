@@ -28,121 +28,139 @@ pub unsafe fn crush_get_bucket_item_weight(
     b: *const CrushBucket,
     p: ffi::c_int,
 ) -> ffi::c_int {
-    if p as U32 >= (*b).size {
-        return 0;
-    }
-    match (*b).alg as ffi::c_int {
-        1 => (*(b as *mut CrushBucketUniform)).item_weight as ffi::c_int,
-        2 => *((*(b as *mut CrushBucketList)).item_weights).offset(p as isize) as ffi::c_int,
-        3 => *((*(b as *mut CrushBucketTree)).node_weights)
-            .offset(crush_calc_tree_node(p) as isize) as ffi::c_int,
-        4 => *((*(b as *mut CrushBucketStraw)).item_weights).offset(p as isize) as ffi::c_int,
-        5 => *((*(b as *mut CrushBucketStraw2)).item_weights).offset(p as isize) as ffi::c_int,
-        _ => 0,
+    unsafe {
+        if p as U32 >= (*b).size {
+            return 0;
+        }
+        match (*b).alg as ffi::c_int {
+            1 => (*(b as *mut CrushBucketUniform)).item_weight as ffi::c_int,
+            2 => *((*(b as *mut CrushBucketList)).item_weights).offset(p as isize) as ffi::c_int,
+            3 => *((*(b as *mut CrushBucketTree)).node_weights)
+                .offset(crush_calc_tree_node(p) as isize) as ffi::c_int,
+            4 => *((*(b as *mut CrushBucketStraw)).item_weights).offset(p as isize) as ffi::c_int,
+            5 => *((*(b as *mut CrushBucketStraw2)).item_weights).offset(p as isize) as ffi::c_int,
+            _ => 0,
+        }
     }
 }
 pub unsafe fn crush_destroy_bucket_uniform(b: *mut CrushBucketUniform) {
-    if !((*b).h.items).is_null() {
-        // Reconstruct Vec to properly deallocate
-        let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
-    }
-    if !b.is_null() {
-        let _ = Box::from_raw(b);
+    unsafe {
+        if !((*b).h.items).is_null() {
+            // Reconstruct Vec to properly deallocate
+            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
+        }
+        if !b.is_null() {
+            let _ = Box::from_raw(b);
+        }
     }
 }
 pub unsafe fn crush_destroy_bucket_list(b: *mut CrushBucketList) {
-    if !((*b).item_weights).is_null() {
-        let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).h.size as usize);
-    }
-    if !((*b).sum_weights).is_null() {
-        let _ = Vec::from_raw_parts((*b).sum_weights, (*b).h.size as usize, (*b).h.size as usize);
-    }
-    if !((*b).h.items).is_null() {
-        let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
-    }
-    if !b.is_null() {
-        let _ = Box::from_raw(b);
+    unsafe {
+        if !((*b).item_weights).is_null() {
+            let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).h.size as usize);
+        }
+        if !((*b).sum_weights).is_null() {
+            let _ = Vec::from_raw_parts((*b).sum_weights, (*b).h.size as usize, (*b).h.size as usize);
+        }
+        if !((*b).h.items).is_null() {
+            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
+        }
+        if !b.is_null() {
+            let _ = Box::from_raw(b);
+        }
     }
 }
 pub unsafe fn crush_destroy_bucket_tree(b: *mut CrushBucketTree) {
-    if !((*b).h.items).is_null() {
-        let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
-    }
-    if !((*b).node_weights).is_null() {
-        let _ = Vec::from_raw_parts((*b).node_weights, (*b).num_nodes as usize, (*b).num_nodes as usize);
-    }
-    if !b.is_null() {
-        let _ = Box::from_raw(b);
+    unsafe {
+        if !((*b).h.items).is_null() {
+            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
+        }
+        if !((*b).node_weights).is_null() {
+            let _ = Vec::from_raw_parts((*b).node_weights, (*b).num_nodes as usize, (*b).num_nodes as usize);
+        }
+        if !b.is_null() {
+            let _ = Box::from_raw(b);
+        }
     }
 }
 pub unsafe fn crush_destroy_bucket_straw(b: *mut CrushBucketStraw) {
-    if !((*b).straws).is_null() {
-        let _ = Vec::from_raw_parts((*b).straws, (*b).h.size as usize, (*b).h.size as usize);
-    }
-    if !((*b).item_weights).is_null() {
-        let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).h.size as usize);
-    }
-    if !((*b).h.items).is_null() {
-        let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
-    }
-    if !b.is_null() {
-        let _ = Box::from_raw(b);
+    unsafe {
+        if !((*b).straws).is_null() {
+            let _ = Vec::from_raw_parts((*b).straws, (*b).h.size as usize, (*b).h.size as usize);
+        }
+        if !((*b).item_weights).is_null() {
+            let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).h.size as usize);
+        }
+        if !((*b).h.items).is_null() {
+            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
+        }
+        if !b.is_null() {
+            let _ = Box::from_raw(b);
+        }
     }
 }
 pub unsafe fn crush_destroy_bucket_straw2(b: *mut CrushBucketStraw2) {
-    if !((*b).item_weights).is_null() {
-        let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).h.size as usize);
-    }
-    if !((*b).h.items).is_null() {
-        let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
-    }
-    if !b.is_null() {
-        let _ = Box::from_raw(b);
+    unsafe {
+        if !((*b).item_weights).is_null() {
+            let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).h.size as usize);
+        }
+        if !((*b).h.items).is_null() {
+            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
+        }
+        if !b.is_null() {
+            let _ = Box::from_raw(b);
+        }
     }
 }
 pub unsafe fn crush_destroy_bucket(b: *mut CrushBucket) {
-    match (*b).alg as ffi::c_int {
-        1 => crush_destroy_bucket_uniform(b as *mut CrushBucketUniform),
-        2 => crush_destroy_bucket_list(b as *mut CrushBucketList),
-        3 => crush_destroy_bucket_tree(b as *mut CrushBucketTree),
-        4 => crush_destroy_bucket_straw(b as *mut CrushBucketStraw),
-        5 => crush_destroy_bucket_straw2(b as *mut CrushBucketStraw2),
-        _ => {}
+    unsafe {
+        match (*b).alg as ffi::c_int {
+            1 => crush_destroy_bucket_uniform(b as *mut CrushBucketUniform),
+            2 => crush_destroy_bucket_list(b as *mut CrushBucketList),
+            3 => crush_destroy_bucket_tree(b as *mut CrushBucketTree),
+            4 => crush_destroy_bucket_straw(b as *mut CrushBucketStraw),
+            5 => crush_destroy_bucket_straw2(b as *mut CrushBucketStraw2),
+            _ => {}
+        }
     }
 }
 pub unsafe fn crush_destroy(map: *mut CrushMap) {
-    if !((*map).buckets).is_null() {
-        for b in 0..(*map).max_buckets {
-            if !(*((*map).buckets).offset(b as isize)).is_null() {
-                crush_destroy_bucket(*((*map).buckets).offset(b as isize));
+    unsafe {
+        if !((*map).buckets).is_null() {
+            for b in 0..(*map).max_buckets {
+                if !(*((*map).buckets).offset(b as isize)).is_null() {
+                    crush_destroy_bucket(*((*map).buckets).offset(b as isize));
+                }
             }
+            // Reconstruct Vec to properly deallocate
+            let _ = Vec::from_raw_parts((*map).buckets, (*map).max_buckets as usize, (*map).max_buckets as usize);
         }
-        // Reconstruct Vec to properly deallocate
-        let _ = Vec::from_raw_parts((*map).buckets, (*map).max_buckets as usize, (*map).max_buckets as usize);
-    }
-    if !((*map).rules).is_null() {
-        for b in 0..(*map).max_rules {
-            crush_destroy_rule(*((*map).rules).offset(b as isize));
+        if !((*map).rules).is_null() {
+            for b in 0..(*map).max_rules {
+                crush_destroy_rule(*((*map).rules).offset(b as isize));
+            }
+            // Reconstruct Vec to properly deallocate
+            let _ = Vec::from_raw_parts((*map).rules, (*map).max_rules as usize, (*map).max_rules as usize);
         }
-        // Reconstruct Vec to properly deallocate
-        let _ = Vec::from_raw_parts((*map).rules, (*map).max_rules as usize, (*map).max_rules as usize);
-    }
-    if !((*map).choose_tries).is_null() {
-        // choose_tries is allocated elsewhere, we need to check how it's allocated
-        // For now, use Box::from_raw assuming it was allocated with Box
-        let _ = Box::from_raw((*map).choose_tries);
-    }
-    if !map.is_null() {
-        let _ = Box::from_raw(map);
+        if !((*map).choose_tries).is_null() {
+            // choose_tries is allocated elsewhere, we need to check how it's allocated
+            // For now, use Box::from_raw assuming it was allocated with Box
+            let _ = Box::from_raw((*map).choose_tries);
+        }
+        if !map.is_null() {
+            let _ = Box::from_raw(map);
+        }
     }
 }
 pub unsafe fn crush_destroy_rule(rule: *mut CrushRule) {
-    if !rule.is_null() {
-        let layout = std::alloc::Layout::from_size_align_unchecked(
-            ::core::mem::size_of::<CrushRule>()
-                + ((*rule).len as usize) * ::core::mem::size_of::<CrushRuleStep>(),
-            ::core::mem::align_of::<CrushRule>(),
-        );
-        std::alloc::dealloc(rule as *mut u8, layout);
+    unsafe {
+        if !rule.is_null() {
+            let layout = std::alloc::Layout::from_size_align_unchecked(
+                ::core::mem::size_of::<CrushRule>()
+                    + ((*rule).len as usize) * ::core::mem::size_of::<CrushRuleStep>(),
+                ::core::mem::align_of::<CrushRule>(),
+            );
+            std::alloc::dealloc(rule as *mut u8, layout);
+        }
     }
 }

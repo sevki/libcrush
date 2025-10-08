@@ -1528,13 +1528,15 @@ pub unsafe fn crush_reweight_bucket(
     map: *mut CrushMap,
     b: *mut CrushBucket,
 ) -> ffi::c_int {
-    match (*b).alg as ffi::c_int {
-        1 => crush_reweight_uniform_bucket(map, b as *mut CrushBucketUniform),
-        2 => crush_reweight_list_bucket(map, b as *mut CrushBucketList),
-        3 => crush_reweight_tree_bucket(map, b as *mut CrushBucketTree),
-        4 => crush_reweight_straw_bucket(map, b as *mut CrushBucketStraw),
-        5 => crush_reweight_straw2_bucket(map, b as *mut CrushBucketStraw2),
-        _ => -1,
+    unsafe {
+        match (*b).alg as ffi::c_int {
+            1 => crush_reweight_uniform_bucket(map, b as *mut CrushBucketUniform),
+            2 => crush_reweight_list_bucket(map, b as *mut CrushBucketList),
+            3 => crush_reweight_tree_bucket(map, b as *mut CrushBucketTree),
+            4 => crush_reweight_straw_bucket(map, b as *mut CrushBucketStraw),
+            5 => crush_reweight_straw2_bucket(map, b as *mut CrushBucketStraw2),
+            _ => -1,
+        }
     }
 }
 pub unsafe fn crush_make_choose_args(

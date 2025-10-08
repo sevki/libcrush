@@ -32,6 +32,8 @@ fn main() {
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         // Disable doc tests for generated bindings
         .generate_comments(false)
+        // Generate unsafe blocks in unsafe functions for edition 2024
+        .wrap_unsafe_ops(true)
         // Finish the builder and generate the bindings.
         .generate()
         // Unwrap the Result and panic on failure.

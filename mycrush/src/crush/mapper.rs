@@ -1298,40 +1298,42 @@ unsafe fn crush_choose_indep(
     }
 }
 pub unsafe fn crush_init_workspace(m: *const CrushMap, v: *mut ffi::c_void) {
-    let w: *mut CrushWork = v as *mut CrushWork;
-    let mut point: *mut ffi::c_char = v as *mut ffi::c_char;
-    
-    point = point.offset(::core::mem::size_of::<CrushWork>() as ffi::c_ulong as isize);
-    (*w).work = point as *mut *mut CrushWorkBucket;
-    point = point.offset(
-        ((*m).max_buckets as ffi::c_ulong)
-            .wrapping_mul(::core::mem::size_of::<*mut CrushWorkBucket>() as ffi::c_ulong)
-            as isize,
-    );
-    
-    for b in 0..(*m).max_buckets {
-        if !(*((*m).buckets).offset(b as isize)).is_null() {
-            let fresh2 = &mut (*((*w).work).offset(b as isize));
-            *fresh2 = point as *mut CrushWorkBucket;
-            let _ = ((*m).buckets).offset(b as isize);
-            {}
-            point = point
-                .offset(::core::mem::size_of::<CrushWorkBucket>() as ffi::c_ulong as isize);
-            (**((*w).work).offset(b as isize)).perm_x = 0;
-            (**((*w).work).offset(b as isize)).perm_n = 0;
-            let fresh3 = &mut (**((*w).work).offset(b as isize)).perm;
-            *fresh3 = point as *mut U32;
-            point = point.offset(
-                ((**((*m).buckets).offset(b as isize)).size as ffi::c_ulong)
-                    .wrapping_mul(::core::mem::size_of::<U32>() as ffi::c_ulong)
-                    as isize,
-            );
+    unsafe {
+        let w: *mut CrushWork = v as *mut CrushWork;
+        let mut point: *mut ffi::c_char = v as *mut ffi::c_char;
+        
+        point = point.offset(::core::mem::size_of::<CrushWork>() as ffi::c_ulong as isize);
+        (*w).work = point as *mut *mut CrushWorkBucket;
+        point = point.offset(
+            ((*m).max_buckets as ffi::c_ulong)
+                .wrapping_mul(::core::mem::size_of::<*mut CrushWorkBucket>() as ffi::c_ulong)
+                as isize,
+        );
+        
+        for b in 0..(*m).max_buckets {
+            if !(*((*m).buckets).offset(b as isize)).is_null() {
+                let fresh2 = &mut (*((*w).work).offset(b as isize));
+                *fresh2 = point as *mut CrushWorkBucket;
+                let _ = ((*m).buckets).offset(b as isize);
+                {}
+                point = point
+                    .offset(::core::mem::size_of::<CrushWorkBucket>() as ffi::c_ulong as isize);
+                (**((*w).work).offset(b as isize)).perm_x = 0;
+                (**((*w).work).offset(b as isize)).perm_n = 0;
+                let fresh3 = &mut (**((*w).work).offset(b as isize)).perm;
+                *fresh3 = point as *mut U32;
+                point = point.offset(
+                    ((**((*m).buckets).offset(b as isize)).size as ffi::c_ulong)
+                        .wrapping_mul(::core::mem::size_of::<U32>() as ffi::c_ulong)
+                        as isize,
+                );
+            }
         }
-    }
-    
-    if point.offset_from(w as *mut ffi::c_char) as ffi::c_long as SizeT == (*m).working_size {
-    } else {
-        panic!("Assertion failed: !((char *)point - (char *)w != m->working_size)");
+        
+        if point.offset_from(w as *mut ffi::c_char) as ffi::c_long as SizeT == (*m).working_size {
+        } else {
+            panic!("Assertion failed: !((char *)point - (char *)w != m->working_size)");
+        }
     }
 }
 pub unsafe fn crush_do_rule(

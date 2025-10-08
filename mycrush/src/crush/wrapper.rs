@@ -56,7 +56,7 @@ impl Map {
     }
 
     pub fn new_legacy() -> Self {
-        let mut map = Self::new();
+        let map = Self::new();
         // Safety: map.ptr is valid and we have mutable access to Map
         unsafe {
             crate::crush::builder::set_legacy_crush_map(&mut *map.ptr);
