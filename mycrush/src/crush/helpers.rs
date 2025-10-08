@@ -8,30 +8,30 @@
     unused_mut
 )]
 use crate::crush::types::*;
-use ::libc;
+use crate::crush::types::ffi;
 unsafe extern "C" {
     fn __assert_fail(
-        __assertion: *const libc::c_char,
-        __file: *const libc::c_char,
-        __line: libc::c_uint,
-        __function: *const libc::c_char,
+        __assertion: *const ffi::c_char,
+        __file: *const ffi::c_char,
+        __line: ffi::c_uint,
+        __function: *const ffi::c_char,
     ) -> !;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
-    fn memset(_: *mut libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
+    fn malloc(_: ffi::c_ulong) -> *mut ffi::c_void;
+    fn memset(_: *mut ffi::c_void, _: ffi::c_int, _: ffi::c_ulong) -> *mut ffi::c_void;
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_find_roots(
     map: *mut CrushMap,
-    buckets: *mut *mut libc::c_int,
-) -> libc::c_int {
+    buckets: *mut *mut ffi::c_int,
+) -> ffi::c_int {
     let vla = (*map).max_buckets as usize;
-    let mut ref_0: Vec<libc::c_int> = ::std::vec::from_elem(0, vla);
-    let mut root_count: libc::c_int = (*map).max_buckets;
+    let mut ref_0: Vec<ffi::c_int> = ::std::vec::from_elem(0, vla);
+    let mut root_count: ffi::c_int = (*map).max_buckets;
     
     memset(
-        ref_0.as_mut_ptr() as *mut libc::c_void,
+        ref_0.as_mut_ptr() as *mut ffi::c_void,
         '\0' as i32,
-        (vla * ::core::mem::size_of::<libc::c_int>()) as libc::c_ulong,
+        (vla * ::core::mem::size_of::<ffi::c_int>()) as ffi::c_ulong,
     );
     
     for pos in 0..(*map).max_buckets {
@@ -41,7 +41,7 @@ pub unsafe extern "C" fn crush_find_roots(
         } else {
             for i in 0..(*b).size {
                 if *((*b).items).offset(i as isize) < 0 {
-                    let item: libc::c_int = -1 - *((*b).items).offset(i as isize);
+                    let item: ffi::c_int = -1 - *((*b).items).offset(i as isize);
                     if item >= (*map).max_buckets {
                         return -22;
                     }
@@ -55,15 +55,15 @@ pub unsafe extern "C" fn crush_find_roots(
         }
     }
     
-    let roots: *mut libc::c_int = malloc(
-        (root_count as libc::c_ulong)
-            .wrapping_mul(::core::mem::size_of::<libc::c_int>() as libc::c_ulong),
-    ) as *mut libc::c_int;
+    let roots: *mut ffi::c_int = malloc(
+        (root_count as ffi::c_ulong)
+            .wrapping_mul(::core::mem::size_of::<ffi::c_int>() as ffi::c_ulong),
+    ) as *mut ffi::c_int;
     if roots.is_null() {
         return -12;
     }
     
-    let mut roots_length: libc::c_int = 0;
+    let mut roots_length: ffi::c_int = 0;
     for pos in 0..(*map).max_buckets {
         if !(*((*map).buckets).offset(pos as isize)).is_null()
             && *ref_0.as_mut_ptr().offset(pos as isize) == 0
@@ -76,10 +76,10 @@ pub unsafe extern "C" fn crush_find_roots(
     
     if roots_length != root_count {
         __assert_fail(
-            b"roots_length == root_count\0" as *const u8 as *const libc::c_char,
-            b"/home/sevki/src/libcrush/crush/helpers.c\0" as *const u8 as *const libc::c_char,
-            38 as libc::c_uint,
-            (*::core::mem::transmute::<&[u8; 49], &[libc::c_char; 49]>(
+            b"roots_length == root_count\0" as *const u8 as *const ffi::c_char,
+            b"/home/sevki/src/libcrush/crush/helpers.c\0" as *const u8 as *const ffi::c_char,
+            38 as ffi::c_uint,
+            (*::core::mem::transmute::<&[u8; 49], &[ffi::c_char; 49]>(
                 b"int crush_find_roots(struct crush_map *, int **)\0",
             ))
             .as_ptr(),

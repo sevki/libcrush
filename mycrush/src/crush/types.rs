@@ -1,15 +1,27 @@
 /// Common types used across all crush modules
 /// Extracted from c2rust transpiled code
-use ::libc;
 
-// Basic C types
-pub type SizeT = libc::c_ulong;
-pub type U8 = libc::c_uchar;
-pub type U16 = libc::c_ushort;
-pub type S32 = libc::c_int;
-pub type U32 = libc::c_uint;
-pub type S64 = libc::c_longlong;
-pub type U64 = libc::c_ulonglong;
+// Re-export FFI types from core::ffi to reduce libc dependency
+pub mod ffi {
+    pub use core::ffi::{c_char, c_int, c_uint, c_uchar, c_ushort, c_ulong, c_longlong, c_ulonglong, c_void, c_double};
+    
+    // c_long is not in core::ffi, we need to define it based on target platform
+    #[cfg(target_pointer_width = "64")]
+    #[allow(non_camel_case_types)]
+    pub type c_long = i64;
+    #[cfg(target_pointer_width = "32")]
+    #[allow(non_camel_case_types)]
+    pub type c_long = i32;
+}
+
+// Basic C types - using core::ffi instead of libc
+pub type SizeT = ffi::c_ulong;
+pub type U8 = ffi::c_uchar;
+pub type U16 = ffi::c_ushort;
+pub type S32 = ffi::c_int;
+pub type U32 = ffi::c_uint;
+pub type S64 = ffi::c_longlong;
+pub type U64 = ffi::c_ulonglong;
 
 // CRUSH rule step
 #[derive(Copy, Clone)]
@@ -21,7 +33,7 @@ pub struct CrushRuleStep {
 }
 
 // CRUSH rule opcodes
-pub type CrushOpcodes = libc::c_uint;
+pub type CrushOpcodes = U32;
 pub const CRUSH_RULE_NOOP: CrushOpcodes = 0;
 pub const CRUSH_RULE_TAKE: CrushOpcodes = 1;
 pub const CRUSH_RULE_CHOOSE_FIRSTN: CrushOpcodes = 2;
@@ -56,7 +68,7 @@ pub struct CrushRule {
 }
 
 // CRUSH bucket algorithms
-pub type CrushAlgorithm = libc::c_uint;
+pub type CrushAlgorithm = U32;
 pub const CRUSH_BUCKET_UNIFORM: CrushAlgorithm = 1;
 pub const CRUSH_BUCKET_LIST: CrushAlgorithm = 2;
 pub const CRUSH_BUCKET_TREE: CrushAlgorithm = 3;
@@ -88,7 +100,7 @@ pub struct CrushWeightSet {
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct CrushChooseArg {
-    pub ids: *mut libc::c_int,
+    pub ids: *mut S32,
     pub ids_size: U32,
     pub weight_set: *mut CrushWeightSet,
     pub weight_set_size: U32,
