@@ -462,9 +462,7 @@ impl ChooseArgs {
 
 impl Drop for ChooseArgs {
     fn drop(&mut self) {
-        unsafe {
-            crush_destroy_choose_args(self.ptr);
-        }
+        crush_destroy_choose_args(self.ptr);
     }
 }
 
@@ -474,5 +472,5 @@ pub struct WeightSet<'a> {
 
 // Helper function for testing
 pub fn is_multiplication_unsafe(a: i64, b: i64) -> bool {
-    unsafe { crush_multiplication_is_unsafe(a as u32, b as u32) != 0 }
+    crush_multiplication_is_unsafe(a as u32, b as u32) != 0
 }
