@@ -36,7 +36,7 @@ pub unsafe extern "C" fn crush_create() -> *mut CrushMap {
             0,
             ::core::mem::size_of::<CrushMap>() as ffi::c_ulong,
         );
-        set_optimal_crush_map(m);
+        set_optimal_crush_map(&mut *m);
         m
     }
 }
@@ -282,7 +282,7 @@ pub unsafe extern "C" fn crush_make_uniform_bucket(
         (*bucket).h.hash = hash as U8;
         (*bucket).h.type_0 = type_0 as U16;
         (*bucket).h.size = size as U32;
-        if crush_multiplication_is_unsafe(size as U32, item_weight as U32) == 0 {
+        if !crush_multiplication_is_unsafe(size as U32, item_weight as U32) {
             (*bucket).h.weight = (size * item_weight) as U32;
             (*bucket).item_weight = item_weight as U32;
             (*bucket).h.items = malloc(
@@ -355,7 +355,6 @@ pub unsafe extern "C" fn crush_make_list_bucket(
                         *((*bucket).item_weights).offset(i as isize) =
                             *weights.offset(i as isize) as U32;
                         if crush_addition_is_unsafe(w as U32, *weights.offset(i as isize) as U32)
-                            != 0
                         {
                             current_block = 944831508617719848;
                             break;
@@ -486,8 +485,7 @@ pub unsafe extern "C" fn crush_make_tree_bucket(
                     if crush_addition_is_unsafe(
                         (*bucket).h.weight,
                         *weights.offset(i as isize) as U32,
-                    ) != 0
-                    {
+                    ) {
                         current_block = 1061975787736880768;
                         break;
                     }
@@ -499,8 +497,7 @@ pub unsafe extern "C" fn crush_make_tree_bucket(
                         if crush_addition_is_unsafe(
                             *((*bucket).node_weights).offset(node as isize),
                             *weights.offset(i as isize) as U32,
-                        ) != 0
-                        {
+                        ) {
                             current_block = 1061975787736880768;
                             break 's_88;
                         }
@@ -858,7 +855,7 @@ pub unsafe extern "C" fn crush_add_uniform_bucket_item(
             (*bucket).h.items = _realloc as *mut S32;
         }
         *((*bucket).h.items).offset((newsize - 1) as isize) = item;
-        if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) != 0 {
+        if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) {
             return -(34 as ffi::c_int);
         }
         (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(weight as U32);
@@ -909,8 +906,7 @@ pub unsafe extern "C" fn crush_add_list_bucket_item(
             if crush_addition_is_unsafe(
                 *((*bucket).sum_weights).offset((newsize - 2 as ffi::c_int) as isize),
                 weight as U32,
-            ) != 0
-            {
+            ) {
                 return -(34 as ffi::c_int);
             }
             *((*bucket).sum_weights).offset((newsize - 1) as isize) =
@@ -970,15 +966,14 @@ pub unsafe extern "C" fn crush_add_tree_bucket_item(
             if crush_addition_is_unsafe(
                 *((*bucket).node_weights).offset(node as isize),
                 weight as U32,
-            ) != 0
-            {
+            ) {
                 return -(34 as ffi::c_int);
             }
             let fresh4 = &mut (*((*bucket).node_weights).offset(node as isize));
             *fresh4 = (*fresh4).wrapping_add(weight as U32);
             j += 1;
         }
-        if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) != 0 {
+        if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) {
             return -(34 as ffi::c_int);
         }
         *((*bucket).h.items).offset((newsize - 1) as isize) = item;
@@ -1027,7 +1022,7 @@ pub unsafe extern "C" fn crush_add_straw_bucket_item(
         }
         *((*bucket).h.items).offset((newsize - 1) as isize) = item;
         *((*bucket).item_weights).offset((newsize - 1) as isize) = weight as U32;
-        if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) != 0 {
+        if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) {
             return -(34 as ffi::c_int);
         }
         (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(weight as U32);
@@ -1066,7 +1061,7 @@ pub unsafe extern "C" fn crush_add_straw2_bucket_item(
         }
         *((*bucket).h.items).offset((newsize - 1) as isize) = item;
         *((*bucket).item_weights).offset((newsize - 1) as isize) = weight as U32;
-        if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) != 0 {
+        if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) {
             return -(34 as ffi::c_int);
         }
         (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(weight as U32);
@@ -1623,7 +1618,7 @@ unsafe extern "C" fn crush_reweight_uniform_bucket(
                 let mut c: *mut CrushBucket =
                     *((*map).buckets).offset(((-1) - id) as isize);
                 crush_reweight_bucket(map, c);
-                if crush_addition_is_unsafe(sum, (*c).weight) != 0 {
+                if crush_addition_is_unsafe(sum, (*c).weight) {
                     return -(34 as ffi::c_int);
                 }
                 sum = sum.wrapping_add((*c).weight);
@@ -1659,8 +1654,7 @@ unsafe extern "C" fn crush_reweight_list_bucket(
             if crush_addition_is_unsafe(
                 (*bucket).h.weight,
                 *((*bucket).item_weights).offset(i as isize),
-            ) != 0
-            {
+            ) {
                 return -(34 as ffi::c_int);
             }
             (*bucket).h.weight =
@@ -1690,8 +1684,7 @@ unsafe extern "C" fn crush_reweight_tree_bucket(
             if crush_addition_is_unsafe(
                 (*bucket).h.weight,
                 *((*bucket).node_weights).offset(node as isize),
-            ) != 0
-            {
+            ) {
                 return -(34 as ffi::c_int);
             }
             (*bucket).h.weight =
@@ -1720,8 +1713,7 @@ unsafe extern "C" fn crush_reweight_straw_bucket(
             if crush_addition_is_unsafe(
                 (*bucket).h.weight,
                 *((*bucket).item_weights).offset(i as isize),
-            ) != 0
-            {
+            ) {
                 return -(34 as ffi::c_int);
             }
             (*bucket).h.weight =
@@ -1751,8 +1743,7 @@ unsafe extern "C" fn crush_reweight_straw2_bucket(
             if crush_addition_is_unsafe(
                 (*bucket).h.weight,
                 *((*bucket).item_weights).offset(i as isize),
-            ) != 0
-            {
+            ) {
                 return -(34 as ffi::c_int);
             }
             (*bucket).h.weight =
@@ -1895,51 +1886,46 @@ pub extern "C" fn crush_destroy_choose_args(args: *mut CrushChooseArg) {
         free(args as *mut ffi::c_void);
     }
 }
-#[unsafe(no_mangle)]
-pub extern "C" fn crush_addition_is_unsafe(a: U32, b: U32) -> ffi::c_int {
-    if U32::MAX.wrapping_sub(b) < a {
-        1
-    } else {
-        0
-    }
+/// Check if adding two u32 values would overflow
+pub fn crush_addition_is_unsafe(a: u32, b: u32) -> bool {
+    u32::MAX.wrapping_sub(b) < a
 }
-#[unsafe(no_mangle)]
-pub extern "C" fn crush_multiplication_is_unsafe(a: U32, b: U32) -> ffi::c_int {
+
+/// Check if multiplying two u32 values would overflow
+pub fn crush_multiplication_is_unsafe(a: u32, b: u32) -> bool {
     if a == 0 {
-        return 0;
+        return false;
     }
     if b == 0 {
-        return 1;
+        return true; // This seems odd but preserves original C logic
     }
-    if U32::MAX / b < a {
-        1
-    } else {
-        0
-    }
+    u32::MAX / b < a
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn set_legacy_crush_map(map: *mut CrushMap) {
-    (*map).choose_local_tries = 2;
-    (*map).choose_local_fallback_tries = 5;
-    (*map).choose_total_tries = 19;
-    (*map).chooseleaf_descend_once = 0;
-    (*map).chooseleaf_vary_r = 0;
-    (*map).chooseleaf_stable = 0;
-    (*map).straw_calc_version = 0;
-    (*map).allowed_bucket_algs = ((1 << CRUSH_BUCKET_UNIFORM as ffi::c_int)
+
+/// Configure a CRUSH map with legacy settings for backward compatibility
+pub fn set_legacy_crush_map(map: &mut CrushMap) {
+    map.choose_local_tries = 2;
+    map.choose_local_fallback_tries = 5;
+    map.choose_total_tries = 19;
+    map.chooseleaf_descend_once = 0;
+    map.chooseleaf_vary_r = 0;
+    map.chooseleaf_stable = 0;
+    map.straw_calc_version = 0;
+    map.allowed_bucket_algs = ((1 << CRUSH_BUCKET_UNIFORM as ffi::c_int)
         | (1 << CRUSH_BUCKET_LIST as ffi::c_int)
         | (1 << CRUSH_BUCKET_STRAW as ffi::c_int))
         as U32;
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn set_optimal_crush_map(map: *mut CrushMap) {
-    (*map).choose_local_tries = 0;
-    (*map).choose_local_fallback_tries = 0;
-    (*map).choose_total_tries = 50;
-    (*map).chooseleaf_descend_once = 1;
-    (*map).chooseleaf_vary_r = 1;
-    (*map).chooseleaf_stable = 1;
-    (*map).allowed_bucket_algs = ((1 << CRUSH_BUCKET_UNIFORM as ffi::c_int)
+
+/// Configure a CRUSH map with optimal settings
+pub fn set_optimal_crush_map(map: &mut CrushMap) {
+    map.choose_local_tries = 0;
+    map.choose_local_fallback_tries = 0;
+    map.choose_total_tries = 50;
+    map.chooseleaf_descend_once = 1;
+    map.chooseleaf_vary_r = 1;
+    map.chooseleaf_stable = 1;
+    map.allowed_bucket_algs = ((1 << CRUSH_BUCKET_UNIFORM as ffi::c_int)
         | (1 << CRUSH_BUCKET_LIST as ffi::c_int)
         | (1 << CRUSH_BUCKET_STRAW as ffi::c_int)
         | (1 << CRUSH_BUCKET_STRAW2 as ffi::c_int))
