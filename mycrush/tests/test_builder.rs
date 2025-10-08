@@ -1,6 +1,7 @@
 use googletest::prelude::*;
 use mycrush::wrapper::Map as CrushMap;
 use mycrush::wrapper::*;
+use mycrush::crush::types::*;
 
 #[googletest::test]
 fn test_crush_create() {
@@ -17,10 +18,10 @@ fn test_crush_create() {
     assert_that!(m.straw_calc_version(), eq(0));
     assert_that!(
         m.allowed_bucket_algs(),
-        eq((1 << crush_sys::crush_algorithm_CRUSH_BUCKET_UNIFORM)
-            | (1 << crush_sys::crush_algorithm_CRUSH_BUCKET_LIST)
-            | (1 << crush_sys::crush_algorithm_CRUSH_BUCKET_STRAW)
-            | (1 << crush_sys::crush_algorithm_CRUSH_BUCKET_STRAW2))
+        eq((1 << CRUSH_BUCKET_UNIFORM)
+            | (1 << CRUSH_BUCKET_LIST)
+            | (1 << CRUSH_BUCKET_STRAW)
+            | (1 << CRUSH_BUCKET_STRAW2))
     );
 }
 
@@ -39,9 +40,9 @@ fn test_crush_create_legacy() {
     assert_that!(m.straw_calc_version(), eq(0));
     assert_that!(
         m.allowed_bucket_algs(),
-        eq((1 << crush_sys::crush_algorithm_CRUSH_BUCKET_UNIFORM)
-            | (1 << crush_sys::crush_algorithm_CRUSH_BUCKET_LIST)
-            | (1 << crush_sys::crush_algorithm_CRUSH_BUCKET_STRAW))
+        eq((1 << CRUSH_BUCKET_UNIFORM)
+            | (1 << CRUSH_BUCKET_LIST)
+            | (1 << CRUSH_BUCKET_STRAW))
     );
 }
 
