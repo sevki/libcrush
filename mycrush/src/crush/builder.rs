@@ -1967,11 +1967,13 @@ pub unsafe extern "C" fn crush_make_choose_args(
     }
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_destroy_choose_args(args: *mut CrushChooseArg) {
-    free(args as *mut libc::c_void);
+pub extern "C" fn crush_destroy_choose_args(args: *mut CrushChooseArg) {
+    unsafe {
+        free(args as *mut libc::c_void);
+    }
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_addition_is_unsafe(a: U32, b: U32) -> libc::c_int {
+pub extern "C" fn crush_addition_is_unsafe(a: U32, b: U32) -> libc::c_int {
     if U32::MAX.wrapping_sub(b) < a {
         1
     } else {
@@ -1979,7 +1981,7 @@ pub unsafe extern "C" fn crush_addition_is_unsafe(a: U32, b: U32) -> libc::c_int
     }
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_multiplication_is_unsafe(a: U32, b: U32) -> libc::c_int {
+pub extern "C" fn crush_multiplication_is_unsafe(a: U32, b: U32) -> libc::c_int {
     if a == 0 {
         return 0;
     }

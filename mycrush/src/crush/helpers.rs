@@ -74,8 +74,7 @@ pub unsafe extern "C" fn crush_find_roots(
         }
     }
     
-    if roots_length == root_count {
-    } else {
+    if roots_length != root_count {
         __assert_fail(
             b"roots_length == root_count\0" as *const u8 as *const libc::c_char,
             b"/home/sevki/src/libcrush/crush/helpers.c\0" as *const u8 as *const libc::c_char,
