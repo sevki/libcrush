@@ -63,7 +63,7 @@ pub unsafe extern "C" fn crush_find_roots(
     }
     
     if roots_length != root_count {
-        panic!("Assertion failed: roots_length == root_count");
+        panic!("Assertion failed: roots_length({}) == root_count({})", roots_length, root_count);
     }
 
     *buckets = roots;

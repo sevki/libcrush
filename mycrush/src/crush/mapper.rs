@@ -876,7 +876,7 @@ unsafe extern "C" fn crush_bucket_choose(
     unsafe {
         if (*in_0).size != 0 as ffi::c_int as U32 {
         } else {
-            panic!("Assertion failed: !(in->size == 0)");
+            panic!("Assertion failed: in->size({}) != 0", (*in_0).size);
         }
 
         match (*in_0).alg as ffi::c_int {
