@@ -25,24 +25,30 @@ pub enum CrushError {
     Other(i32),
 }
 
+// Error code constants (matching POSIX errno values)
+pub const EINVAL: i32 = -22;  // Invalid argument
+pub const ENOMEM: i32 = -12;  // Out of memory
+pub const ENOENT: i32 = -2;   // No such file or directory
+pub const EEXIST: i32 = -17;  // File exists
+
 impl CrushError {
     pub fn from_errno(errno: i32) -> Self {
         match errno {
-            -22 => CrushError::InvalidArgument, // EINVAL
-            -12 => CrushError::OutOfMemory,     // ENOMEM
-            -2 => CrushError::NotFound,         // ENOENT
-            -17 => CrushError::AlreadyExists,   // EEXIST
+            EINVAL => CrushError::InvalidArgument,
+            ENOMEM => CrushError::OutOfMemory,
+            ENOENT => CrushError::NotFound,
+            EEXIST => CrushError::AlreadyExists,
             other => CrushError::Other(other),
         }
     }
 
     pub fn to_errno(&self) -> i32 {
         match self {
-            CrushError::InvalidArgument => -22,
-            CrushError::OutOfMemory => -12,
-            CrushError::NotFound => -2,
-            CrushError::AlreadyExists => -17,
-            CrushError::InvalidOperation => -22,
+            CrushError::InvalidArgument => EINVAL,
+            CrushError::OutOfMemory => ENOMEM,
+            CrushError::NotFound => ENOENT,
+            CrushError::AlreadyExists => EEXIST,
+            CrushError::InvalidOperation => EINVAL,
             CrushError::Other(code) => *code,
         }
     }

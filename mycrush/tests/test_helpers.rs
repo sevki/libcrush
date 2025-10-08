@@ -1,6 +1,8 @@
 use googletest::prelude::*;
 use mycrush::wrapper::Map as CrushMap;
 use mycrush::wrapper::*;
+use mycrush::crush::types::*;
+
 #[googletest::test]
 fn test_crush_find_roots() {
     let mut m = CrushMap::new();
@@ -48,5 +50,5 @@ fn test_crush_find_roots() {
     // Should return error
     let result = m.find_roots();
     assert!(result.is_err());
-    assert_that!(result.unwrap_err(), eq(-libc::EINVAL));
+    assert_that!(result.unwrap_err(), eq(EINVAL));
 }

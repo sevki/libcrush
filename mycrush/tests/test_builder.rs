@@ -81,7 +81,7 @@ fn test_crush_add_bucket() {
         .make_bucket(BucketAlgorithm::Straw2, hash, type_, &[], &[])
         .unwrap();
     let result = m.add_bucket(bucketno, b2);
-    assert_that!(result, err(eq(-libc::EEXIST)));
+    assert_that!(result, err(eq(EEXIST)));
 
     // Add many buckets
     for _ in 0..1024 {
@@ -118,7 +118,7 @@ fn test_crush_bucket_add_item_uniform() {
     /* For a kind CRUSH_BUCKET_UNIFORM, if no item weights has been
     passed to 'crush_make_bucket', by default 0 is used. */
     assert_that!(b2.add_item(&mut m, 0, 0), ok(()));
-    assert_that!(b2.add_item(&mut m, 0, 1), err(eq(-libc::EINVAL)));
+    assert_that!(b2.add_item(&mut m, 0, 1), err(eq(EINVAL)));
 }
 
 #[googletest::test]
