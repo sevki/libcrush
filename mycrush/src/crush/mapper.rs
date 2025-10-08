@@ -680,27 +680,26 @@ unsafe extern "C" fn bucket_list_choose(
         *((*bucket).h.items).offset(0 as libc::c_int as isize)
     }
 }
-unsafe extern "C" fn height(mut n: libc::c_int) -> libc::c_int {
-    let mut h: libc::c_int = 0 as libc::c_int;
-    while n & 1 as libc::c_int == 0 as libc::c_int {
+fn height(mut n: libc::c_int) -> libc::c_int {
+    let mut h = 0;
+    while n & 1 == 0 {
         h += 1;
-        n >>= 1 as libc::c_int;
+        n >>= 1;
     }
     h
 }
-unsafe extern "C" fn left(mut x: libc::c_int) -> libc::c_int {
-    unsafe {
-        let mut h: libc::c_int = height(x);
-        x - ((1 as libc::c_int) << (h - 1 as libc::c_int))
-    }
+
+fn left(x: libc::c_int) -> libc::c_int {
+    let h = height(x);
+    x - ((1 as libc::c_int) << (h - 1 as libc::c_int))
 }
-unsafe extern "C" fn right(mut x: libc::c_int) -> libc::c_int {
-    unsafe {
-        let mut h: libc::c_int = height(x);
-        x + ((1 as libc::c_int) << (h - 1 as libc::c_int))
-    }
+
+fn right(x: libc::c_int) -> libc::c_int {
+    let h = height(x);
+    x + ((1 as libc::c_int) << (h - 1 as libc::c_int))
 }
-unsafe extern "C" fn terminal(mut x: libc::c_int) -> libc::c_int {
+
+fn terminal(x: libc::c_int) -> libc::c_int {
     x & 1 as libc::c_int
 }
 unsafe extern "C" fn bucket_tree_choose(
