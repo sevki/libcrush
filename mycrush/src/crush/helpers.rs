@@ -17,7 +17,6 @@ unsafe extern "C" {
         __function: *const ffi::c_char,
     ) -> !;
     fn malloc(_: ffi::c_ulong) -> *mut ffi::c_void;
-    fn memset(_: *mut ffi::c_void, _: ffi::c_int, _: ffi::c_ulong) -> *mut ffi::c_void;
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_find_roots(
@@ -25,14 +24,10 @@ pub unsafe extern "C" fn crush_find_roots(
     buckets: *mut *mut ffi::c_int,
 ) -> ffi::c_int {
     let vla = (*map).max_buckets as usize;
-    let mut ref_0: Vec<ffi::c_int> = ::std::vec::from_elem(0, vla);
+    let mut ref_0: Vec<ffi::c_int> = vec![0; vla];
     let mut root_count: ffi::c_int = (*map).max_buckets;
     
-    memset(
-        ref_0.as_mut_ptr() as *mut ffi::c_void,
-        '\0' as i32,
-        (vla * ::core::mem::size_of::<ffi::c_int>()) as ffi::c_ulong,
-    );
+    // Vec is already zeroed by vec![0; vla], no need for memset
     
     for pos in 0..(*map).max_buckets {
         let b: *mut CrushBucket = *((*map).buckets).offset(pos as isize);
@@ -45,11 +40,10 @@ pub unsafe extern "C" fn crush_find_roots(
                     if item >= (*map).max_buckets {
                         return -22;
                     }
-                    if *ref_0.as_mut_ptr().offset(item as isize) == 0 {
+                    if ref_0[item as usize] == 0 {
                         root_count -= 1;
                     }
-                    let fresh0 = &mut (*ref_0.as_mut_ptr().offset(item as isize));
-                    *fresh0 += 1;
+                    ref_0[item as usize] += 1;
                 }
             }
         }
@@ -66,7 +60,7 @@ pub unsafe extern "C" fn crush_find_roots(
     let mut roots_length: ffi::c_int = 0;
     for pos in 0..(*map).max_buckets {
         if !(*((*map).buckets).offset(pos as isize)).is_null()
-            && *ref_0.as_mut_ptr().offset(pos as isize) == 0
+            && ref_0[pos as usize] == 0
         {
             let fresh1 = roots_length;
             roots_length += 1;
