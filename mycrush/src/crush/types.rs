@@ -33,20 +33,38 @@ pub struct CrushRuleStep {
 }
 
 // CRUSH rule opcodes
-pub type CrushOpcodes = U32;
-pub const CRUSH_RULE_NOOP: CrushOpcodes = 0;
-pub const CRUSH_RULE_TAKE: CrushOpcodes = 1;
-pub const CRUSH_RULE_CHOOSE_FIRSTN: CrushOpcodes = 2;
-pub const CRUSH_RULE_CHOOSE_INDEP: CrushOpcodes = 3;
-pub const CRUSH_RULE_EMIT: CrushOpcodes = 4;
-pub const CRUSH_RULE_CHOOSELEAF_FIRSTN: CrushOpcodes = 6;
-pub const CRUSH_RULE_CHOOSELEAF_INDEP: CrushOpcodes = 7;
-pub const CRUSH_RULE_SET_CHOOSE_TRIES: CrushOpcodes = 8;
-pub const CRUSH_RULE_SET_CHOOSELEAF_TRIES: CrushOpcodes = 9;
-pub const CRUSH_RULE_SET_CHOOSE_LOCAL_TRIES: CrushOpcodes = 10;
-pub const CRUSH_RULE_SET_CHOOSE_LOCAL_FALLBACK_TRIES: CrushOpcodes = 11;
-pub const CRUSH_RULE_SET_CHOOSELEAF_VARY_R: CrushOpcodes = 12;
-pub const CRUSH_RULE_SET_CHOOSELEAF_STABLE: CrushOpcodes = 13;
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[repr(u32)]
+pub enum CrushOpcodes {
+    Noop = 0,
+    Take = 1,
+    ChooseFirstn = 2,
+    ChooseIndep = 3,
+    Emit = 4,
+    ChooseleafFirstn = 6,
+    ChooseleafIndep = 7,
+    SetChooseTries = 8,
+    SetChooseleafTries = 9,
+    SetChooseLocalTries = 10,
+    SetChooseLocalFallbackTries = 11,
+    SetChooseleafVaryR = 12,
+    SetChooseleafStable = 13,
+}
+
+// Keep legacy constants for backwards compatibility
+pub const CRUSH_RULE_NOOP: u32 = CrushOpcodes::Noop as u32;
+pub const CRUSH_RULE_TAKE: u32 = CrushOpcodes::Take as u32;
+pub const CRUSH_RULE_CHOOSE_FIRSTN: u32 = CrushOpcodes::ChooseFirstn as u32;
+pub const CRUSH_RULE_CHOOSE_INDEP: u32 = CrushOpcodes::ChooseIndep as u32;
+pub const CRUSH_RULE_EMIT: u32 = CrushOpcodes::Emit as u32;
+pub const CRUSH_RULE_CHOOSELEAF_FIRSTN: u32 = CrushOpcodes::ChooseleafFirstn as u32;
+pub const CRUSH_RULE_CHOOSELEAF_INDEP: u32 = CrushOpcodes::ChooseleafIndep as u32;
+pub const CRUSH_RULE_SET_CHOOSE_TRIES: u32 = CrushOpcodes::SetChooseTries as u32;
+pub const CRUSH_RULE_SET_CHOOSELEAF_TRIES: u32 = CrushOpcodes::SetChooseleafTries as u32;
+pub const CRUSH_RULE_SET_CHOOSE_LOCAL_TRIES: u32 = CrushOpcodes::SetChooseLocalTries as u32;
+pub const CRUSH_RULE_SET_CHOOSE_LOCAL_FALLBACK_TRIES: u32 = CrushOpcodes::SetChooseLocalFallbackTries as u32;
+pub const CRUSH_RULE_SET_CHOOSELEAF_VARY_R: u32 = CrushOpcodes::SetChooseleafVaryR as u32;
+pub const CRUSH_RULE_SET_CHOOSELEAF_STABLE: u32 = CrushOpcodes::SetChooseleafStable as u32;
 
 // CRUSH rule mask
 #[derive(Copy, Clone)]
@@ -68,12 +86,22 @@ pub struct CrushRule {
 }
 
 // CRUSH bucket algorithms
-pub type CrushAlgorithm = U32;
-pub const CRUSH_BUCKET_UNIFORM: CrushAlgorithm = 1;
-pub const CRUSH_BUCKET_LIST: CrushAlgorithm = 2;
-pub const CRUSH_BUCKET_TREE: CrushAlgorithm = 3;
-pub const CRUSH_BUCKET_STRAW: CrushAlgorithm = 4;
-pub const CRUSH_BUCKET_STRAW2: CrushAlgorithm = 5;
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[repr(u32)]
+pub enum CrushAlgorithm {
+    Uniform = 1,
+    List = 2,
+    Tree = 3,
+    Straw = 4,
+    Straw2 = 5,
+}
+
+// Keep legacy constants for backwards compatibility
+pub const CRUSH_BUCKET_UNIFORM: u32 = CrushAlgorithm::Uniform as u32;
+pub const CRUSH_BUCKET_LIST: u32 = CrushAlgorithm::List as u32;
+pub const CRUSH_BUCKET_TREE: u32 = CrushAlgorithm::Tree as u32;
+pub const CRUSH_BUCKET_STRAW: u32 = CrushAlgorithm::Straw as u32;
+pub const CRUSH_BUCKET_STRAW2: u32 = CrushAlgorithm::Straw2 as u32;
 
 // Base CRUSH bucket
 #[derive(Copy, Clone)]
