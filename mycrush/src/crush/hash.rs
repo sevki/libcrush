@@ -9,11 +9,11 @@
 )]
 use crate::crush::types::*;
 use ::libc;
-unsafe extern "C" fn crush_hash32_rjenkins1(mut a: __u32) -> __u32 {
-    let mut hash: __u32 = 1315423911 as libc::c_int as __u32 ^ a;
-    let mut b: __u32 = a;
-    let mut x: __u32 = 231232 as libc::c_int as __u32;
-    let mut y: __u32 = 1232 as libc::c_int as __u32;
+unsafe extern "C" fn crush_hash32_rjenkins1(mut a: U32) -> U32 {
+    let mut hash: U32 = 1315423911 as libc::c_int as U32 ^ a;
+    let mut b: U32 = a;
+    let mut x: U32 = 231232 as libc::c_int as U32;
+    let mut y: U32 = 1232 as libc::c_int as U32;
     b = b.wrapping_sub(x);
     b = b.wrapping_sub(hash);
     b ^= hash >> 13 as libc::c_int;
@@ -70,10 +70,10 @@ unsafe extern "C" fn crush_hash32_rjenkins1(mut a: __u32) -> __u32 {
     hash ^= a >> 15 as libc::c_int;
     hash
 }
-unsafe extern "C" fn crush_hash32_rjenkins1_2(mut a: __u32, mut b: __u32) -> __u32 {
-    let mut hash: __u32 = 1315423911 as libc::c_int as __u32 ^ a ^ b;
-    let mut x: __u32 = 231232 as libc::c_int as __u32;
-    let mut y: __u32 = 1232 as libc::c_int as __u32;
+unsafe extern "C" fn crush_hash32_rjenkins1_2(mut a: U32, mut b: U32) -> U32 {
+    let mut hash: U32 = 1315423911 as libc::c_int as U32 ^ a ^ b;
+    let mut x: U32 = 231232 as libc::c_int as U32;
+    let mut y: U32 = 1232 as libc::c_int as U32;
     a = a.wrapping_sub(b);
     a = a.wrapping_sub(hash);
     a ^= hash >> 13 as libc::c_int;
@@ -157,10 +157,10 @@ unsafe extern "C" fn crush_hash32_rjenkins1_2(mut a: __u32, mut b: __u32) -> __u
     hash ^= y >> 15 as libc::c_int;
     hash
 }
-unsafe extern "C" fn crush_hash32_rjenkins1_3(mut a: __u32, mut b: __u32, mut c: __u32) -> __u32 {
-    let mut hash: __u32 = 1315423911 as libc::c_int as __u32 ^ a ^ b ^ c;
-    let mut x: __u32 = 231232 as libc::c_int as __u32;
-    let mut y: __u32 = 1232 as libc::c_int as __u32;
+unsafe extern "C" fn crush_hash32_rjenkins1_3(mut a: U32, mut b: U32, mut c: U32) -> U32 {
+    let mut hash: U32 = 1315423911 as libc::c_int as U32 ^ a ^ b ^ c;
+    let mut x: U32 = 231232 as libc::c_int as U32;
+    let mut y: U32 = 1232 as libc::c_int as U32;
     a = a.wrapping_sub(b);
     a = a.wrapping_sub(hash);
     a ^= hash >> 13 as libc::c_int;
@@ -299,14 +299,14 @@ unsafe extern "C" fn crush_hash32_rjenkins1_3(mut a: __u32, mut b: __u32, mut c:
     hash
 }
 unsafe extern "C" fn crush_hash32_rjenkins1_4(
-    mut a: __u32,
-    mut b: __u32,
-    mut c: __u32,
-    mut d: __u32,
-) -> __u32 {
-    let mut hash: __u32 = 1315423911 as libc::c_int as __u32 ^ a ^ b ^ c ^ d;
-    let mut x: __u32 = 231232 as libc::c_int as __u32;
-    let mut y: __u32 = 1232 as libc::c_int as __u32;
+    mut a: U32,
+    mut b: U32,
+    mut c: U32,
+    mut d: U32,
+) -> U32 {
+    let mut hash: U32 = 1315423911 as libc::c_int as U32 ^ a ^ b ^ c ^ d;
+    let mut x: U32 = 231232 as libc::c_int as U32;
+    let mut y: U32 = 1232 as libc::c_int as U32;
     a = a.wrapping_sub(b);
     a = a.wrapping_sub(hash);
     a ^= hash >> 13 as libc::c_int;
@@ -472,15 +472,15 @@ unsafe extern "C" fn crush_hash32_rjenkins1_4(
     hash
 }
 unsafe extern "C" fn crush_hash32_rjenkins1_5(
-    mut a: __u32,
-    mut b: __u32,
-    mut c: __u32,
-    mut d: __u32,
-    mut e: __u32,
-) -> __u32 {
-    let mut hash: __u32 = 1315423911 as libc::c_int as __u32 ^ a ^ b ^ c ^ d ^ e;
-    let mut x: __u32 = 231232 as libc::c_int as __u32;
-    let mut y: __u32 = 1232 as libc::c_int as __u32;
+    mut a: U32,
+    mut b: U32,
+    mut c: U32,
+    mut d: U32,
+    mut e: U32,
+) -> U32 {
+    let mut hash: U32 = 1315423911 as libc::c_int as U32 ^ a ^ b ^ c ^ d ^ e;
+    let mut x: U32 = 231232 as libc::c_int as U32;
+    let mut y: U32 = 1232 as libc::c_int as U32;
     a = a.wrapping_sub(b);
     a = a.wrapping_sub(hash);
     a ^= hash >> 13 as libc::c_int;
@@ -700,62 +700,68 @@ unsafe extern "C" fn crush_hash32_rjenkins1_5(
     hash
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_hash32(mut type_0: libc::c_int, mut a: __u32) -> __u32 { unsafe {
-    match type_0 {
-        0 => crush_hash32_rjenkins1(a),
-        _ => 0 as libc::c_int as __u32,
+pub unsafe extern "C" fn crush_hash32(mut type_0: libc::c_int, mut a: U32) -> U32 {
+    unsafe {
+        match type_0 {
+            0 => crush_hash32_rjenkins1(a),
+            _ => 0 as libc::c_int as U32,
+        }
     }
-}}
+}
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn crush_hash32_2(
-    mut type_0: libc::c_int,
-    mut a: __u32,
-    mut b: __u32,
-) -> __u32 { unsafe {
-    match type_0 {
-        0 => crush_hash32_rjenkins1_2(a, b),
-        _ => 0 as libc::c_int as __u32,
+pub unsafe extern "C" fn crush_hash32_2(mut type_0: libc::c_int, mut a: U32, mut b: U32) -> U32 {
+    unsafe {
+        match type_0 {
+            0 => crush_hash32_rjenkins1_2(a, b),
+            _ => 0 as libc::c_int as U32,
+        }
     }
-}}
+}
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash32_3(
     mut type_0: libc::c_int,
-    mut a: __u32,
-    mut b: __u32,
-    mut c: __u32,
-) -> __u32 { unsafe {
-    match type_0 {
-        0 => crush_hash32_rjenkins1_3(a, b, c),
-        _ => 0 as libc::c_int as __u32,
+    mut a: U32,
+    mut b: U32,
+    mut c: U32,
+) -> U32 {
+    unsafe {
+        match type_0 {
+            0 => crush_hash32_rjenkins1_3(a, b, c),
+            _ => 0 as libc::c_int as U32,
+        }
     }
-}}
+}
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash32_4(
     mut type_0: libc::c_int,
-    mut a: __u32,
-    mut b: __u32,
-    mut c: __u32,
-    mut d: __u32,
-) -> __u32 { unsafe {
-    match type_0 {
-        0 => crush_hash32_rjenkins1_4(a, b, c, d),
-        _ => 0 as libc::c_int as __u32,
+    mut a: U32,
+    mut b: U32,
+    mut c: U32,
+    mut d: U32,
+) -> U32 {
+    unsafe {
+        match type_0 {
+            0 => crush_hash32_rjenkins1_4(a, b, c, d),
+            _ => 0 as libc::c_int as U32,
+        }
     }
-}}
+}
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash32_5(
     mut type_0: libc::c_int,
-    mut a: __u32,
-    mut b: __u32,
-    mut c: __u32,
-    mut d: __u32,
-    mut e: __u32,
-) -> __u32 { unsafe {
-    match type_0 {
-        0 => crush_hash32_rjenkins1_5(a, b, c, d, e),
-        _ => 0 as libc::c_int as __u32,
+    mut a: U32,
+    mut b: U32,
+    mut c: U32,
+    mut d: U32,
+    mut e: U32,
+) -> U32 {
+    unsafe {
+        match type_0 {
+            0 => crush_hash32_rjenkins1_5(a, b, c, d, e),
+            _ => 0 as libc::c_int as U32,
+        }
     }
-}}
+}
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn crush_hash_name(mut type_0: libc::c_int) -> *const libc::c_char {
     match type_0 {

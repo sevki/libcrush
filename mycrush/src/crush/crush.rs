@@ -34,7 +34,7 @@ pub unsafe extern "C" fn crush_get_bucket_item_weight(
     mut p: libc::c_int,
 ) -> libc::c_int {
     unsafe {
-        if p as __u32 >= (*b).size {
+        if p as U32 >= (*b).size {
             return 0 as libc::c_int;
         }
         match (*b).alg as libc::c_int {
@@ -161,26 +161,24 @@ pub unsafe extern "C" fn crush_destroy_bucket(mut b: *mut CrushBucket) {
 pub unsafe extern "C" fn crush_destroy(mut map: *mut CrushMap) {
     unsafe {
         if !((*map).buckets).is_null() {
-            let mut b: __s32 = 0;
+            let mut b: S32 = 0;
             b = 0 as libc::c_int;
             while b < (*map).max_buckets {
                 if !(*((*map).buckets).offset(b as isize)).is_null() {
                     crush_destroy_bucket(*((*map).buckets).offset(b as isize));
                 }
                 b += 1;
-                b;
             }
             if !((*map).buckets).is_null() {
                 free((*map).buckets as *mut libc::c_void);
             }
         }
         if !((*map).rules).is_null() {
-            let mut b_0: __u32 = 0;
-            b_0 = 0 as libc::c_int as __u32;
+            let mut b_0: U32 = 0;
+            b_0 = 0 as libc::c_int as U32;
             while b_0 < (*map).max_rules {
                 crush_destroy_rule(*((*map).rules).offset(b_0 as isize));
                 b_0 = b_0.wrapping_add(1);
-                b_0;
             }
             if !((*map).rules).is_null() {
                 free((*map).rules as *mut libc::c_void);
