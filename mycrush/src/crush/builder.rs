@@ -370,7 +370,7 @@ pub unsafe fn crush_make_list_bucket(
         std::ptr::null_mut::<CrushBucketList>()
     }
 }
-unsafe extern "C" fn height(mut n: ffi::c_int) -> ffi::c_int {
+unsafe fn height(mut n: ffi::c_int) -> ffi::c_int {
     let mut h: ffi::c_int = 0;
     while n & 1 == 0 {
         h += 1;
@@ -378,10 +378,10 @@ unsafe extern "C" fn height(mut n: ffi::c_int) -> ffi::c_int {
     }
     h
 }
-unsafe extern "C" fn on_right(mut n: ffi::c_int, mut h: ffi::c_int) -> ffi::c_int {
+unsafe fn on_right(mut n: ffi::c_int, mut h: ffi::c_int) -> ffi::c_int {
     n & (1) << (h + 1)
 }
-unsafe extern "C" fn parent(mut n: ffi::c_int) -> ffi::c_int {
+unsafe fn parent(mut n: ffi::c_int) -> ffi::c_int {
     unsafe {
         let mut h: ffi::c_int = height(n);
         if on_right(n, h) != 0 {
@@ -391,7 +391,7 @@ unsafe extern "C" fn parent(mut n: ffi::c_int) -> ffi::c_int {
         }
     }
 }
-unsafe extern "C" fn calc_depth(mut size: ffi::c_int) -> ffi::c_int {
+unsafe fn calc_depth(mut size: ffi::c_int) -> ffi::c_int {
     if size == 0 {
         return 0;
     }
@@ -1569,7 +1569,7 @@ pub unsafe fn crush_bucket_adjust_item_weight(
         }
     }
 }
-unsafe extern "C" fn crush_reweight_uniform_bucket(
+unsafe fn crush_reweight_uniform_bucket(
     mut map: *mut CrushMap,
     mut bucket: *mut CrushBucketUniform,
 ) -> ffi::c_int {
@@ -1602,7 +1602,7 @@ unsafe extern "C" fn crush_reweight_uniform_bucket(
         0
     }
 }
-unsafe extern "C" fn crush_reweight_list_bucket(
+unsafe fn crush_reweight_list_bucket(
     mut map: *mut CrushMap,
     mut bucket: *mut CrushBucketList,
 ) -> ffi::c_int {
@@ -1631,7 +1631,7 @@ unsafe extern "C" fn crush_reweight_list_bucket(
         0
     }
 }
-unsafe extern "C" fn crush_reweight_tree_bucket(
+unsafe fn crush_reweight_tree_bucket(
     mut map: *mut CrushMap,
     mut bucket: *mut CrushBucketTree,
 ) -> ffi::c_int {
@@ -1661,7 +1661,7 @@ unsafe extern "C" fn crush_reweight_tree_bucket(
         0
     }
 }
-unsafe extern "C" fn crush_reweight_straw_bucket(
+unsafe fn crush_reweight_straw_bucket(
     mut map: *mut CrushMap,
     mut bucket: *mut CrushBucketStraw,
 ) -> ffi::c_int {
@@ -1691,7 +1691,7 @@ unsafe extern "C" fn crush_reweight_straw_bucket(
         0
     }
 }
-unsafe extern "C" fn crush_reweight_straw2_bucket(
+unsafe fn crush_reweight_straw2_bucket(
     mut map: *mut CrushMap,
     mut bucket: *mut CrushBucketStraw2,
 ) -> ffi::c_int {

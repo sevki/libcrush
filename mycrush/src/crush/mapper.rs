@@ -556,7 +556,7 @@ pub unsafe fn crush_find_rule(
         -(1 as ffi::c_int)
     }
 }
-unsafe extern "C" fn bucket_perm_choose(
+unsafe fn bucket_perm_choose(
     mut bucket: *const CrushBucket,
     mut work: *mut CrushWorkBucket,
     mut x: ffi::c_int,
@@ -636,7 +636,7 @@ unsafe extern "C" fn bucket_perm_choose(
         *((*bucket).items).offset(s as isize)
     }
 }
-unsafe extern "C" fn bucket_uniform_choose(
+unsafe fn bucket_uniform_choose(
     mut bucket: *const CrushBucketUniform,
     mut work: *mut CrushWorkBucket,
     mut x: ffi::c_int,
@@ -644,7 +644,7 @@ unsafe extern "C" fn bucket_uniform_choose(
 ) -> ffi::c_int {
     unsafe { bucket_perm_choose(&(*bucket).h, work, x, r) }
 }
-unsafe extern "C" fn bucket_list_choose(
+unsafe fn bucket_list_choose(
     mut bucket: *const CrushBucketList,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
@@ -693,7 +693,7 @@ fn right(x: ffi::c_int) -> ffi::c_int {
 fn terminal(x: ffi::c_int) -> ffi::c_int {
     x & 1 as ffi::c_int
 }
-unsafe extern "C" fn bucket_tree_choose(
+unsafe fn bucket_tree_choose(
     mut bucket: *const CrushBucketTree,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
@@ -725,7 +725,7 @@ unsafe extern "C" fn bucket_tree_choose(
         *((*bucket).h.items).offset((n >> 1 as ffi::c_int) as isize)
     }
 }
-unsafe extern "C" fn bucket_straw_choose(
+unsafe fn bucket_straw_choose(
     mut bucket: *const CrushBucketStraw,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
@@ -754,7 +754,7 @@ unsafe extern "C" fn bucket_straw_choose(
         *((*bucket).h.items).offset(high as isize)
     }
 }
-unsafe extern "C" fn crush_ln(mut xin: ffi::c_uint) -> U64 {
+unsafe fn crush_ln(mut xin: ffi::c_uint) -> U64 {
     unsafe {
         let mut x: ffi::c_uint = xin;
         let mut iexpon: ffi::c_int = 0;
@@ -790,7 +790,7 @@ unsafe extern "C" fn crush_ln(mut xin: ffi::c_uint) -> U64 {
     }
 }
 #[inline]
-unsafe extern "C" fn get_choose_arg_weights(
+unsafe fn get_choose_arg_weights(
     mut bucket: *const CrushBucketStraw2,
     mut arg: *const CrushChooseArg,
     mut position: ffi::c_int,
@@ -810,7 +810,7 @@ unsafe extern "C" fn get_choose_arg_weights(
     }
 }
 #[inline]
-unsafe extern "C" fn get_choose_arg_ids(
+unsafe fn get_choose_arg_ids(
     mut bucket: *const CrushBucketStraw2,
     mut arg: *const CrushChooseArg,
 ) -> *mut ffi::c_int {
@@ -821,7 +821,7 @@ unsafe extern "C" fn get_choose_arg_ids(
         (*arg).ids
     }
 }
-unsafe extern "C" fn bucket_straw2_choose(
+unsafe fn bucket_straw2_choose(
     mut bucket: *const CrushBucketStraw2,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
@@ -862,7 +862,7 @@ unsafe extern "C" fn bucket_straw2_choose(
         *((*bucket).h.items).offset(high as isize)
     }
 }
-unsafe extern "C" fn crush_bucket_choose(
+unsafe fn crush_bucket_choose(
     mut in_0: *const CrushBucket,
     mut work: *mut CrushWorkBucket,
     mut x: ffi::c_int,
@@ -886,7 +886,7 @@ unsafe extern "C" fn crush_bucket_choose(
         }
     }
 }
-unsafe extern "C" fn is_out(
+unsafe fn is_out(
     mut _map: *const CrushMap,
     mut weight: *const U32,
     mut weight_max: ffi::c_int,
@@ -911,7 +911,7 @@ unsafe extern "C" fn is_out(
         1 as ffi::c_int
     }
 }
-unsafe extern "C" fn crush_choose_firstn(
+unsafe fn crush_choose_firstn(
     mut map: *const CrushMap,
     mut work: *mut CrushWork,
     mut bucket: *const CrushBucket,
@@ -1122,7 +1122,7 @@ unsafe extern "C" fn crush_choose_firstn(
         outpos
     }
 }
-unsafe extern "C" fn crush_choose_indep(
+unsafe fn crush_choose_indep(
     mut map: *const CrushMap,
     mut work: *mut CrushWork,
     mut bucket: *const CrushBucket,
