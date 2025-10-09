@@ -799,16 +799,16 @@ unsafe fn get_choose_arg_weights(
         if arg.is_null() {
             return (*bucket).item_weights;
         }
-        // SAFETY: arg is not null as verified above
-        let arg_ref = &*arg;
-        if arg_ref.weight_set.is_null() || arg_ref.weight_set_size == 0 as ffi::c_int as U32 {
+        // Read fields using ptr::read to avoid creating intermediate references
+        let weight_set = std::ptr::read(std::ptr::addr_of!((*arg).weight_set));
+        let weight_set_size = std::ptr::read(std::ptr::addr_of!((*arg).weight_set_size));
+        if weight_set.is_null() || weight_set_size == 0 as ffi::c_int as U32 {
             return (*bucket).item_weights;
         }
-        if position as U32 >= arg_ref.weight_set_size {
-            position =
-                arg_ref.weight_set_size.wrapping_sub(1 as ffi::c_int as U32) as ffi::c_int;
+        if position as U32 >= weight_set_size {
+            position = weight_set_size.wrapping_sub(1 as ffi::c_int as U32) as ffi::c_int;
         }
-        (*arg_ref.weight_set.offset(position as isize)).weights
+        (*weight_set.offset(position as isize)).weights
     }
 }
 #[inline]
@@ -820,12 +820,12 @@ unsafe fn get_choose_arg_ids(
         if arg.is_null() {
             return (*bucket).h.items;
         }
-        // SAFETY: arg is not null as verified above
-        let arg_ref = &*arg;
-        if arg_ref.ids.is_null() {
+        // Read field using ptr::read to avoid creating intermediate references
+        let ids = std::ptr::read(std::ptr::addr_of!((*arg).ids));
+        if ids.is_null() {
             return (*bucket).h.items;
         }
-        arg_ref.ids
+        ids
     }
 }
 unsafe fn bucket_straw2_choose(
@@ -995,8 +995,7 @@ unsafe fn crush_choose_firstn(
                                 x,
                                 r,
                                 if !choose_args.is_null() {
-                                    &*choose_args
-                                        .offset((-(1 as ffi::c_int) - (*in_0).id) as isize)
+                                    choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize)
                                 } else {
                                     std::ptr::null::<CrushChooseArg>()
                                 },
@@ -1194,7 +1193,7 @@ unsafe fn crush_choose_indep(
                             x,
                             r,
                             if !choose_args.is_null() {
-                                &*choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize)
+                                choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize)
                             } else {
                                 std::ptr::null::<CrushChooseArg>()
                             },
