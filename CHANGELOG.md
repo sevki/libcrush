@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.0.0](https://github.com/sevki/libcrush/compare/v0.1.2...v1.0.0) (2025-10-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mycrush:** Functions no longer expose C ABI. Code depending on C compatibility will need updates.
+
+### Features
+
+* wasm bindings ([f29f155](https://github.com/sevki/libcrush/commit/f29f155c31ee7060fc754b37cded74d5ec430f4a))
+
+
+### Bug Fixes
+
+* missing instructions for GH Agents ([aae4cf0](https://github.com/sevki/libcrush/commit/aae4cf03f50aaf3ff0823502015845f2f5491ba4))
+* **mycrush:** remove unnecessary unsafe blocks in wrapper.rs ([31d0315](https://github.com/sevki/libcrush/commit/31d0315794d42b6897c85991ebd4121c7a3a25a0))
+
+
+### Code Refactoring
+
+* **mycrush:** convert to pure Rust implementation without C ABI ([a4c821f](https://github.com/sevki/libcrush/commit/a4c821f469f82e9d5a550744f911c1132326fc20))
+
 ## [0.1.2](https://github.com/sevki/libcrush/compare/v0.1.1...v0.1.2) (2025-10-08)
 
 
