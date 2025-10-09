@@ -799,14 +799,16 @@ unsafe fn get_choose_arg_weights(
         if arg.is_null() {
             return (*bucket).item_weights;
         }
-        if ((*arg).weight_set).is_null() || (*arg).weight_set_size == 0 as ffi::c_int as U32 {
+        // SAFETY: arg is not null as verified above
+        let arg_ref = &*arg;
+        if arg_ref.weight_set.is_null() || arg_ref.weight_set_size == 0 as ffi::c_int as U32 {
             return (*bucket).item_weights;
         }
-        if position as U32 >= (*arg).weight_set_size {
+        if position as U32 >= arg_ref.weight_set_size {
             position =
-                ((*arg).weight_set_size).wrapping_sub(1 as ffi::c_int as U32) as ffi::c_int;
+                arg_ref.weight_set_size.wrapping_sub(1 as ffi::c_int as U32) as ffi::c_int;
         }
-        (*((*arg).weight_set).offset(position as isize)).weights
+        (*arg_ref.weight_set.offset(position as isize)).weights
     }
 }
 #[inline]
@@ -818,10 +820,12 @@ unsafe fn get_choose_arg_ids(
         if arg.is_null() {
             return (*bucket).h.items;
         }
-        if ((*arg).ids).is_null() {
+        // SAFETY: arg is not null as verified above
+        let arg_ref = &*arg;
+        if arg_ref.ids.is_null() {
             return (*bucket).h.items;
         }
-        (*arg).ids
+        arg_ref.ids
     }
 }
 unsafe fn bucket_straw2_choose(
