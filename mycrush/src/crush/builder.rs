@@ -275,12 +275,12 @@ pub unsafe fn crush_make_list_bucket(
         std::mem::forget(items_vec);
         
         // Allocate item_weights array
-        let mut item_weights_vec: Vec<U32> = Vec::with_capacity(size as usize);
+        let mut item_weights_vec: Vec<U32> = vec![0; size as usize];
         (*bucket).item_weights = item_weights_vec.as_mut_ptr();
         std::mem::forget(item_weights_vec);
         
         // Allocate sum_weights array
-        let mut sum_weights_vec: Vec<U32> = Vec::with_capacity(size as usize);
+        let mut sum_weights_vec: Vec<U32> = vec![0; size as usize];
         (*bucket).sum_weights = sum_weights_vec.as_mut_ptr();
         std::mem::forget(sum_weights_vec);
         
@@ -570,12 +570,12 @@ pub unsafe fn crush_make_straw_bucket(
         std::mem::forget(items_vec);
         
         // Allocate item_weights array
-        let mut item_weights_vec: Vec<U32> = Vec::with_capacity(size as usize);
+        let mut item_weights_vec: Vec<U32> = vec![0; size as usize];
         (*bucket).item_weights = item_weights_vec.as_mut_ptr();
         std::mem::forget(item_weights_vec);
         
         // Allocate straws array
-        let mut straws_vec: Vec<U32> = Vec::with_capacity(size as usize);
+        let mut straws_vec: Vec<U32> = vec![0; size as usize];
         (*bucket).straws = straws_vec.as_mut_ptr();
         std::mem::forget(straws_vec);
         
@@ -618,7 +618,7 @@ pub unsafe fn crush_make_straw2_bucket(
         std::mem::forget(items_vec);
         
         // Allocate item_weights array
-        let mut item_weights_vec: Vec<U32> = Vec::with_capacity(size as usize);
+        let mut item_weights_vec: Vec<U32> = vec![0; size as usize];
         (*bucket).item_weights = item_weights_vec.as_mut_ptr();
         std::mem::forget(item_weights_vec);
         
@@ -1575,7 +1575,8 @@ pub unsafe fn crush_make_choose_args(
             ) as ffi::c_int;
         
         // Allocate using std::alloc instead of malloc
-        let layout = std::alloc::Layout::from_size_align_unchecked(size as usize, std::mem::align_of::<CrushChooseArg>());
+        let layout = std::alloc::Layout::from_size_align(size as usize, std::mem::align_of::<CrushChooseArg>())
+            .expect("Invalid layout for CrushChooseArg allocation");
         let space = std::alloc::alloc(layout) as *mut ffi::c_char;
         
         let mut arg: *mut CrushChooseArg = space as *mut CrushChooseArg;
