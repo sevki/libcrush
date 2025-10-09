@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::*;
+
 use crate::crush::builder::*;
 use crate::crush::crush::*;
 use crate::crush::mapper::{crush_do_rule, crush_init_workspace};
@@ -9,6 +11,7 @@ use std::slice;
 pub use crate::crush::builder::crush_bucket_add_item;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
+#[wasm_bindgen]
 pub enum BucketAlgorithm {
     Uniform,
     List,
@@ -42,11 +45,27 @@ impl BucketAlgorithm {
 
 // Wrapper for crush_map
 #[repr(transparent)]
+#[wasm_bindgen]
 pub struct Map {
     pub ptr: *mut CrushMap,
 }
 
+#[derive(thiserror::Error, Debug)]
+#[wasm_bindgen]
+pub enum Error {
+    #[error("Invalid algorithm")]
+    InvalidAlgorithm,
+    #[error("failed to create bucket")]
+    FailedToCreateBucket,
+    #[error("items and weights must have the same length")]
+    InvalidLength,
+    #[error("do rule failed")]
+    FailedToDoRule,
+}
+
+#[wasm_bindgen]
 impl Map {
+    #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         unsafe {
             let ptr = crush_create();
@@ -111,9 +130,9 @@ impl Map {
         type_: i32,
         items: &[i32],
         weights: &[i32],
-    ) -> Result<Bucket, &'static str> {
+    ) -> Result<Bucket, Error> {
         if items.len() != weights.len() {
-            return Err("items and weights must have the same length");
+            return Err(Error::InvalidLength);
         }
 
         unsafe {
@@ -128,7 +147,7 @@ impl Map {
             );
 
             if ptr.is_null() {
-                Err("Failed to create bucket")
+                Err(Error::FailedToCreateBucket)
             } else {
                 Ok(Bucket {
                     ptr,
@@ -183,7 +202,31 @@ impl Map {
             result
         }
     }
+}
 
+#[wasm_bindgen]
+pub struct ChooseArgsOptional {
+    choose_args: Option<&'static ChooseArgs>,
+}
+
+#[wasm_bindgen]
+impl Map {
+    #[
+        wasm_bindgen(js_name = doRule)
+    ]
+    pub fn wasm_do_rule(
+        &self,
+        ruleno: i32,
+        x: i32,
+        result: &mut [i32],
+        weights: &[u32],
+        choose_args: ChooseArgsOptional,
+    ) -> Result<usize, Error> {
+        self.do_rule(ruleno, x, result, weights, choose_args.choose_args)
+    }
+}
+
+impl Map {
     pub fn do_rule(
         &self,
         ruleno: i32,
@@ -191,7 +234,7 @@ impl Map {
         result: &mut [i32],
         weights: &[u32],
         choose_args: Option<&ChooseArgs>,
-    ) -> Result<usize, &'static str> {
+    ) -> Result<usize, Error> {
         unsafe {
             // Implement crush_work_size inline function
             let cwin_size =
@@ -214,7 +257,7 @@ impl Map {
             );
 
             if result_len < 0 {
-                Err("crush_do_rule failed")
+                Err(Error::FailedToDoRule)
             } else {
                 Ok(result_len as usize)
             }
@@ -239,11 +282,13 @@ impl Default for Map {
 }
 
 #[derive(Debug)]
+#[wasm_bindgen]
 pub struct Bucket {
     ptr: *mut CrushBucket,
     _map: *mut CrushMap,
 }
 
+#[wasm_bindgen]
 impl Bucket {
     pub fn algorithm(&self) -> Option<BucketAlgorithm> {
         unsafe { BucketAlgorithm::from_c((*self.ptr).alg) }
@@ -277,6 +322,7 @@ impl Drop for Bucket {
 }
 
 #[derive(Debug)]
+#[wasm_bindgen]
 pub struct Rule {
     ptr: *mut CrushRule,
 }
@@ -320,7 +366,9 @@ impl RuleStep {
     }
 }
 
+#[wasm_bindgen]
 impl Rule {
+    #[wasm_bindgen(constructor)]
     pub fn new(
         steps_count: i32,
         ruleset: i32,
@@ -342,7 +390,8 @@ impl Rule {
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
-
+}
+impl Rule {
     pub fn set_step(&mut self, pos: i32, step: RuleStep) {
         let (op, arg1, arg2) = step.to_crush_parts();
         unsafe {
@@ -360,6 +409,7 @@ impl Drop for Rule {
 }
 
 #[derive(Debug)]
+#[wasm_bindgen]
 pub struct ChooseArgs {
     ptr: *mut CrushChooseArg,
     _num_positions: i32,

@@ -3,8 +3,11 @@
 
 // Re-export FFI types from core::ffi to reduce libc dependency
 pub mod ffi {
-    pub use core::ffi::{c_char, c_int, c_uint, c_uchar, c_ushort, c_ulong, c_longlong, c_ulonglong, c_void, c_double};
-    
+    pub use core::ffi::{
+        c_char, c_double, c_int, c_longlong, c_uchar, c_uint, c_ulong, c_ulonglong, c_ushort,
+        c_void,
+    };
+
     // c_long is not in core::ffi, we need to define it based on target platform
     #[cfg(target_pointer_width = "64")]
     #[allow(non_camel_case_types)]
@@ -26,10 +29,10 @@ pub enum CrushError {
 }
 
 // Error code constants (matching POSIX errno values)
-pub const EINVAL: i32 = -22;  // Invalid argument
-pub const ENOMEM: i32 = -12;  // Out of memory
-pub const ENOENT: i32 = -2;   // No such file or directory
-pub const EEXIST: i32 = -17;  // File exists
+pub const EINVAL: i32 = -22; // Invalid argument
+pub const ENOMEM: i32 = -12; // Out of memory
+pub const ENOENT: i32 = -2; // No such file or directory
+pub const EEXIST: i32 = -17; // File exists
 
 impl CrushError {
     pub fn from_errno(errno: i32) -> Self {
@@ -79,7 +82,7 @@ pub type S64 = ffi::c_longlong;
 pub type U64 = ffi::c_ulonglong;
 
 // CRUSH rule step
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
 pub struct CrushRuleStep {
     pub op: U32,
@@ -117,12 +120,13 @@ pub const CRUSH_RULE_CHOOSELEAF_INDEP: u32 = CrushOpcodes::ChooseleafIndep as u3
 pub const CRUSH_RULE_SET_CHOOSE_TRIES: u32 = CrushOpcodes::SetChooseTries as u32;
 pub const CRUSH_RULE_SET_CHOOSELEAF_TRIES: u32 = CrushOpcodes::SetChooseleafTries as u32;
 pub const CRUSH_RULE_SET_CHOOSE_LOCAL_TRIES: u32 = CrushOpcodes::SetChooseLocalTries as u32;
-pub const CRUSH_RULE_SET_CHOOSE_LOCAL_FALLBACK_TRIES: u32 = CrushOpcodes::SetChooseLocalFallbackTries as u32;
+pub const CRUSH_RULE_SET_CHOOSE_LOCAL_FALLBACK_TRIES: u32 =
+    CrushOpcodes::SetChooseLocalFallbackTries as u32;
 pub const CRUSH_RULE_SET_CHOOSELEAF_VARY_R: u32 = CrushOpcodes::SetChooseleafVaryR as u32;
 pub const CRUSH_RULE_SET_CHOOSELEAF_STABLE: u32 = CrushOpcodes::SetChooseleafStable as u32;
 
 // CRUSH rule mask
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
 pub struct CrushRuleMask {
     pub ruleset: U8,
@@ -132,7 +136,7 @@ pub struct CrushRuleMask {
 }
 
 // CRUSH rule
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
 pub struct CrushRule {
     pub len: U32,
@@ -159,7 +163,7 @@ pub const CRUSH_BUCKET_STRAW: u32 = CrushAlgorithm::Straw as u32;
 pub const CRUSH_BUCKET_STRAW2: u32 = CrushAlgorithm::Straw2 as u32;
 
 // Base CRUSH bucket
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
 pub struct CrushBucket {
     pub id: S32,
@@ -190,7 +194,7 @@ pub struct CrushChooseArg {
 }
 
 // Uniform bucket
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
 pub struct CrushBucketUniform {
     pub h: CrushBucket,
@@ -198,7 +202,7 @@ pub struct CrushBucketUniform {
 }
 
 // List bucket
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
 pub struct CrushBucketList {
     pub h: CrushBucket,
@@ -207,7 +211,7 @@ pub struct CrushBucketList {
 }
 
 // Tree bucket
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
 pub struct CrushBucketTree {
     pub h: CrushBucket,
@@ -216,7 +220,7 @@ pub struct CrushBucketTree {
 }
 
 // Straw bucket
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
 pub struct CrushBucketStraw {
     pub h: CrushBucket,
@@ -225,7 +229,7 @@ pub struct CrushBucketStraw {
 }
 
 // Straw2 bucket
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
 pub struct CrushBucketStraw2 {
     pub h: CrushBucket,
@@ -233,7 +237,7 @@ pub struct CrushBucketStraw2 {
 }
 
 // CRUSH map
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
 pub struct CrushMap {
     pub buckets: *mut *mut CrushBucket,

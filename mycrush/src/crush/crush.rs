@@ -7,8 +7,8 @@
     unused_assignments,
     unused_mut
 )]
-use crate::crush::types::*;
 use crate::crush::types::ffi;
+use crate::crush::types::*;
 
 unsafe extern "C" {
     fn free(_: *mut ffi::c_void);
@@ -27,18 +27,17 @@ pub fn crush_bucket_alg_name(alg: ffi::c_int) -> *const ffi::c_char {
         _ => b"unknown\0" as *const u8 as *const ffi::c_char,
     }
 }
-pub unsafe fn crush_get_bucket_item_weight(
-    b: *const CrushBucket,
-    p: ffi::c_int,
-) -> ffi::c_int {
+pub unsafe fn crush_get_bucket_item_weight(b: *const CrushBucket, p: ffi::c_int) -> ffi::c_int {
     if p as U32 >= (*b).size {
         return 0;
     }
     match (*b).alg as ffi::c_int {
         1 => (*(b as *mut CrushBucketUniform)).item_weight as ffi::c_int,
         2 => *((*(b as *mut CrushBucketList)).item_weights).offset(p as isize) as ffi::c_int,
-        3 => *((*(b as *mut CrushBucketTree)).node_weights)
-            .offset(crush_calc_tree_node(p) as isize) as ffi::c_int,
+        3 => {
+            *((*(b as *mut CrushBucketTree)).node_weights).offset(crush_calc_tree_node(p) as isize)
+                as ffi::c_int
+        }
         4 => *((*(b as *mut CrushBucketStraw)).item_weights).offset(p as isize) as ffi::c_int,
         5 => *((*(b as *mut CrushBucketStraw2)).item_weights).offset(p as isize) as ffi::c_int,
         _ => 0,
