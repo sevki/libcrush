@@ -246,6 +246,7 @@ pub unsafe fn crush_make_uniform_bucket(
             let items_slice = std::slice::from_raw_parts(items, size as usize);
             let mut items_vec: Vec<S32> = items_slice.to_vec();
             (*bucket).h.items = items_vec.as_mut_ptr();
+            (*bucket).h.items_capacity = items_vec.capacity() as U32;
             std::mem::forget(items_vec); // Prevent Vec from deallocating
             
             return Box::into_raw(bucket);
@@ -362,6 +363,7 @@ pub unsafe fn crush_make_tree_bucket(
         let _items_slice = std::slice::from_raw_parts(items, size as usize);
         let mut items_vec: Vec<S32> = vec![0; size as usize];
         (*bucket).h.items = items_vec.as_mut_ptr();
+        (*bucket).h.items_capacity = items_vec.capacity() as U32;
         std::mem::forget(items_vec);
         
         let depth = calc_depth(size);
@@ -370,6 +372,7 @@ pub unsafe fn crush_make_tree_bucket(
         // Allocate node_weights array
         let mut node_weights_vec: Vec<U32> = vec![0; (*bucket).num_nodes as usize];
         (*bucket).node_weights = node_weights_vec.as_mut_ptr();
+        (*bucket).node_weights_capacity = node_weights_vec.capacity() as U32;
         std::mem::forget(node_weights_vec);
         
         // Fill the arrays
@@ -379,9 +382,9 @@ pub unsafe fn crush_make_tree_bucket(
             *((*bucket).node_weights).offset(node as isize) = *weights.offset(i as isize) as U32;
             
             if crush_addition_is_unsafe((*bucket).h.weight, *weights.offset(i as isize) as U32) {
-                // Cleanup on error
-                let _ = Vec::from_raw_parts((*bucket).h.items, 0, size as usize);
-                let _ = Vec::from_raw_parts((*bucket).node_weights, 0, (*bucket).num_nodes as usize);
+                // Cleanup on error - use correct capacities
+                let _ = Vec::from_raw_parts((*bucket).h.items, 0, (*bucket).h.items_capacity as usize);
+                let _ = Vec::from_raw_parts((*bucket).node_weights, 0, (*bucket).node_weights_capacity as usize);
                 return std::ptr::null_mut::<CrushBucketTree>();
             }
             (*bucket).h.weight = ((*bucket).h.weight).wrapping_add(*weights.offset(i as isize) as U32);
@@ -392,9 +395,9 @@ pub unsafe fn crush_make_tree_bucket(
                     *((*bucket).node_weights).offset(node as isize),
                     *weights.offset(i as isize) as U32,
                 ) {
-                    // Cleanup on error
-                    let _ = Vec::from_raw_parts((*bucket).h.items, 0, size as usize);
-                    let _ = Vec::from_raw_parts((*bucket).node_weights, 0, (*bucket).num_nodes as usize);
+                    // Cleanup on error - use correct capacities
+                    let _ = Vec::from_raw_parts((*bucket).h.items, 0, (*bucket).h.items_capacity as usize);
+                    let _ = Vec::from_raw_parts((*bucket).node_weights, 0, (*bucket).node_weights_capacity as usize);
                     return std::ptr::null_mut::<CrushBucketTree>();
                 }
                 let fresh3 = &mut (*((*bucket).node_weights).offset(node as isize));
@@ -691,14 +694,15 @@ pub unsafe fn crush_add_uniform_bucket_item(
             return -(22 as ffi::c_int);
         }
         
-        // Reconstruct Vec, push, and convert back
+        // Reconstruct Vec with correct capacity, push, and convert back
         let mut items_vec = Vec::from_raw_parts(
             (*bucket).h.items,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).h.items_capacity as usize
         );
         items_vec.push(item);
         (*bucket).h.items = items_vec.as_mut_ptr();
+        (*bucket).h.items_capacity = items_vec.capacity() as U32;
         std::mem::forget(items_vec);
         
         if crush_addition_is_unsafe((*bucket).h.weight, weight as U32) {
@@ -782,17 +786,18 @@ pub unsafe fn crush_add_tree_bucket_item(
         let mut j: ffi::c_int = 0;
         (*bucket).num_nodes = ((1) << depth) as U8;
         
-        // Reconstruct and resize items
+        // Reconstruct and resize items with correct capacity
         let mut items_vec = Vec::from_raw_parts(
             (*bucket).h.items,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).h.items_capacity as usize
         );
         items_vec.push(item);
         (*bucket).h.items = items_vec.as_mut_ptr();
+        (*bucket).h.items_capacity = items_vec.capacity() as U32;
         std::mem::forget(items_vec);
         
-        // Reconstruct and resize node_weights
+        // Reconstruct and resize node_weights with correct capacity
         let old_num_nodes = if (*bucket).h.size == 0 { 0 } else { 
             let old_depth = calc_depth((*bucket).h.size as ffi::c_int);
             ((1) << old_depth) as usize
@@ -800,10 +805,11 @@ pub unsafe fn crush_add_tree_bucket_item(
         let mut node_weights_vec = Vec::from_raw_parts(
             (*bucket).node_weights,
             old_num_nodes,
-            old_num_nodes
+            (*bucket).node_weights_capacity as usize
         );
         node_weights_vec.resize((*bucket).num_nodes as usize, 0);
         (*bucket).node_weights = node_weights_vec.as_mut_ptr();
+        (*bucket).node_weights_capacity = node_weights_vec.capacity() as U32;
         std::mem::forget(node_weights_vec);
         
         node = crush_calc_tree_node(newsize - 1);
@@ -942,11 +948,11 @@ pub unsafe fn crush_remove_uniform_bucket_item(
     mut item: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
-        // Reconstruct Vec to modify it
+        // Reconstruct Vec to modify it - use correct capacity
         let mut items_vec = Vec::from_raw_parts(
             (*bucket).h.items,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).h.items_capacity as usize
         );
         
         // Find and remove the item
@@ -961,6 +967,7 @@ pub unsafe fn crush_remove_uniform_bucket_item(
             }
             
             (*bucket).h.items = items_vec.as_mut_ptr();
+            (*bucket).h.items_capacity = items_vec.capacity() as U32;
             std::mem::forget(items_vec);
             0
         } else {
@@ -974,21 +981,21 @@ pub unsafe fn crush_remove_list_bucket_item(
     mut item: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
-        // Reconstruct Vecs to modify them
+        // Reconstruct Vecs to modify them - use correct capacities
         let mut items_vec = Vec::from_raw_parts(
             (*bucket).h.items,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).h.items_capacity as usize
         );
         let mut item_weights_vec = Vec::from_raw_parts(
             (*bucket).item_weights,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).item_weights_capacity as usize
         );
         let mut sum_weights_vec = Vec::from_raw_parts(
             (*bucket).sum_weights,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).sum_weights_capacity as usize
         );
         
         // Find the item
@@ -1013,8 +1020,11 @@ pub unsafe fn crush_remove_list_bucket_item(
             (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
             
             (*bucket).h.items = items_vec.as_mut_ptr();
+            (*bucket).h.items_capacity = items_vec.capacity() as U32;
             (*bucket).item_weights = item_weights_vec.as_mut_ptr();
+            (*bucket).item_weights_capacity = item_weights_vec.capacity() as U32;
             (*bucket).sum_weights = sum_weights_vec.as_mut_ptr();
+            (*bucket).sum_weights_capacity = sum_weights_vec.capacity() as U32;
             std::mem::forget(items_vec);
             std::mem::forget(item_weights_vec);
             std::mem::forget(sum_weights_vec);
@@ -1080,28 +1090,30 @@ pub unsafe fn crush_remove_tree_bucket_item(
             let olddepth: ffi::c_int = calc_depth((*bucket).h.size as ffi::c_int);
             let newdepth: ffi::c_int = calc_depth(newsize as ffi::c_int);
             
-            // Reconstruct and resize items
+            // Reconstruct and resize items - use correct capacity
             let mut items_vec = Vec::from_raw_parts(
                 (*bucket).h.items,
                 (*bucket).h.size as usize,
-                (*bucket).h.size as usize
+                (*bucket).h.items_capacity as usize
             );
             items_vec.truncate(newsize as usize);
             (*bucket).h.items = items_vec.as_mut_ptr();
+            (*bucket).h.items_capacity = items_vec.capacity() as U32;
             std::mem::forget(items_vec);
             
             if olddepth != newdepth {
                 (*bucket).num_nodes = ((1) << newdepth) as U8;
                 
-                // Reconstruct and resize node_weights
+                // Reconstruct and resize node_weights - use correct capacity
                 let old_num_nodes = ((1) << olddepth) as usize;
                 let mut node_weights_vec = Vec::from_raw_parts(
                     (*bucket).node_weights,
                     old_num_nodes,
-                    old_num_nodes
+                    (*bucket).node_weights_capacity as usize
                 );
                 node_weights_vec.truncate((*bucket).num_nodes as usize);
                 (*bucket).node_weights = node_weights_vec.as_mut_ptr();
+                (*bucket).node_weights_capacity = node_weights_vec.capacity() as U32;
                 std::mem::forget(node_weights_vec);
             }
             (*bucket).h.size = newsize;
@@ -1115,21 +1127,21 @@ pub unsafe fn crush_remove_straw_bucket_item(
     mut item: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
-        // Reconstruct Vecs to modify them
+        // Reconstruct Vecs to modify them - use correct capacities
         let mut items_vec = Vec::from_raw_parts(
             (*bucket).h.items,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).h.items_capacity as usize
         );
         let mut item_weights_vec = Vec::from_raw_parts(
             (*bucket).item_weights,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).item_weights_capacity as usize
         );
         let mut straws_vec = Vec::from_raw_parts(
             (*bucket).straws,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).straws_capacity as usize
         );
         
         // Find and remove the item
@@ -1149,8 +1161,11 @@ pub unsafe fn crush_remove_straw_bucket_item(
             (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
             
             (*bucket).h.items = items_vec.as_mut_ptr();
+            (*bucket).h.items_capacity = items_vec.capacity() as U32;
             (*bucket).item_weights = item_weights_vec.as_mut_ptr();
+            (*bucket).item_weights_capacity = item_weights_vec.capacity() as U32;
             (*bucket).straws = straws_vec.as_mut_ptr();
+            (*bucket).straws_capacity = straws_vec.capacity() as U32;
             std::mem::forget(items_vec);
             std::mem::forget(item_weights_vec);
             std::mem::forget(straws_vec);
@@ -1170,16 +1185,16 @@ pub unsafe fn crush_remove_straw2_bucket_item(
     mut item: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
-        // Reconstruct Vecs to modify them
+        // Reconstruct Vecs to modify them - use correct capacities
         let mut items_vec = Vec::from_raw_parts(
             (*bucket).h.items,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).h.items_capacity as usize
         );
         let mut item_weights_vec = Vec::from_raw_parts(
             (*bucket).item_weights,
             (*bucket).h.size as usize,
-            (*bucket).h.size as usize
+            (*bucket).item_weights_capacity as usize
         );
         
         // Find and remove the item
@@ -1198,7 +1213,9 @@ pub unsafe fn crush_remove_straw2_bucket_item(
             (*bucket).h.size = ((*bucket).h.size).wrapping_sub(1);
             
             (*bucket).h.items = items_vec.as_mut_ptr();
+            (*bucket).h.items_capacity = items_vec.capacity() as U32;
             (*bucket).item_weights = item_weights_vec.as_mut_ptr();
+            (*bucket).item_weights_capacity = item_weights_vec.capacity() as U32;
             std::mem::forget(items_vec);
             std::mem::forget(item_weights_vec);
             0
