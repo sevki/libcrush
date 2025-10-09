@@ -923,6 +923,7 @@ unsafe fn is_out(
         1 as ffi::c_int
     }
 }
+#[allow(clippy::too_many_arguments)]
 unsafe fn crush_choose_firstn(
     mut map: *const CrushMap,
     mut work: *mut CrushWork,
@@ -1136,6 +1137,7 @@ unsafe fn crush_choose_firstn(
         outpos
     }
 }
+#[allow(clippy::too_many_arguments)]
 unsafe fn crush_choose_indep(
     mut map: *const CrushMap,
     mut work: *mut CrushWork,
@@ -1353,6 +1355,7 @@ pub unsafe fn crush_init_workspace(m: *const CrushMap, v: *mut ffi::c_void) {
         }
     }
 }
+#[allow(clippy::too_many_arguments)]
 pub unsafe fn crush_do_rule(
     mut map: *const CrushMap,
     mut ruleno: ffi::c_int,
