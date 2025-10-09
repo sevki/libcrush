@@ -1,6 +1,5 @@
 /// Common types used across all crush modules
 /// Extracted from c2rust transpiled code
-
 // Re-export FFI types from core::ffi to reduce libc dependency
 pub mod ffi {
     pub use core::ffi::{
