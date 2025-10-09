@@ -799,9 +799,10 @@ unsafe fn get_choose_arg_weights(
         if arg.is_null() {
             return (*bucket).item_weights;
         }
-        // Read fields using ptr::read to avoid creating intermediate references
-        let weight_set = std::ptr::read(std::ptr::addr_of!((*arg).weight_set));
-        let weight_set_size = std::ptr::read(std::ptr::addr_of!((*arg).weight_set_size));
+        
+        let weight_set = (*arg).weight_set;
+        let weight_set_size = (*arg).weight_set_size;
+        
         if weight_set.is_null() || weight_set_size == 0 as ffi::c_int as U32 {
             return (*bucket).item_weights;
         }
@@ -820,8 +821,9 @@ unsafe fn get_choose_arg_ids(
         if arg.is_null() {
             return (*bucket).h.items;
         }
-        // Read field using ptr::read to avoid creating intermediate references
-        let ids = std::ptr::read(std::ptr::addr_of!((*arg).ids));
+        
+        let ids = (*arg).ids;
+        
         if ids.is_null() {
             return (*bucket).h.items;
         }
