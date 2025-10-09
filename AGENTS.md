@@ -1,7 +1,7 @@
 # Agent Instructions: Translating C to Rust with c2rust
 
 MyCrush directory contains code generated with c2rust. 
-Here are some common patterns for cleaning up the code base to achive a more idiomatic codebase.
+Here are some common patterns for cleaning up the code base to achieve a more idiomatic codebase.
 
 This code base uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
