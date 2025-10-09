@@ -11,6 +11,7 @@
 use crate::crush::types::*;
 use crate::crush::types::ffi;
 use crate::crush::hash::{crush_hash32_2, crush_hash32_3, crush_hash32_4};
+use std::ptr::NonNull;
 
 unsafe extern "C" {
     fn memcpy(_: *mut ffi::c_void, _: *const ffi::c_void, _: ffi::c_ulong) -> *mut ffi::c_void;
@@ -792,16 +793,17 @@ unsafe fn crush_ln(mut xin: ffi::c_uint) -> U64 {
 #[inline]
 unsafe fn get_choose_arg_weights(
     mut bucket: *const CrushBucketStraw2,
-    mut arg: *const CrushChooseArg,
+    arg: Option<NonNull<CrushChooseArg>>,
     mut position: ffi::c_int,
 ) -> *mut U32 {
     unsafe {
-        if arg.is_null() {
+        let Some(arg_ptr) = arg else {
             return (*bucket).item_weights;
-        }
+        };
         
-        let weight_set = (*arg).weight_set;
-        let weight_set_size = (*arg).weight_set_size;
+        let arg_ref = arg_ptr.as_ref();
+        let weight_set = arg_ref.weight_set;
+        let weight_set_size = arg_ref.weight_set_size;
         
         if weight_set.is_null() || weight_set_size == 0 as ffi::c_int as U32 {
             return (*bucket).item_weights;
@@ -815,14 +817,15 @@ unsafe fn get_choose_arg_weights(
 #[inline]
 unsafe fn get_choose_arg_ids(
     mut bucket: *const CrushBucketStraw2,
-    mut arg: *const CrushChooseArg,
+    arg: Option<NonNull<CrushChooseArg>>,
 ) -> *mut ffi::c_int {
     unsafe {
-        if arg.is_null() {
+        let Some(arg_ptr) = arg else {
             return (*bucket).h.items;
-        }
+        };
         
-        let ids = (*arg).ids;
+        let arg_ref = arg_ptr.as_ref();
+        let ids = arg_ref.ids;
         
         if ids.is_null() {
             return (*bucket).h.items;
@@ -834,7 +837,7 @@ unsafe fn bucket_straw2_choose(
     mut bucket: *const CrushBucketStraw2,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
-    mut arg: *const CrushChooseArg,
+    arg: Option<NonNull<CrushChooseArg>>,
     mut position: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
@@ -876,7 +879,7 @@ unsafe fn crush_bucket_choose(
     mut work: *mut CrushWorkBucket,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
-    mut arg: *const CrushChooseArg,
+    arg: Option<NonNull<CrushChooseArg>>,
     mut position: ffi::c_int,
 ) -> ffi::c_int {
     unsafe {
@@ -991,16 +994,19 @@ unsafe fn crush_choose_firstn(
                                 r,
                             );
                         } else {
+                            let arg_opt = if choose_args.is_null() {
+                                None
+                            } else {
+                                NonNull::new(
+                                    choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize) as *mut _
+                                )
+                            };
                             item = crush_bucket_choose(
                                 in_0,
                                 *((*work).work).offset((-(1 as ffi::c_int) - (*in_0).id) as isize),
                                 x,
                                 r,
-                                if !choose_args.is_null() {
-                                    choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize)
-                                } else {
-                                    std::ptr::null::<CrushChooseArg>()
-                                },
+                                arg_opt,
                                 outpos,
                             );
                         }
@@ -1189,16 +1195,19 @@ unsafe fn crush_choose_indep(
                         if (*in_0).size == 0 as ffi::c_int as U32 {
                             break;
                         }
+                        let arg_opt = if choose_args.is_null() {
+                            None
+                        } else {
+                            NonNull::new(
+                                choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize) as *mut _
+                            )
+                        };
                         item = crush_bucket_choose(
                             in_0,
                             *((*work).work).offset((-(1 as ffi::c_int) - (*in_0).id) as isize),
                             x,
                             r,
-                            if !choose_args.is_null() {
-                                choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize)
-                            } else {
-                                std::ptr::null::<CrushChooseArg>()
-                            },
+                            arg_opt,
                             outpos,
                         );
                         if item >= (*map).max_devices {
