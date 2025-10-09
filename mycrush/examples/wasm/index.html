@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MycrUSH WASM Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .code-block {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .result {
+            background: #e7f4e7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>🥰 mycrush WASM Example</h1>
+    <p>This example demonstrates using the mycrush CRUSH algorithm in the browser via WebAssembly.</p>
+    
+    <button id="runExample">Run Example</button>
+    
+    <div id="output"></div>
+
+    <script type="module">
+        import init, { WasmCrushMap, getVersion, isMultiplicationUnsafe } from '../pkg/mycrush.js';
+
+        async function runExample() {
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+
+            try {
+                // Initialize the WASM module
+                await init();
+                
+                output.innerHTML += '<div class="result">✅ WASM module loaded successfully!</div>';
+                
+                // Get version
+                const version = getVersion();
+                output.innerHTML += `<div class="result">📦 Library version: ${version}</div>`;
+                
+                // Create a new CRUSH map
+                const map = new WasmCrushMap();
+                output.innerHTML += '<div class="result">🗺️  Created new CRUSH map</div>';
+                
+                // Get some properties
+                output.innerHTML += `<div class="result">
+                    <h3>Map Properties:</h3>
+                    <ul>
+                        <li>Choose Local Tries: ${map.chooseLocalTries()}</li>
+                        <li>Choose Total Tries: ${map.chooseTotalTries()}</li>
+                        <li>Chooseleaf Vary R: ${map.chooseleafVaryR()}</li>
+                        <li>Has Rules: ${map.hasRules()}</li>
+                    </ul>
+                </div>`;
+                
+                // Test multiplication safety check
+                const unsafeResult = isMultiplicationUnsafe(1000000, 1000000);
+                output.innerHTML += `<div class="result">
+                    🔢 Is 1000000 * 1000000 unsafe? ${unsafeResult}
+                </div>`;
+                
+                // Create a legacy map
+                const legacyMap = WasmCrushMap.newLegacy();
+                output.innerHTML += '<div class="result">🗺️  Created legacy CRUSH map</div>';
+                
+                // Finalize the map
+                map.finalize();
+                output.innerHTML += '<div class="result">✅ Map finalized</div>';
+                
+                output.innerHTML += '<div class="result">🎉 All operations completed successfully!</div>';
+                
+            } catch (error) {
+                output.innerHTML += `<div class="result" style="background: #f4e7e7;">
+                    ❌ Error: ${error.message}
+                </div>`;
+                console.error(error);
+            }
+        }
+
+        document.getElementById('runExample').addEventListener('click', runExample);
+        
+        // Auto-run on load
+        window.addEventListener('load', runExample);
+    </script>
+</body>
+</html>

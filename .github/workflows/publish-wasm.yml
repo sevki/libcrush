@@ -1,0 +1,99 @@
+name: Publish WASM Package to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_target:
+        description: 'Publish target (npm or github)'
+        required: true
+        default: 'npm'
+        type: choice
+        options:
+          - npm
+          - github
+  release:
+    types: [published]
+
+jobs:
+  publish-wasm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+      
+      - name: Build WASM packages
+        run: |
+          cd mycrush
+          chmod +x build-wasm.sh
+          ./build-wasm.sh
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+        if: github.event.inputs.publish_target == 'npm' || github.event_name == 'release'
+      
+      - name: Setup Node.js for GitHub Packages
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@sevki'
+        if: github.event.inputs.publish_target == 'github'
+      
+      - name: Publish to npm (bundler)
+        if: github.event.inputs.publish_target == 'npm' || github.event_name == 'release'
+        working-directory: mycrush/pkg-bundler
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Publish to GitHub Packages
+        if: github.event.inputs.publish_target == 'github'
+        working-directory: mycrush/pkg-bundler
+        run: |
+          # Update package name for GitHub Packages
+          node -e "const pkg=require('./package.json'); pkg.name='@sevki/mycrush'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-packages
+          path: |
+            mycrush/pkg/
+            mycrush/pkg-node/
+            mycrush/pkg-bundler/

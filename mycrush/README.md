@@ -19,9 +19,14 @@ cargo build --package mycrush
 # WASM build
 cargo build --package mycrush --target wasm32-unknown-unknown --release
 
+# WASM-pack build (for npm packages)
+cd mycrush && ./build-wasm.sh
+
 # Run tests
 cargo test --package mycrush
 ```
+
+For detailed WASM usage and npm publishing instructions, see [WASM.md](WASM.md).
 
 ## Status
 
