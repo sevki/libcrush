@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/sevki/libcrush/compare/v1.0.0...v1.0.1) (2025-10-09)
+
+
+### Bug Fixes
+
+* **mycrush:** allow too_many_arguments for c2rust-generated functions ([b85951f](https://github.com/sevki/libcrush/commit/b85951f1f3e1e938d9987d431c34b4420bb2bf0f))
+* **mycrush:** wrap unsafe operations in explicit unsafe blocks ([8879cf1](https://github.com/sevki/libcrush/commit/8879cf11a973532af7a6800f9faca7e88df5b349))
+
 ## [1.0.0](https://github.com/sevki/libcrush/compare/v0.1.2...v1.0.0) (2025-10-09)
 
 
