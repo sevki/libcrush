@@ -3,6 +3,8 @@
 MyCrush directory contains code generated with c2rust. 
 Here are some common patterns for cleaning up the code base to achive a more idiomatic codebase.
 
+This code base uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
 ### Pattern 1: Loop Simplification
 
 **Problem:** c2rust translates all C `for` loops to `while` loops for safety.
