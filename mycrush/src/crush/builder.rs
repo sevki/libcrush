@@ -15,6 +15,8 @@ unsafe extern "C" {
     fn memset(_: *mut ffi::c_void, _: ffi::c_int, _: ffi::c_ulong) -> *mut ffi::c_void;
     fn pow(_: ffi::c_double, _: ffi::c_double) -> ffi::c_double;
     fn crush_destroy_bucket(b: *mut CrushBucket);
+    fn malloc(_: ffi::c_ulong) -> *mut ffi::c_void;
+    fn free(_: *mut ffi::c_void);
 }
 #[inline]
 fn crush_calc_tree_node(i: i32) -> i32 {
@@ -1574,10 +1576,11 @@ pub unsafe fn crush_make_choose_args(
                     .wrapping_mul(sum_bucket_size as ffi::c_ulong),
             ) as ffi::c_int;
         
-        // Allocate using std::alloc instead of malloc
-        let layout = std::alloc::Layout::from_size_align(size as usize, std::mem::align_of::<CrushChooseArg>())
-            .expect("Invalid layout for CrushChooseArg allocation");
-        let space = std::alloc::alloc(layout) as *mut ffi::c_char;
+        // Allocate using malloc for consistency with C code and to allow proper deallocation with free
+        let space = malloc(size as ffi::c_ulong) as *mut ffi::c_char;
+        if space.is_null() {
+            panic!("Failed to allocate memory for CrushChooseArg");
+        }
         
         let mut arg: *mut CrushChooseArg = space as *mut CrushChooseArg;
         let mut weight_set: *mut CrushWeightSet =
@@ -1657,22 +1660,11 @@ pub unsafe fn crush_make_choose_args(
     }
 }
 /// Destroy choose args allocated by crush_make_choose_args
-/// Note: We use Box to handle deallocation, but we need to be careful about the layout
 pub fn crush_destroy_choose_args(args: *mut CrushChooseArg) {
     unsafe {
         if !args.is_null() {
-            // Since we allocated with std::alloc::alloc which is compatible with the system allocator,
-            // and we don't track the size, we have a few options:
-            // 1. Use a global allocator that tracks sizes (complex)
-            // 2. Store the size alongside (API change)
-            // 3. Accept memory leak (not acceptable)
-            // 4. Use a different allocation strategy
-            //
-            // For now, we'll document that this is a known limitation.
-            // The proper solution would be to change the API to pass the map or size.
-            // As a workaround, we'll use Box::from_raw with a single element,
-            // which will at least free the first element. This is still incorrect.
-            let _ = Box::from_raw(args);
+            // Free using free() to match the malloc() allocation in crush_make_choose_args
+            free(args as *mut ffi::c_void);
         }
     }
 }
