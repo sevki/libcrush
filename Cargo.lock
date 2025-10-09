@@ -87,7 +87,7 @@ dependencies = [
 
 [[package]]
 name = "crush-sys"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "bindgen",
  "cc",
@@ -163,7 +163,7 @@ checksum = "58f929b4d672ea937a23a1ab494143d968337a5f47e56d0815df1e0890ddf174"
 
 [[package]]
 name = "libcrush"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "crush-sys",
  "googletest",
@@ -210,7 +210,7 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "mycrush"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "googletest",
  "libc",
