@@ -46,8 +46,8 @@ pub unsafe fn crush_get_bucket_item_weight(
 pub unsafe fn crush_destroy_bucket_uniform(b: *mut CrushBucketUniform) {
     unsafe {
         if !((*b).h.items).is_null() {
-            // Reconstruct Vec to properly deallocate
-            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
+            // Reconstruct Vec to properly deallocate using correct capacity
+            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.items_capacity as usize);
         }
         if !b.is_null() {
             let _ = Box::from_raw(b);
@@ -57,13 +57,13 @@ pub unsafe fn crush_destroy_bucket_uniform(b: *mut CrushBucketUniform) {
 pub unsafe fn crush_destroy_bucket_list(b: *mut CrushBucketList) {
     unsafe {
         if !((*b).item_weights).is_null() {
-            let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).h.size as usize);
+            let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).item_weights_capacity as usize);
         }
         if !((*b).sum_weights).is_null() {
-            let _ = Vec::from_raw_parts((*b).sum_weights, (*b).h.size as usize, (*b).h.size as usize);
+            let _ = Vec::from_raw_parts((*b).sum_weights, (*b).h.size as usize, (*b).sum_weights_capacity as usize);
         }
         if !((*b).h.items).is_null() {
-            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
+            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.items_capacity as usize);
         }
         if !b.is_null() {
             let _ = Box::from_raw(b);
@@ -73,10 +73,10 @@ pub unsafe fn crush_destroy_bucket_list(b: *mut CrushBucketList) {
 pub unsafe fn crush_destroy_bucket_tree(b: *mut CrushBucketTree) {
     unsafe {
         if !((*b).h.items).is_null() {
-            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
+            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.items_capacity as usize);
         }
         if !((*b).node_weights).is_null() {
-            let _ = Vec::from_raw_parts((*b).node_weights, (*b).num_nodes as usize, (*b).num_nodes as usize);
+            let _ = Vec::from_raw_parts((*b).node_weights, (*b).num_nodes as usize, (*b).node_weights_capacity as usize);
         }
         if !b.is_null() {
             let _ = Box::from_raw(b);
@@ -86,13 +86,13 @@ pub unsafe fn crush_destroy_bucket_tree(b: *mut CrushBucketTree) {
 pub unsafe fn crush_destroy_bucket_straw(b: *mut CrushBucketStraw) {
     unsafe {
         if !((*b).straws).is_null() {
-            let _ = Vec::from_raw_parts((*b).straws, (*b).h.size as usize, (*b).h.size as usize);
+            let _ = Vec::from_raw_parts((*b).straws, (*b).h.size as usize, (*b).straws_capacity as usize);
         }
         if !((*b).item_weights).is_null() {
-            let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).h.size as usize);
+            let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).item_weights_capacity as usize);
         }
         if !((*b).h.items).is_null() {
-            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
+            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.items_capacity as usize);
         }
         if !b.is_null() {
             let _ = Box::from_raw(b);
@@ -102,10 +102,10 @@ pub unsafe fn crush_destroy_bucket_straw(b: *mut CrushBucketStraw) {
 pub unsafe fn crush_destroy_bucket_straw2(b: *mut CrushBucketStraw2) {
     unsafe {
         if !((*b).item_weights).is_null() {
-            let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).h.size as usize);
+            let _ = Vec::from_raw_parts((*b).item_weights, (*b).h.size as usize, (*b).item_weights_capacity as usize);
         }
         if !((*b).h.items).is_null() {
-            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.size as usize);
+            let _ = Vec::from_raw_parts((*b).h.items, (*b).h.size as usize, (*b).h.items_capacity as usize);
         }
         if !b.is_null() {
             let _ = Box::from_raw(b);

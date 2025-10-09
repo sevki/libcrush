@@ -169,6 +169,7 @@ pub struct CrushBucket {
     pub weight: U32,
     pub size: U32,
     pub items: *mut S32,
+    pub items_capacity: U32, // Track actual allocated capacity for items
 }
 
 // Weight set for choose args
@@ -203,7 +204,9 @@ pub struct CrushBucketUniform {
 pub struct CrushBucketList {
     pub h: CrushBucket,
     pub item_weights: *mut U32,
+    pub item_weights_capacity: U32, // Track capacity for item_weights
     pub sum_weights: *mut U32,
+    pub sum_weights_capacity: U32, // Track capacity for sum_weights
 }
 
 // Tree bucket
@@ -213,6 +216,7 @@ pub struct CrushBucketTree {
     pub h: CrushBucket,
     pub num_nodes: U8,
     pub node_weights: *mut U32,
+    pub node_weights_capacity: U32, // Track capacity for node_weights
 }
 
 // Straw bucket
@@ -221,7 +225,9 @@ pub struct CrushBucketTree {
 pub struct CrushBucketStraw {
     pub h: CrushBucket,
     pub item_weights: *mut U32,
+    pub item_weights_capacity: U32, // Track capacity for item_weights
     pub straws: *mut U32,
+    pub straws_capacity: U32, // Track capacity for straws
 }
 
 // Straw2 bucket
@@ -230,6 +236,7 @@ pub struct CrushBucketStraw {
 pub struct CrushBucketStraw2 {
     pub h: CrushBucket,
     pub item_weights: *mut U32,
+    pub item_weights_capacity: U32, // Track capacity for item_weights
 }
 
 // CRUSH map
