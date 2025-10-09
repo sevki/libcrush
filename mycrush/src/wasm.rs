@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 use crate::crush::wrapper::{BucketAlgorithm, Map};
 
 /// A WASM-friendly wrapper for the CRUSH Map
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = CrushMap)]
 pub struct WasmCrushMap {
     inner: Map,
 }
@@ -109,7 +109,7 @@ pub fn get_version() -> String {
 }
 
 /// Bucket algorithm types
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = BucketAlgorithm)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WasmBucketAlgorithm {
     Uniform = 0,
