@@ -796,10 +796,10 @@ unsafe fn get_choose_arg_weights(
     mut position: ffi::c_int,
 ) -> *mut U32 {
     unsafe {
-        if arg.is_null()
-            || ((*arg).weight_set).is_null()
-            || (*arg).weight_set_size == 0 as ffi::c_int as U32
-        {
+        if arg.is_null() {
+            return (*bucket).item_weights;
+        }
+        if ((*arg).weight_set).is_null() || (*arg).weight_set_size == 0 as ffi::c_int as U32 {
             return (*bucket).item_weights;
         }
         if position as U32 >= (*arg).weight_set_size {
@@ -815,7 +815,10 @@ unsafe fn get_choose_arg_ids(
     mut arg: *const CrushChooseArg,
 ) -> *mut ffi::c_int {
     unsafe {
-        if arg.is_null() || ((*arg).ids).is_null() {
+        if arg.is_null() {
+            return (*bucket).h.items;
+        }
+        if ((*arg).ids).is_null() {
             return (*bucket).h.items;
         }
         (*arg).ids
