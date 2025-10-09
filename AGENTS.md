@@ -5,6 +5,14 @@ Here are some common patterns for cleaning up the code base to achieve a more id
 
 This code base uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
+## Project Type and Tooling
+
+This is a **systems programming library** (C library and Rust translation), not a web application. When working with this codebase:
+
+- **Do not** launch the Playwright MCP server - it is not needed for this project
+- Focus on C/Rust tooling and testing infrastructure
+- Use standard command-line tools for building and testing
+
 ### Pattern 1: Loop Simplification
 
 **Problem:** c2rust translates all C `for` loops to `while` loops for safety.
