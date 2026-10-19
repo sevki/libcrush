@@ -25,3 +25,5 @@ wasm-bindgen-test = "0.3.54"
 
 [dev-dependencies]
 googletest = "0.14.1"
+# C oracle for differential tests
+crush-sys = { path = ".." }
