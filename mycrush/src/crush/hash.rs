@@ -102,6 +102,7 @@ impl RJenkins1 {
     #[cfg(test)]
     pub const NAME: &'static str = "rjenkins1";
 
+    #[cfg(test)]
     /// Converts a digest output back into the `u32` hash value.
     pub fn to_u32(out: &digest::Output<Self>) -> u32 {
         u32::from_le_bytes((*out).into())
