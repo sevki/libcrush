@@ -15,6 +15,7 @@ description.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+digest = "0.10"
 libc = "0.2.176"
 num = { version = "0.4", features = ["std"] }
 num-derive = "0.3"
