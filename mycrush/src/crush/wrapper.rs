@@ -289,6 +289,13 @@ pub struct Bucket {
     _map: *mut CrushMap,
 }
 
+#[cfg(test)]
+impl Bucket {
+    pub(crate) fn as_ptr(&self) -> *const CrushBucket {
+        self.ptr
+    }
+}
+
 #[wasm_bindgen]
 impl Bucket {
     pub fn algorithm(&self) -> Option<BucketAlgorithm> {

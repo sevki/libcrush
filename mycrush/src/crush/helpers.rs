@@ -6,7 +6,7 @@ use std::slice;
 ///
 /// # Safety
 /// A non-null `ptr` must point to `len` initialized, live elements.
-unsafe fn c_slice<'a, T>(ptr: *const T, len: usize) -> &'a [T] {
+pub(crate) unsafe fn c_slice<'a, T>(ptr: *const T, len: usize) -> &'a [T] {
     match NonNull::new(ptr.cast_mut()) {
         // Safety: guaranteed by the caller.
         Some(ptr) => unsafe { slice::from_raw_parts(ptr.as_ptr(), len) },
