@@ -13,10 +13,13 @@ use crate::crush::types::ffi;
 use crate::crush::types::*;
 use std::ptr::NonNull;
 
+#[cfg(test)]
+mod tests;
+
 unsafe extern "C" {
     fn memcpy(_: *mut ffi::c_void, _: *const ffi::c_void, _: ffi::c_ulong) -> *mut ffi::c_void;
 }
-static mut __RH_LH_tbl: [S64; 258] = [
+static __RH_LH_tbl: [S64; 258] = [
     0x1000000000000 as ffi::c_longlong,
     0 as ffi::c_longlong,
     0xfe03f80fe040 as ffi::c_longlong,
@@ -276,7 +279,7 @@ static mut __RH_LH_tbl: [S64; 258] = [
     0x800000000000 as ffi::c_longlong,
     0xffff00000000 as ffi::c_longlong,
 ];
-static mut __LL_tbl: [S64; 256] = [
+static __LL_tbl: [S64; 256] = [
     0 as ffi::c_ulonglong as S64,
     0x2e2a60a00 as ffi::c_ulonglong as S64,
     0x70cb64ec5 as ffi::c_ulonglong as S64,
@@ -736,40 +739,21 @@ unsafe fn bucket_straw_choose<D: digest::Digest>(
         *((*bucket).h.items).offset(high as isize)
     }
 }
-unsafe fn crush_ln(mut xin: ffi::c_uint) -> U64 {
-    unsafe {
-        let mut x: ffi::c_uint = xin;
-        let mut iexpon: ffi::c_int = 0;
-        let mut index1: ffi::c_int = 0;
-        let mut index2: ffi::c_int = 0;
-        let mut RH: U64 = 0;
-        let mut LH: U64 = 0;
-        let mut LL: U64 = 0;
-        let mut xl64: U64 = 0;
-        let mut result: U64 = 0;
-        x = x.wrapping_add(1);
-        iexpon = 15 as ffi::c_int;
-        if x & 0x18000 as ffi::c_int as ffi::c_uint == 0 {
-            let mut bits: ffi::c_int = (x & 0x1ffff as ffi::c_int as ffi::c_uint).leading_zeros()
-                as i32
-                - 16 as ffi::c_int;
-            x <<= bits;
-            iexpon = 15 as ffi::c_int - bits;
-        }
-        index1 = ((x >> 8 as ffi::c_int) << 1 as ffi::c_int) as ffi::c_int;
-        RH = __RH_LH_tbl[(index1 - 256 as ffi::c_int) as usize] as U64;
-        LH = __RH_LH_tbl[(index1 + 1 as ffi::c_int - 256 as ffi::c_int) as usize] as U64;
-        xl64 = x as S64 as U64 * RH;
-        xl64 >>= 48 as ffi::c_int;
-        result = iexpon as U64;
-        result <<= 12 as ffi::c_int + 32 as ffi::c_int;
-        index2 = (xl64 & 0xff as ffi::c_int as U64) as ffi::c_int;
-        LL = __LL_tbl[index2 as usize] as U64;
-        LH = LH.wrapping_add(LL);
-        LH >>= 48 as ffi::c_int - 12 as ffi::c_int - 32 as ffi::c_int;
-        result = result.wrapping_add(LH);
-        result
+/// Fixed-point `2^44 * log2(x + 1)` used by straw2 to draw from `0..=0xffff`.
+fn crush_ln(xin: u32) -> u64 {
+    let mut x = xin.wrapping_add(1);
+    let mut iexpon: i32 = 15;
+    if x & 0x18000 == 0 {
+        let bits = (x & 0x1ffff).leading_zeros() as i32 - 16;
+        x <<= bits;
+        iexpon = 15 - bits;
     }
+    let index1 = ((x >> 8) << 1) as i32;
+    let rh = __RH_LH_tbl[(index1 - 256) as usize] as u64;
+    let lh = __RH_LH_tbl[(index1 + 1 - 256) as usize] as u64;
+    let xl64 = (x as i64 as u64 * rh) >> 48;
+    let ll = __LL_tbl[(xl64 & 0xff) as usize] as u64;
+    ((iexpon as u64) << (12 + 32)).wrapping_add(lh.wrapping_add(ll) >> (48 - 12 - 32))
 }
 #[inline]
 unsafe fn get_choose_arg_weights(
