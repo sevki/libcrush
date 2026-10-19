@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/sevki/libcrush/compare/v1.0.1...v1.1.0) (2026-10-19)
+
+
+### Features
+
+* **mycrush:** add Digest trait implemented by RJenkins1 ([346002d](https://github.com/sevki/libcrush/commit/346002d29578f976fcd9e4b97f23eec469e37b0f))
+
 ## [1.0.1](https://github.com/sevki/libcrush/compare/v1.0.0...v1.0.1) (2025-10-09)
 
 
