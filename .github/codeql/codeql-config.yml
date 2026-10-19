@@ -1,0 +1,6 @@
+name: libcrush CodeQL config
+# Test code reads raw C maps directly (see mycrush/src/crush/helpers/tests.rs);
+# the shipping code is still analysed.
+paths-ignore:
+  - "**/tests.rs"
+  - "mycrush/tests/**"
