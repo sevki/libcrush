@@ -85,10 +85,48 @@ fn rjenkins1_5(mut a: u32, mut b: u32, mut c: u32, mut d: u32, mut e: u32) -> u3
     hash
 }
 
-/// Hashes one value; unknown hash types yield 0, as in the C implementation.
+/// A CRUSH digest: the hash a map uses to place items.
+pub trait Digest {
+    /// Name reported for this digest (`crush_hash_name`).
+    const NAME: &'static str;
+
+    fn hash1(a: u32) -> u32;
+    fn hash2(a: u32, b: u32) -> u32;
+    fn hash3(a: u32, b: u32, c: u32) -> u32;
+    fn hash4(a: u32, b: u32, c: u32, d: u32) -> u32;
+    fn hash5(a: u32, b: u32, c: u32, d: u32, e: u32) -> u32;
+}
+
+/// Robert Jenkins' hash (`CRUSH_HASH_RJENKINS1`).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct RJenkins1;
+
+impl Digest for RJenkins1 {
+    const NAME: &'static str = "rjenkins1";
+
+    fn hash1(a: u32) -> u32 {
+        rjenkins1(a)
+    }
+    fn hash2(a: u32, b: u32) -> u32 {
+        rjenkins1_2(a, b)
+    }
+    fn hash3(a: u32, b: u32, c: u32) -> u32 {
+        rjenkins1_3(a, b, c)
+    }
+    fn hash4(a: u32, b: u32, c: u32, d: u32) -> u32 {
+        rjenkins1_4(a, b, c, d)
+    }
+    fn hash5(a: u32, b: u32, c: u32, d: u32, e: u32) -> u32 {
+        rjenkins1_5(a, b, c, d, e)
+    }
+}
+
+// Runtime-dispatched entry points used by the mapper until it is made generic
+// over `Digest`. Unknown hash types yield 0, as in the C implementation.
+
 pub fn crush_hash32(ty: i32, a: u32) -> u32 {
     if ty == HASH_RJENKINS1 {
-        rjenkins1(a)
+        RJenkins1::hash1(a)
     } else {
         0
     }
@@ -96,7 +134,7 @@ pub fn crush_hash32(ty: i32, a: u32) -> u32 {
 
 pub fn crush_hash32_2(ty: i32, a: u32, b: u32) -> u32 {
     if ty == HASH_RJENKINS1 {
-        rjenkins1_2(a, b)
+        RJenkins1::hash2(a, b)
     } else {
         0
     }
@@ -104,7 +142,7 @@ pub fn crush_hash32_2(ty: i32, a: u32, b: u32) -> u32 {
 
 pub fn crush_hash32_3(ty: i32, a: u32, b: u32, c: u32) -> u32 {
     if ty == HASH_RJENKINS1 {
-        rjenkins1_3(a, b, c)
+        RJenkins1::hash3(a, b, c)
     } else {
         0
     }
@@ -112,7 +150,7 @@ pub fn crush_hash32_3(ty: i32, a: u32, b: u32, c: u32) -> u32 {
 
 pub fn crush_hash32_4(ty: i32, a: u32, b: u32, c: u32, d: u32) -> u32 {
     if ty == HASH_RJENKINS1 {
-        rjenkins1_4(a, b, c, d)
+        RJenkins1::hash4(a, b, c, d)
     } else {
         0
     }
@@ -120,7 +158,7 @@ pub fn crush_hash32_4(ty: i32, a: u32, b: u32, c: u32, d: u32) -> u32 {
 
 pub fn crush_hash32_5(ty: i32, a: u32, b: u32, c: u32, d: u32, e: u32) -> u32 {
     if ty == HASH_RJENKINS1 {
-        rjenkins1_5(a, b, c, d, e)
+        RJenkins1::hash5(a, b, c, d, e)
     } else {
         0
     }
@@ -128,7 +166,7 @@ pub fn crush_hash32_5(ty: i32, a: u32, b: u32, c: u32, d: u32, e: u32) -> u32 {
 
 pub fn crush_hash_name(ty: i32) -> &'static str {
     if ty == HASH_RJENKINS1 {
-        "rjenkins1"
+        RJenkins1::NAME
     } else {
         "unknown"
     }
@@ -177,6 +215,29 @@ mod tests {
                         crush_sys::crush_hash32_5(ty, a, b, c, d, e)
                     );
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn digest_trait_matches_c_oracle() {
+        for (i, &a) in samples().iter().enumerate() {
+            let (b, c, d, e) = (a.rotate_left(3), !a, a ^ 0xdead_beef, i as u32);
+            unsafe {
+                assert_eq!(RJenkins1::hash1(a), crush_sys::crush_hash32(0, a));
+                assert_eq!(RJenkins1::hash2(a, b), crush_sys::crush_hash32_2(0, a, b));
+                assert_eq!(
+                    RJenkins1::hash3(a, b, c),
+                    crush_sys::crush_hash32_3(0, a, b, c)
+                );
+                assert_eq!(
+                    RJenkins1::hash4(a, b, c, d),
+                    crush_sys::crush_hash32_4(0, a, b, c, d)
+                );
+                assert_eq!(
+                    RJenkins1::hash5(a, b, c, d, e),
+                    crush_sys::crush_hash32_5(0, a, b, c, d, e)
+                );
             }
         }
     }
