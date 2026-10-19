@@ -73,6 +73,9 @@ fn c_find_roots(m: &Map) -> Result<Vec<i32>, i32> {
 }
 
 fn check(m: &Map) -> Result<Vec<i32>, CrushError> {
+    if m.ptr.is_null() {
+        return Err(CrushError::InvalidArgument);
+    }
     let safe = crush_find_roots_safe(unsafe { &*m.ptr });
     let oracle = unsafe { crush_find_roots_unsafe_oracle(&*m.ptr) };
     assert_eq!(safe, oracle);
@@ -99,19 +102,28 @@ fn matches_oracle_and_c() {
 
     // Nest `second` under `first`, then `third` under `second`.
     unsafe {
+        assert!(!m.ptr.is_null(), "Map pointer must not be null");
+        assert!(!(*m.ptr).buckets.is_null(), "Map buckets pointer must not be null");
         let b = *(*m.ptr).buckets.offset(-1 - first as isize);
+        assert!(!b.is_null(), "Selected bucket pointer must not be null");
         crush_bucket_add_item(m.ptr, b, second, 0x1000);
     }
     assert_eq!(check(&m), Ok(vec![first, third]));
     unsafe {
+        assert!(!m.ptr.is_null(), "Map pointer must not be null");
+        assert!(!(*m.ptr).buckets.is_null(), "Map buckets pointer must not be null");
         let b = *(*m.ptr).buckets.offset(-1 - second as isize);
+        assert!(!b.is_null(), "Selected bucket pointer must not be null");
         crush_bucket_add_item(m.ptr, b, third, 0x1000);
     }
     assert_eq!(check(&m), Ok(vec![first]));
 
     // An item referencing a bucket slot past max_buckets is invalid.
     unsafe {
+        assert!(!m.ptr.is_null(), "Map pointer must not be null");
+        assert!(!(*m.ptr).buckets.is_null(), "Map buckets pointer must not be null");
         let b = *(*m.ptr).buckets.offset(-1 - first as isize);
+        assert!(!b.is_null(), "Selected bucket pointer must not be null");
         crush_bucket_add_item(m.ptr, b, -200, 0x1000);
     }
     assert_eq!(check(&m), Err(CrushError::InvalidArgument));
