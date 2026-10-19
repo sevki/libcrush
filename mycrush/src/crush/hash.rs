@@ -2,8 +2,6 @@
 // The trailing mix of each variant leaves unread values in the mixed inputs,
 // exactly as the C macro does.
 #![allow(unused_assignments)]
-// The full C hash API is kept for parity even where mycrush does not call it.
-#![allow(dead_code)]
 
 const SEED: u32 = 1_315_423_911;
 
@@ -31,6 +29,7 @@ macro_rules! mix {
     };
 }
 
+#[cfg(test)]
 fn rjenkins1(mut a: u32) -> u32 {
     let mut hash = SEED ^ a;
     let (mut b, mut x, mut y) = (a, 231_232, 1_232);
@@ -71,6 +70,7 @@ fn rjenkins1_4(mut a: u32, mut b: u32, mut c: u32, mut d: u32) -> u32 {
     hash
 }
 
+#[cfg(test)]
 fn rjenkins1_5(mut a: u32, mut b: u32, mut c: u32, mut d: u32, mut e: u32) -> u32 {
     let mut hash = SEED ^ a ^ b ^ c ^ d ^ e;
     let (mut x, mut y) = (231_232, 1_232);
@@ -92,12 +92,14 @@ fn rjenkins1_5(mut a: u32, mut b: u32, mut c: u32, mut d: u32, mut e: u32) -> u3
 /// (native-endian `u32`s, as `u32::to_ne_bytes` produces). Any other length
 /// hashes to 0, like an unknown hash type in the C implementation. The 4-byte
 /// output is the hash in little-endian order; see [`RJenkins1::to_u32`].
+#[cfg(test)]
 #[derive(Debug, Clone, Default)]
 pub struct RJenkins1 {
     buf: [u8; Self::MAX_BYTES],
     len: usize,
 }
 
+#[cfg(test)]
 impl RJenkins1 {
     const MAX_BYTES: usize = 20;
     pub const NAME: &'static str = "rjenkins1";
@@ -113,12 +115,15 @@ impl RJenkins1 {
     }
 }
 
+#[cfg(test)]
 impl digest::HashMarker for RJenkins1 {}
 
+#[cfg(test)]
 impl digest::OutputSizeUser for RJenkins1 {
     type OutputSize = digest::consts::U4;
 }
 
+#[cfg(test)]
 impl digest::Update for RJenkins1 {
     fn update(&mut self, data: &[u8]) {
         // Bytes past the buffer are dropped but still counted, so the
@@ -130,12 +135,14 @@ impl digest::Update for RJenkins1 {
     }
 }
 
+#[cfg(test)]
 impl digest::Reset for RJenkins1 {
     fn reset(&mut self) {
         *self = Self::default();
     }
 }
 
+#[cfg(test)]
 impl digest::FixedOutput for RJenkins1 {
     fn finalize_into(self, out: &mut digest::Output<Self>) {
         let w = |i| self.word(i);
@@ -154,6 +161,7 @@ impl digest::FixedOutput for RJenkins1 {
 // Runtime-dispatched entry points used by the mapper until it is made generic
 // over `digest::Digest`. Unknown hash types yield 0, as in the C implementation.
 
+#[cfg(test)]
 pub fn crush_hash32(ty: i32, a: u32) -> u32 {
     if ty == HASH_RJENKINS1 {
         rjenkins1(a)
@@ -186,6 +194,7 @@ pub fn crush_hash32_4(ty: i32, a: u32, b: u32, c: u32, d: u32) -> u32 {
     }
 }
 
+#[cfg(test)]
 pub fn crush_hash32_5(ty: i32, a: u32, b: u32, c: u32, d: u32, e: u32) -> u32 {
     if ty == HASH_RJENKINS1 {
         rjenkins1_5(a, b, c, d, e)
@@ -194,6 +203,7 @@ pub fn crush_hash32_5(ty: i32, a: u32, b: u32, c: u32, d: u32, e: u32) -> u32 {
     }
 }
 
+#[cfg(test)]
 pub fn crush_hash_name(ty: i32) -> &'static str {
     if ty == HASH_RJENKINS1 {
         RJenkins1::NAME
