@@ -151,6 +151,31 @@ impl digest::FixedOutput for RJenkins1 {
     }
 }
 
+/// Hashes `words` with digest `D`, as the CRUSH mapper does for placement.
+///
+/// The words are fed as native-endian bytes and the first four output bytes
+/// are read as a little-endian `u32`.
+fn hash_words<D: digest::Digest>(words: &[u32]) -> u32 {
+    let mut h = D::new();
+    for w in words {
+        h.update(w.to_ne_bytes());
+    }
+    let out = h.finalize();
+    u32::from_le_bytes([out[0], out[1], out[2], out[3]])
+}
+
+pub fn hash32_2<D: digest::Digest>(a: u32, b: u32) -> u32 {
+    hash_words::<D>(&[a, b])
+}
+
+pub fn hash32_3<D: digest::Digest>(a: u32, b: u32, c: u32) -> u32 {
+    hash_words::<D>(&[a, b, c])
+}
+
+pub fn hash32_4<D: digest::Digest>(a: u32, b: u32, c: u32, d: u32) -> u32 {
+    hash_words::<D>(&[a, b, c, d])
+}
+
 // Runtime-dispatched entry points used by the mapper until it is made generic
 // over `digest::Digest`. Unknown hash types yield 0, as in the C implementation.
 

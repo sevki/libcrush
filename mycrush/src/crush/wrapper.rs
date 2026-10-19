@@ -2,6 +2,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::crush::builder::*;
 use crate::crush::crush::*;
+use crate::crush::hash::RJenkins1;
 use crate::crush::mapper::{crush_do_rule, crush_init_workspace};
 use crate::crush::types::*;
 
@@ -244,7 +245,7 @@ impl Map {
 
             let choose_args_ptr = choose_args.map(|ca| ca.ptr).unwrap_or(ptr::null_mut());
 
-            let result_len = crush_do_rule(
+            let result_len = crush_do_rule::<RJenkins1>(
                 self.ptr,
                 ruleno,
                 x,
