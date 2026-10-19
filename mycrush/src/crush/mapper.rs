@@ -8,9 +8,9 @@
     unused_mut
 )]
 
-use crate::crush::types::*;
+use crate::crush::hash::{hash32_2, hash32_3, hash32_4};
 use crate::crush::types::ffi;
-use crate::crush::hash::{crush_hash32_2, crush_hash32_3, crush_hash32_4};
+use crate::crush::types::*;
 use std::ptr::NonNull;
 
 unsafe extern "C" {
@@ -557,7 +557,7 @@ pub unsafe fn crush_find_rule(
         -(1 as ffi::c_int)
     }
 }
-unsafe fn bucket_perm_choose(
+unsafe fn bucket_perm_choose<D: digest::Digest>(
     mut bucket: *const CrushBucket,
     mut work: *mut CrushWorkBucket,
     mut x: ffi::c_int,
@@ -571,12 +571,8 @@ unsafe fn bucket_perm_choose(
         if (*work).perm_x != x as U32 || (*work).perm_n == 0 as ffi::c_int as U32 {
             (*work).perm_x = x as U32;
             if pr == 0 as ffi::c_int as ffi::c_uint {
-                s = crush_hash32_3(
-                    (*bucket).hash as ffi::c_int,
-                    x as U32,
-                    (*bucket).id as U32,
-                    0 as ffi::c_int as U32,
-                ) % (*bucket).size;
+                s = hash32_3::<D>(x as U32, (*bucket).id as U32, 0 as ffi::c_int as U32)
+                    % (*bucket).size;
                 *((*work).perm).offset(0 as ffi::c_int as isize) = s;
                 (*work).perm_n = 0xffff as ffi::c_int as U32;
                 current_block = 3275366147856559585;
@@ -596,8 +592,7 @@ unsafe fn bucket_perm_choose(
                     *((*work).perm).offset(i as isize) = i;
                     i = i.wrapping_add(1);
                 }
-                *((*work).perm)
-                    .offset(*((*work).perm).offset(0 as ffi::c_int as isize) as isize) =
+                *((*work).perm).offset(*((*work).perm).offset(0 as ffi::c_int as isize) as isize) =
                     0 as ffi::c_int as U32;
                 (*work).perm_n = 1 as ffi::c_int as U32;
             }
@@ -611,16 +606,10 @@ unsafe fn bucket_perm_choose(
             while (*work).perm_n <= pr {
                 let mut p: ffi::c_uint = (*work).perm_n;
                 if p < ((*bucket).size).wrapping_sub(1 as ffi::c_int as U32) {
-                    i = (crush_hash32_3(
-                        (*bucket).hash as ffi::c_int,
-                        x as U32,
-                        (*bucket).id as U32,
-                        p,
-                    ))
-                    .wrapping_rem(((*bucket).size).wrapping_sub(p));
+                    i = (hash32_3::<D>(x as U32, (*bucket).id as U32, p))
+                        .wrapping_rem(((*bucket).size).wrapping_sub(p));
                     if i != 0 {
-                        let mut t: ffi::c_uint =
-                            *((*work).perm).offset(p.wrapping_add(i) as isize);
+                        let mut t: ffi::c_uint = *((*work).perm).offset(p.wrapping_add(i) as isize);
                         *((*work).perm).offset(p.wrapping_add(i) as isize) =
                             *((*work).perm).offset(p as isize);
                         *((*work).perm).offset(p as isize) = t;
@@ -637,15 +626,15 @@ unsafe fn bucket_perm_choose(
         *((*bucket).items).offset(s as isize)
     }
 }
-unsafe fn bucket_uniform_choose(
+unsafe fn bucket_uniform_choose<D: digest::Digest>(
     mut bucket: *const CrushBucketUniform,
     mut work: *mut CrushWorkBucket,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
 ) -> ffi::c_int {
-    unsafe { bucket_perm_choose(&(*bucket).h, work, x, r) }
+    unsafe { bucket_perm_choose::<D>(&(*bucket).h, work, x, r) }
 }
-unsafe fn bucket_list_choose(
+unsafe fn bucket_list_choose<D: digest::Digest>(
     mut bucket: *const CrushBucketList,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
@@ -654,8 +643,7 @@ unsafe fn bucket_list_choose(
         let mut i: ffi::c_int = 0;
         i = ((*bucket).h.size).wrapping_sub(1 as ffi::c_int as U32) as ffi::c_int;
         while i >= 0 as ffi::c_int {
-            let mut w: U64 = crush_hash32_4(
-                (*bucket).h.hash as ffi::c_int,
+            let mut w: U64 = hash32_4::<D>(
                 x as U32,
                 *((*bucket).h.items).offset(i as isize) as U32,
                 r as U32,
@@ -694,7 +682,7 @@ fn right(x: ffi::c_int) -> ffi::c_int {
 fn terminal(x: ffi::c_int) -> ffi::c_int {
     x & 1 as ffi::c_int
 }
-unsafe fn bucket_tree_choose(
+unsafe fn bucket_tree_choose<D: digest::Digest>(
     mut bucket: *const CrushBucketTree,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
@@ -707,13 +695,7 @@ unsafe fn bucket_tree_choose(
         while terminal(n) == 0 {
             let mut l: ffi::c_int = 0;
             w = *((*bucket).node_weights).offset(n as isize);
-            t = crush_hash32_4(
-                (*bucket).h.hash as ffi::c_int,
-                x as U32,
-                n as U32,
-                r as U32,
-                (*bucket).h.id as U32,
-            ) as U64
+            t = hash32_4::<D>(x as U32, n as U32, r as U32, (*bucket).h.id as U32) as U64
                 * w as U64;
             t >>= 32 as ffi::c_int;
             l = left(n);
@@ -726,7 +708,7 @@ unsafe fn bucket_tree_choose(
         *((*bucket).h.items).offset((n >> 1 as ffi::c_int) as isize)
     }
 }
-unsafe fn bucket_straw_choose(
+unsafe fn bucket_straw_choose<D: digest::Digest>(
     mut bucket: *const CrushBucketStraw,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
@@ -738,8 +720,7 @@ unsafe fn bucket_straw_choose(
         let mut draw: U64 = 0;
         i = 0 as ffi::c_int as U32;
         while i < (*bucket).h.size {
-            draw = crush_hash32_3(
-                (*bucket).h.hash as ffi::c_int,
+            draw = hash32_3::<D>(
                 x as U32,
                 *((*bucket).h.items).offset(i as isize) as U32,
                 r as U32,
@@ -800,11 +781,11 @@ unsafe fn get_choose_arg_weights(
         let Some(arg_ptr) = arg else {
             return (*bucket).item_weights;
         };
-        
+
         let arg_ref = arg_ptr.as_ref();
         let weight_set = arg_ref.weight_set;
         let weight_set_size = arg_ref.weight_set_size;
-        
+
         if weight_set.is_null() || weight_set_size == 0 as ffi::c_int as U32 {
             return (*bucket).item_weights;
         }
@@ -823,17 +804,17 @@ unsafe fn get_choose_arg_ids(
         let Some(arg_ptr) = arg else {
             return (*bucket).h.items;
         };
-        
+
         let arg_ref = arg_ptr.as_ref();
         let ids = arg_ref.ids;
-        
+
         if ids.is_null() {
             return (*bucket).h.items;
         }
         ids
     }
 }
-unsafe fn bucket_straw2_choose(
+unsafe fn bucket_straw2_choose<D: digest::Digest>(
     mut bucket: *const CrushBucketStraw2,
     mut x: ffi::c_int,
     mut r: ffi::c_int,
@@ -852,12 +833,7 @@ unsafe fn bucket_straw2_choose(
         i = 0 as ffi::c_int as ffi::c_uint;
         while i < (*bucket).h.size {
             if *weights.offset(i as isize) != 0 {
-                u = crush_hash32_3(
-                    (*bucket).h.hash as ffi::c_int,
-                    x as U32,
-                    *ids.offset(i as isize) as U32,
-                    r as U32,
-                );
+                u = hash32_3::<D>(x as U32, *ids.offset(i as isize) as U32, r as U32);
                 u &= 0xffff as ffi::c_int as ffi::c_uint;
                 ln = (crush_ln(u)).wrapping_sub(0x1000000000000 as ffi::c_longlong as U64) as S64;
                 draw = ln / *weights.offset(i as isize) as S64;
@@ -874,7 +850,7 @@ unsafe fn bucket_straw2_choose(
         *((*bucket).h.items).offset(high as isize)
     }
 }
-unsafe fn crush_bucket_choose(
+unsafe fn crush_bucket_choose<D: digest::Digest>(
     mut in_0: *const CrushBucket,
     mut work: *mut CrushWorkBucket,
     mut x: ffi::c_int,
@@ -889,16 +865,16 @@ unsafe fn crush_bucket_choose(
         }
 
         match (*in_0).alg as ffi::c_int {
-            1 => bucket_uniform_choose(in_0 as *const CrushBucketUniform, work, x, r),
-            2 => bucket_list_choose(in_0 as *const CrushBucketList, x, r),
-            3 => bucket_tree_choose(in_0 as *const CrushBucketTree, x, r),
-            4 => bucket_straw_choose(in_0 as *const CrushBucketStraw, x, r),
-            5 => bucket_straw2_choose(in_0 as *const CrushBucketStraw2, x, r, arg, position),
+            1 => bucket_uniform_choose::<D>(in_0 as *const CrushBucketUniform, work, x, r),
+            2 => bucket_list_choose::<D>(in_0 as *const CrushBucketList, x, r),
+            3 => bucket_tree_choose::<D>(in_0 as *const CrushBucketTree, x, r),
+            4 => bucket_straw_choose::<D>(in_0 as *const CrushBucketStraw, x, r),
+            5 => bucket_straw2_choose::<D>(in_0 as *const CrushBucketStraw2, x, r, arg, position),
             _ => *((*in_0).items).offset(0 as ffi::c_int as isize),
         }
     }
 }
-unsafe fn is_out(
+unsafe fn is_out<D: digest::Digest>(
     mut _map: *const CrushMap,
     mut weight: *const U32,
     mut weight_max: ffi::c_int,
@@ -915,7 +891,7 @@ unsafe fn is_out(
         if *weight.offset(item as isize) == 0 as ffi::c_int as U32 {
             return 1 as ffi::c_int;
         }
-        if (crush_hash32_2(0 as ffi::c_int, x as U32, item as U32) & 0xffff as ffi::c_int as U32)
+        if (hash32_2::<D>(x as U32, item as U32) & 0xffff as ffi::c_int as U32)
             < *weight.offset(item as isize)
         {
             return 0 as ffi::c_int;
@@ -924,7 +900,7 @@ unsafe fn is_out(
     }
 }
 #[allow(clippy::too_many_arguments)]
-unsafe fn crush_choose_firstn(
+unsafe fn crush_choose_firstn<D: digest::Digest>(
     mut map: *const CrushMap,
     mut work: *mut CrushWork,
     mut bucket: *const CrushBucket,
@@ -962,11 +938,7 @@ unsafe fn crush_choose_firstn(
         let mut collide: ffi::c_int = 0;
         let mut reject: ffi::c_int = 0;
         let mut count: ffi::c_int = out_size;
-        rep = if stable != 0 {
-            0 as ffi::c_int
-        } else {
-            outpos
-        };
+        rep = if stable != 0 { 0 as ffi::c_int } else { outpos };
         while rep < numrep && count > 0 as ffi::c_int {
             ftotal = 0 as ffi::c_int as ffi::c_uint;
             skip_rep = 0 as ffi::c_int;
@@ -988,7 +960,7 @@ unsafe fn crush_choose_firstn(
                             && flocal >= (*in_0).size >> 1 as ffi::c_int
                             && flocal > local_fallback_retries
                         {
-                            item = bucket_perm_choose(
+                            item = bucket_perm_choose::<D>(
                                 in_0,
                                 *((*work).work).offset((-(1 as ffi::c_int) - (*in_0).id) as isize),
                                 x,
@@ -999,10 +971,11 @@ unsafe fn crush_choose_firstn(
                                 None
                             } else {
                                 NonNull::new(
-                                    choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize) as *mut _
+                                    choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize)
+                                        as *mut _,
                                 )
                             };
-                            item = crush_bucket_choose(
+                            item = crush_bucket_choose::<D>(
                                 in_0,
                                 *((*work).work).offset((-(1 as ffi::c_int) - (*in_0).id) as isize),
                                 x,
@@ -1055,7 +1028,7 @@ unsafe fn crush_choose_firstn(
                                         } else {
                                             sub_r = 0 as ffi::c_int;
                                         }
-                                        if crush_choose_firstn(
+                                        if crush_choose_firstn::<D>(
                                             map,
                                             work,
                                             *((*map).buckets)
@@ -1091,7 +1064,7 @@ unsafe fn crush_choose_firstn(
                                     }
                                 }
                                 if reject == 0 && collide == 0 && itemtype == 0 as ffi::c_int {
-                                    reject = is_out(map, weight, weight_max, item, x);
+                                    reject = is_out::<D>(map, weight, weight_max, item, x);
                                 }
                                 current_block_55 = 5532067231413442433;
                             }
@@ -1138,7 +1111,7 @@ unsafe fn crush_choose_firstn(
     }
 }
 #[allow(clippy::too_many_arguments)]
-unsafe fn crush_choose_indep(
+unsafe fn crush_choose_indep<D: digest::Digest>(
     mut map: *const CrushMap,
     mut work: *mut CrushWork,
     mut bucket: *const CrushBucket,
@@ -1201,10 +1174,11 @@ unsafe fn crush_choose_indep(
                             None
                         } else {
                             NonNull::new(
-                                choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize) as *mut _
+                                choose_args.offset((-(1 as ffi::c_int) - (*in_0).id) as isize)
+                                    as *mut _,
                             )
                         };
-                        item = crush_bucket_choose(
+                        item = crush_bucket_choose::<D>(
                             in_0,
                             *((*work).work).offset((-(1 as ffi::c_int) - (*in_0).id) as isize),
                             x,
@@ -1257,7 +1231,7 @@ unsafe fn crush_choose_indep(
                                 }
                                 if recurse_to_leaf != 0 {
                                     if item < 0 as ffi::c_int {
-                                        crush_choose_indep(
+                                        crush_choose_indep::<D>(
                                             map,
                                             work,
                                             *((*map).buckets)
@@ -1285,7 +1259,7 @@ unsafe fn crush_choose_indep(
                                     }
                                 }
                                 if itemtype == 0 as ffi::c_int
-                                    && is_out(map, weight, weight_max, item, x) != 0
+                                    && is_out::<D>(map, weight, weight_max, item, x) != 0
                                 {
                                     break;
                                 }
@@ -1320,7 +1294,7 @@ pub unsafe fn crush_init_workspace(m: *const CrushMap, v: *mut ffi::c_void) {
     unsafe {
         let w: *mut CrushWork = v as *mut CrushWork;
         let mut point: *mut ffi::c_char = v as *mut ffi::c_char;
-        
+
         point = point.offset(::core::mem::size_of::<CrushWork>() as ffi::c_ulong as isize);
         (*w).work = point as *mut *mut CrushWorkBucket;
         point = point.offset(
@@ -1328,7 +1302,7 @@ pub unsafe fn crush_init_workspace(m: *const CrushMap, v: *mut ffi::c_void) {
                 .wrapping_mul(::core::mem::size_of::<*mut CrushWorkBucket>() as ffi::c_ulong)
                 as isize,
         );
-        
+
         for b in 0..(*m).max_buckets {
             if !(*((*m).buckets).offset(b as isize)).is_null() {
                 let fresh2 = &mut (*((*w).work).offset(b as isize));
@@ -1348,7 +1322,7 @@ pub unsafe fn crush_init_workspace(m: *const CrushMap, v: *mut ffi::c_void) {
                 );
             }
         }
-        
+
         if point.offset_from(w as *mut ffi::c_char) as ffi::c_long as SizeT == (*m).working_size {
         } else {
             panic!("Assertion failed: !((char *)point - (char *)w != m->working_size)");
@@ -1356,7 +1330,7 @@ pub unsafe fn crush_init_workspace(m: *const CrushMap, v: *mut ffi::c_void) {
     }
 }
 #[allow(clippy::too_many_arguments)]
-pub unsafe fn crush_do_rule(
+pub unsafe fn crush_do_rule<D: digest::Digest>(
     mut map: *const CrushMap,
     mut ruleno: ffi::c_int,
     mut x: ffi::c_int,
@@ -1510,7 +1484,7 @@ pub unsafe fn crush_do_rule(
                                 } else {
                                     recurse_tries = choose_tries;
                                 }
-                                osize += crush_choose_firstn(
+                                osize += crush_choose_firstn::<D>(
                                     map,
                                     cw,
                                     *((*map).buckets).offset(bno as isize),
@@ -1539,7 +1513,7 @@ pub unsafe fn crush_do_rule(
                                 } else {
                                     result_max - osize
                                 };
-                                crush_choose_indep(
+                                crush_choose_indep::<D>(
                                     map,
                                     cw,
                                     *((*map).buckets).offset(bno as isize),
