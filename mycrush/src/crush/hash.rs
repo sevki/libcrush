@@ -6,6 +6,7 @@
 const SEED: u32 = 1_315_423_911;
 
 /// Hash function selector (`CRUSH_HASH_*`).
+#[cfg(test)]
 const HASH_RJENKINS1: i32 = 0;
 
 /// One round of Jenkins' reversible mix.
@@ -29,7 +30,6 @@ macro_rules! mix {
     };
 }
 
-#[cfg(test)]
 fn rjenkins1(mut a: u32) -> u32 {
     let mut hash = SEED ^ a;
     let (mut b, mut x, mut y) = (a, 231_232, 1_232);
@@ -70,7 +70,6 @@ fn rjenkins1_4(mut a: u32, mut b: u32, mut c: u32, mut d: u32) -> u32 {
     hash
 }
 
-#[cfg(test)]
 fn rjenkins1_5(mut a: u32, mut b: u32, mut c: u32, mut d: u32, mut e: u32) -> u32 {
     let mut hash = SEED ^ a ^ b ^ c ^ d ^ e;
     let (mut x, mut y) = (231_232, 1_232);
@@ -92,16 +91,15 @@ fn rjenkins1_5(mut a: u32, mut b: u32, mut c: u32, mut d: u32, mut e: u32) -> u3
 /// (native-endian `u32`s, as `u32::to_ne_bytes` produces). Any other length
 /// hashes to 0, like an unknown hash type in the C implementation. The 4-byte
 /// output is the hash in little-endian order; see [`RJenkins1::to_u32`].
-#[cfg(test)]
 #[derive(Debug, Clone, Default)]
 pub struct RJenkins1 {
     buf: [u8; Self::MAX_BYTES],
     len: usize,
 }
 
-#[cfg(test)]
 impl RJenkins1 {
     const MAX_BYTES: usize = 20;
+    #[cfg(test)]
     pub const NAME: &'static str = "rjenkins1";
 
     /// Converts a digest output back into the `u32` hash value.
@@ -115,15 +113,12 @@ impl RJenkins1 {
     }
 }
 
-#[cfg(test)]
 impl digest::HashMarker for RJenkins1 {}
 
-#[cfg(test)]
 impl digest::OutputSizeUser for RJenkins1 {
     type OutputSize = digest::consts::U4;
 }
 
-#[cfg(test)]
 impl digest::Update for RJenkins1 {
     fn update(&mut self, data: &[u8]) {
         // Bytes past the buffer are dropped but still counted, so the
@@ -135,14 +130,12 @@ impl digest::Update for RJenkins1 {
     }
 }
 
-#[cfg(test)]
 impl digest::Reset for RJenkins1 {
     fn reset(&mut self) {
         *self = Self::default();
     }
 }
 
-#[cfg(test)]
 impl digest::FixedOutput for RJenkins1 {
     fn finalize_into(self, out: &mut digest::Output<Self>) {
         let w = |i| self.word(i);
@@ -195,6 +188,7 @@ pub fn crush_hash32(ty: i32, a: u32) -> u32 {
     }
 }
 
+#[cfg(test)]
 pub fn crush_hash32_2(ty: i32, a: u32, b: u32) -> u32 {
     if ty == HASH_RJENKINS1 {
         rjenkins1_2(a, b)
@@ -203,6 +197,7 @@ pub fn crush_hash32_2(ty: i32, a: u32, b: u32) -> u32 {
     }
 }
 
+#[cfg(test)]
 pub fn crush_hash32_3(ty: i32, a: u32, b: u32, c: u32) -> u32 {
     if ty == HASH_RJENKINS1 {
         rjenkins1_3(a, b, c)
@@ -211,6 +206,7 @@ pub fn crush_hash32_3(ty: i32, a: u32, b: u32, c: u32) -> u32 {
     }
 }
 
+#[cfg(test)]
 pub fn crush_hash32_4(ty: i32, a: u32, b: u32, c: u32, d: u32) -> u32 {
     if ty == HASH_RJENKINS1 {
         rjenkins1_4(a, b, c, d)
