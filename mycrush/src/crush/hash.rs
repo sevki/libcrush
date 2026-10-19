@@ -753,3 +753,55 @@ pub fn crush_hash_name(type_0: ffi::c_int) -> *const ffi::c_char {
         _ => b"unknown\0" as *const u8 as *const ffi::c_char,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Deterministic spread of inputs, including edge values.
+    fn samples() -> Vec<u32> {
+        let mut v = vec![0, 1, 2, 0xff, 0xffff, 0x7fff_ffff, 0x8000_0000, u32::MAX];
+        let mut x = 0x1234_5678u32;
+        for _ in 0..200 {
+            x = x.wrapping_mul(1664525).wrapping_add(1013904223);
+            v.push(x);
+        }
+        v
+    }
+
+    #[test]
+    fn matches_c_oracle() {
+        let s = samples();
+        for (i, &a) in s.iter().enumerate() {
+            let b = s[(i * 7 + 1) % s.len()];
+            let c = s[(i * 13 + 2) % s.len()];
+            let d = s[(i * 17 + 3) % s.len()];
+            let e = s[(i * 19 + 4) % s.len()];
+            for ty in [0, 1, -1] {
+                unsafe {
+                    assert_eq!(crush_hash32(ty, a), crush_sys::crush_hash32(ty, a));
+                    assert_eq!(crush_hash32_2(ty, a, b), crush_sys::crush_hash32_2(ty, a, b));
+                    assert_eq!(
+                        crush_hash32_3(ty, a, b, c),
+                        crush_sys::crush_hash32_3(ty, a, b, c)
+                    );
+                    assert_eq!(
+                        crush_hash32_4(ty, a, b, c, d),
+                        crush_sys::crush_hash32_4(ty, a, b, c, d)
+                    );
+                    assert_eq!(
+                        crush_hash32_5(ty, a, b, c, d, e),
+                        crush_sys::crush_hash32_5(ty, a, b, c, d, e)
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn hash_names() {
+        let name = |t| unsafe { core::ffi::CStr::from_ptr(crush_hash_name(t)) };
+        assert_eq!(name(0).to_str(), Ok("rjenkins1"));
+        assert_eq!(name(1).to_str(), Ok("unknown"));
+    }
+}
