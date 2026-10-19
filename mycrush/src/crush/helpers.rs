@@ -1,4 +1,5 @@
 use crate::crush::types::*;
+use std::ptr::NonNull;
 use std::slice;
 
 /// Views a C array as a slice, treating a null pointer as empty.
@@ -6,11 +7,10 @@ use std::slice;
 /// # Safety
 /// A non-null `ptr` must point to `len` initialized, live elements.
 unsafe fn c_slice<'a, T>(ptr: *const T, len: usize) -> &'a [T] {
-    if ptr.is_null() {
-        &[]
-    } else {
+    match NonNull::new(ptr.cast_mut()) {
         // Safety: guaranteed by the caller.
-        unsafe { slice::from_raw_parts(ptr, len) }
+        Some(ptr) => unsafe { slice::from_raw_parts(ptr.as_ptr(), len) },
+        None => &[],
     }
 }
 
@@ -21,8 +21,10 @@ pub fn crush_find_roots_safe(map: &CrushMap) -> Result<Vec<i32>, CrushError> {
     // Safety: a CrushMap's `buckets` array holds `max_buckets` bucket pointers,
     // each null or pointing to a live bucket whose `items` holds `size` ids.
     let buckets = unsafe { c_slice(map.buckets, max_buckets) };
-    let buckets: Vec<Option<&CrushBucket>> =
-        buckets.iter().map(|&b| unsafe { b.as_ref() }).collect();
+    let buckets: Vec<Option<&CrushBucket>> = buckets
+        .iter()
+        .map(|&b| NonNull::new(b).map(|b| unsafe { b.as_ref() }))
+        .collect();
 
     let mut referenced = vec![false; max_buckets];
     for b in buckets.iter().flatten() {
